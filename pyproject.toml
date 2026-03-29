@@ -62,7 +62,7 @@ dependencies = [
     "numpy>=1.24",
     # LLM backends 
     "langchain-anthropic>=0.3", 
-    "anthropic>=0.30"
+    "anthropic>=0.30",
     "langchain-openai>=0.2", 
     "openai>=1.30",
     # STT (voice input)
