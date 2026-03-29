@@ -1,4 +1,4 @@
-# audia — turn your ideas into audio
+# <img src="https://api.iconify.design/streamline-freehand:help-headphones-customer-support-human.svg" width="24" height="24"> audia — turn your ideas into audio
 
 <div align="center">
 

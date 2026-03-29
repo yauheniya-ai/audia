@@ -2,6 +2,12 @@
 
 ## Version 0.1.1 (2026-03-29)
 
+`listen` command pipeline overhaul
+
+- **LLM query distillation**: raw transcribed speech is now passed through the configured LLM to extract a concise ArXiv search query (e.g. _"I would like to research agentic AI"_ → _"agentic AI research"_)
+- `distill_search_query()` moved to `audia.agents.stt` (proper agent layer, not CLI)
+- **Confirmation loop before searching**: after distillation the user sees the extracted query and can confirm (`y`), re-record (`r`), or quit (`q`) — prevents accidental searches from mis-transcriptions
+- `typer.confirm()` replaced with explicit `typer.prompt()` to support the three-way choice
 
 ## Version 0.1.0 (2026-03-29)
 

@@ -320,13 +320,14 @@ class TestListenCommand:
         monkeypatch.setenv("AUDIA_LLM_PROVIDER", "openai")
 
         with patch("audia.agents.stt.record_and_transcribe", return_value="neural nets"), \
+             patch("audia.agents.stt.distill_search_query", return_value="neural networks"), \
              patch("audia.agents.research.ArxivSearcher") as mock_cls, \
              patch("audia.storage.database.init_db"):
             mock_cls.return_value.search.return_value = []
-            result = runner.invoke(app, ["listen"])
+            result = runner.invoke(app, ["listen"], input="y\n")
 
         assert result.exit_code == 0
-        assert "neural nets" in result.output or "Heard" in result.output
+        assert "Heard" in result.output
 
 
 class TestResearchCommandEdgeCases:

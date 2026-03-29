@@ -87,6 +87,35 @@ def _transcribe_array(
         Path(tmp_path).unlink(missing_ok=True)
 
 
+def distill_search_query(speech: str) -> str:
+    """
+    Use the configured LLM to extract a concise ArXiv search query from raw speech.
+
+    Example
+    -------
+    >>> distill_search_query("I would like to research about agentic AI.")
+    'agentic AI research'
+    """
+    from audia.config import get_settings
+    from audia.agents.text_cleaner import _build_llm
+    from langchain_core.messages import HumanMessage, SystemMessage  # type: ignore
+
+    cfg = get_settings()
+    llm = _build_llm(cfg)
+    messages = [
+        SystemMessage(
+            content=(
+                "You extract a short, precise academic search query from spoken input. "
+                "Return ONLY the query – no explanation, no punctuation at the end. "
+                "3–6 words maximum, suitable for searching ArXiv."
+            )
+        ),
+        HumanMessage(content=speech),
+    ]
+    result = llm.invoke(messages)
+    return result.content.strip().strip(".")
+
+
 def _ensure_stt_deps() -> None:
     missing = []
     try:

@@ -270,13 +270,32 @@ def listen(
     """
     [bold green]Record a voice query, search ArXiv, and convert to audio.[/bold green]
 
-    Requires: pip install audia[stt]
+    Pipeline: record → transcribe → LLM extracts search query → confirm → research
     """
-    from audia.agents.stt import record_and_transcribe
+    from audia.agents.stt import record_and_transcribe, distill_search_query
 
-    rprint("[cyan]Listening…[/cyan] Speak your research topic.")
-    query = record_and_transcribe(seconds=seconds)
-    rprint(f"[green]Heard:[/green] {query}")
+    while True:
+        rprint("[cyan]Listening…[/cyan] Speak your research topic.")
+        speech = record_and_transcribe(seconds=seconds)
+        rprint(f"[green]Heard:[/green] {speech}")
+
+        rprint("[dim]Distilling search query…[/dim]")
+        query = distill_search_query(speech)
+        rprint(f"[bold cyan]Search query:[/bold cyan] {query}")
+
+        choice = typer.prompt(
+            "Search ArXiv with this query? [y=yes / r=re-record / q=quit]",
+            default="y",
+        ).strip().lower()
+
+        if choice in ("y", "yes", ""):
+            break
+        elif choice in ("r", "re", "retry"):
+            rprint("[yellow]OK, let's try again.[/yellow]")
+            continue
+        else:
+            rprint("[yellow]Cancelled.[/yellow]")
+            raise typer.Exit()
 
     # Run research with auto-convert
     research(
