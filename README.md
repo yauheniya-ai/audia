@@ -33,7 +33,7 @@ It uses an LLM to rewrite content into natural spoken language (math in plain En
 - <img src="https://api.iconify.design/simple-icons:langgraph.svg" width="16" height="16"> [LangGraph](https://github.com/langchain-ai/langgraph) — agentic pipeline orchestration (PDF → preprocess → LLM curate → TTS)
 - <img src="https://api.iconify.design/simple-icons:langchain.svg" width="16" height="16"> [LangChain](https://github.com/langchain-ai/langchain) — LLM abstraction (OpenAI / Anthropic)
 - <img src="https://api.iconify.design/logos:microsoft-icon.svg" width="16" height="16"> [edge-tts](https://github.com/rany2/edge-tts) — default TTS backend, no API key required
-- <img src="https://upload.wikimedia.org/wikipedia/commons/d/da/SYSTRAN_logo.svg" width="50" height="16"> [faster-whisper](https://github.com/SYSTRAN/faster-whisper) — STT for voice input
+- <img src="https://upload.wikimedia.org/wikipedia/commons/d/da/SYSTRAN_logo.svg" width="48" height="16"> [faster-whisper](https://github.com/SYSTRAN/faster-whisper) — STT for voice input
 - <img src="https://pymupdf.readthedocs.io/en/latest/_static/sidebar-logo-dark.svg" width="16" height="16"> [PyMuPDF](https://pymupdf.readthedocs.io/) — PDF text extraction
 - <img src="https://api.iconify.design/devicon:sqlite.svg" width="16" height="16"> [SQLite](https://sqlite.org/docs.html) — local database for papers and audio files
 
@@ -151,3 +151,15 @@ Output files for a run on `2025_Xu+.pdf`:
     2_preprocessed.txt   ← after heuristic pass
     3_curated.txt        ← after LLM curation
 ```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/my-change`)
+3. Make your changes
+4. Run the test suite: `pytest --cov=src --cov-report=term-missing`
+5. Submit a pull request
+
+## License
+
+MIT — see [LICENSE](https://raw.githubusercontent.com/yauheniya-ai/audia/main/LICENSE) for details.

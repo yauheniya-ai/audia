@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## Version 0.1.1 (2026-03-29)
+
+
 ## Version 0.1.0 (2026-03-29)
 
 First fully working release: PDF to audio via mandatory LLM curation and edge-tts synthesis.
