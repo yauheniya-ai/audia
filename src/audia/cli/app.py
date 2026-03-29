@@ -348,7 +348,7 @@ def serve(
     host: str = typer.Option(None, "--host", "-h", help="Server host."),
     port: int = typer.Option(None, "--port", "-p", help="Server port."),
     reload: bool = typer.Option(False, "--reload", help="Enable auto-reload (dev)."),
-    open_browser: bool = typer.Option(True, "--open/--no-open", help="Open browser."),
+    open_browser: bool = typer.Option(True, "--browser/--no-browser", help="Open browser."),
 ) -> None:
     """
     [bold green]Start the audia web UI.[/bold green]

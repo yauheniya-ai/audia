@@ -5,7 +5,9 @@ Core pipeline: PDF → text extraction → agentic cleaning → TTS → audio fi
 Optional: ArXiv research → select paper → pipeline above.
 """
 
-__version__ = "0.1.0"
+from importlib.metadata import version
+
+__version__ = version("audia")
 __author__ = "Yauheniya Varabyova"
 
 from audia.config import Settings, get_settings  # noqa: F401
