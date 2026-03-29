@@ -9,7 +9,7 @@
 
 </div>
 
-**audia** converts PDFs — academic papers, reports, regulations — into podcast-style audio files.
+**audia** is an agentic Python package that converts PDFs — academic papers, reports, regulations — into podcast-style audio files.
 It uses an LLM to rewrite content into natural spoken language (math in plain English, tables as sentences, no citations) before passing it to a TTS engine, so the result actually sounds good when read aloud.
 
 ## Features
@@ -33,8 +33,8 @@ It uses an LLM to rewrite content into natural spoken language (math in plain En
 - <img src="https://api.iconify.design/simple-icons:langgraph.svg" width="16" height="16"> [LangGraph](https://github.com/langchain-ai/langgraph) — agentic pipeline orchestration (PDF → preprocess → LLM curate → TTS)
 - <img src="https://api.iconify.design/simple-icons:langchain.svg" width="16" height="16"> [LangChain](https://github.com/langchain-ai/langchain) — LLM abstraction (OpenAI / Anthropic)
 - <img src="https://api.iconify.design/logos:microsoft-icon.svg" width="16" height="16"> [edge-tts](https://github.com/rany2/edge-tts) — default TTS backend, no API key required
-- <img src="https://upload.wikimedia.org/wikipedia/commons/d/da/SYSTRAN_logo.svg" height="16"> [faster-whisper](https://github.com/SYSTRAN/faster-whisper) — STT for voice input
-- <img src="https://pymupdf.readthedocs.io/en/latest/_static/sidebar-logo-dark.svg" height="16"> [PyMuPDF](https://pymupdf.readthedocs.io/) — PDF text extraction
+- <img src="https://upload.wikimedia.org/wikipedia/commons/d/da/SYSTRAN_logo.svg" width="64" height="16"> [faster-whisper](https://github.com/SYSTRAN/faster-whisper) — STT for voice input
+- <img src="https://pymupdf.readthedocs.io/en/latest/_static/sidebar-logo-dark.svg" width="16" height="16"> [PyMuPDF](https://pymupdf.readthedocs.io/) — PDF text extraction
 - <img src="https://api.iconify.design/devicon:sqlite.svg" width="16" height="16"> [SQLite](https://sqlite.org/docs.html) — local database for papers and audio files
 
 **Frontend**
