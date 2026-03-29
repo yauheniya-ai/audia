@@ -6,7 +6,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 [![PyPI version](https://img.shields.io/pypi/v/audia?color=blue&label=PyPI)](https://pypi.org/project/audia/)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/audia)](https://pypistats.org/packages/audia)
-
+[![Tests](https://github.com/yauheniya-ai/audia/actions/workflows/tests.yml/badge.svg)](https://github.com/yauheniya-ai/audia/actions/workflows/tests.yml)
+[![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/yauheniya-ai/88593f7c590674e0f8c99c66c7b58b36/raw/coverage.json)](https://github.com/yauheniya-ai/audia/actions/workflows/tests.yml)
+[![GitHub last commit](https://img.shields.io/github/last-commit/yauheniya-ai/audia)](https://github.com/yauheniya-ai/audia/commits/main)
 </div>
 
 **audia** is an agentic Python package that converts PDFs — academic papers, reports, regulations — into podcast-style audio files.
