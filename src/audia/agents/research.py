@@ -7,6 +7,7 @@ Fallback: HTML scrape of arxiv.org/search (used when the API returns 429).
 
 from __future__ import annotations
 
+import calendar
 import html as _html
 import re
 import shutil
@@ -90,7 +91,7 @@ class ArxivSearcher:
         req = urllib.request.Request(
             url, headers={"User-Agent": "audia/0.1 (research fallback)"}
         )
-        with urllib.request.urlopen(req, timeout=20) as resp:
+        with urllib.request.urlopen(req, timeout=40) as resp:
             body = resp.read().decode("utf-8", errors="replace")
 
         papers: list[ArxivPaper] = []
@@ -111,8 +112,12 @@ class ArxivSearcher:
                 raw_authors = re.sub(r'<[^>]+>', '', authors_m.group(1))
                 authors = [a.strip() for a in raw_authors.split(',') if a.strip()]
 
-            date_m = re.search(r'Submitted\s+([\d]+\s+\w+,\s+\d{4})', block)
-            published = date_m.group(1) if date_m else ""
+            date_m = re.match(r'(\d{2})(\d{2})\.', arxiv_id)
+            if date_m:
+                yy, mm = int(date_m.group(1)), int(date_m.group(2))
+                published = f"{calendar.month_abbr[mm]} {2000 + yy}"
+            else:
+                published = ""
 
             abstract_m = re.search(
                 r'<span class="abstract-[^"]*">(.*?)</span>', block, re.DOTALL
@@ -139,14 +144,11 @@ class ArxivSearcher:
 
     def download_pdf(self, paper: ArxivPaper, dest_dir: str | Path | None = None) -> Path:
         """
-        Download the PDF for *paper* and return the local file path.
+        Download the PDF for *paper* directly from arxiv.org/pdf/<id>.
+
+        Bypasses the arxiv SDK export API entirely to avoid HTTP 429 rate-limits.
         Skips the download if the file already exists.
         """
-        try:
-            import arxiv  # type: ignore
-        except ImportError as e:
-            raise ImportError("arxiv package required: pip install arxiv") from e
-
         cfg = get_settings()
         dest = Path(dest_dir) if dest_dir else cfg.upload_dir
         dest.mkdir(parents=True, exist_ok=True)
@@ -158,11 +160,16 @@ class ArxivSearcher:
             paper.local_pdf_path = str(target)
             return target
 
-        # Use the arxiv SDK's built-in downloader
-        client = arxiv.Client()
-        search = arxiv.Search(id_list=[paper.arxiv_id])
-        result = next(client.results(search))
-        result.download_pdf(dirpath=str(dest), filename=filename)
+        pdf_url = f"https://arxiv.org/pdf/{paper.arxiv_id}"
+        req = urllib.request.Request(
+            pdf_url,
+            headers={
+                "User-Agent": "audia/0.1 (PDF download)",
+                "Accept": "application/pdf,*/*",
+            },
+        )
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            target.write_bytes(resp.read())
 
         paper.local_pdf_path = str(target)
         return target

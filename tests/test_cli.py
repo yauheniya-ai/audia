@@ -394,7 +394,8 @@ class TestResearchCommandEdgeCases:
              patch("audia.storage.database.init_db"):
             mock_cls.return_value.search.return_value = [paper]
             mock_cls.return_value.download_pdf.side_effect = IOError("network down")
-            result = runner.invoke(app, ["research", "neural nets", "--convert"])
+            result = runner.invoke(app, ["research", "neural nets", "--convert"],
+                                   input="\n")  # skip manual-path prompt
 
         assert result.exit_code == 0
         assert "Download failed" in result.output

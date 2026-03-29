@@ -199,7 +199,7 @@ def research(
     table.add_column("Title", style="bold", max_width=50)
     table.add_column("Authors", max_width=28)
     table.add_column("Date", width=12)
-    table.add_column("Link", style="cyan", max_width=40)
+    table.add_column("Link", style="cyan", no_wrap=True)
 
     for i, p in enumerate(papers, 1):
         authors_str = ", ".join(p.authors[:2])
@@ -212,7 +212,7 @@ def research(
 
     if not auto_convert:
         raw = typer.prompt(
-            "Enter paper numbers to convert (comma-separated, or 'all', or 'q' to quit)",
+            "Enter the # of study to convert to audio (comma-separated, or 'all', or 'q' to quit)",
             default="q",
         )
         if raw.strip().lower() in ("q", ""):
@@ -234,11 +234,26 @@ def research(
 
     for paper in selected:
         rprint(f"\n[cyan]Downloading[/cyan] {paper.title[:60]}…")
+        abs_url = f"https://arxiv.org/abs/{paper.arxiv_id}"
+        pdf_path: Optional[Path] = None
         try:
             pdf_path = searcher.download_pdf(paper)
         except Exception as exc:
-            rprint(f"[red]Download failed:[/red] {exc}")
-            continue
+            short = str(exc).splitlines()[0][:120]
+            rprint(f"[red]Download failed:[/red] {short}")
+            rprint(
+                f"[yellow]Please download the PDF manually:[/yellow] {abs_url}\n"
+                "then enter the local path below (or press Enter to skip)."
+            )
+            manual = typer.prompt("Local PDF path", default="").strip()
+            if manual:
+                manual_path = Path(manual).expanduser()
+                if manual_path.is_file():
+                    pdf_path = manual_path
+                else:
+                    rprint(f"[red]File not found:[/red] {manual_path}")
+            if pdf_path is None:
+                continue
 
         rprint(f"[cyan]Converting[/cyan] {paper.title[:60]}…")
         state = run_pipeline(pdf_path, output_dir=output_dir)

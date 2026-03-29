@@ -1,8 +1,25 @@
 # CHANGELOG
 
+## Version 0.1.2 (2026-03-29)
+
+### ArXiv search robustness & CLI improvements
+
+#### ArXiv search
+- **HTTP fallback**: when the ArXiv export API returns HTTP 429, the search automatically retries via HTML scraping of `arxiv.org/search` — no user action required; a short one-line warning is shown instead of a full traceback
+- **Date from arxiv ID**: publication date is now derived from the paper ID (`YYMM` prefix, e.g. `2603` → `Mar 2026`) instead of unreliable HTML scraping
+
+#### PDF download
+- **SDK-free download**: PDFs are now fetched directly from `https://arxiv.org/pdf/<id>` via `urllib`, bypassing the export API entirely and eliminating 429 rate-limit failures on download
+- **Manual fallback prompt**: if a download still fails, the user is shown the `arxiv.org/abs/` link and prompted to provide a local PDF path to continue conversion
+
+#### CLI output
+- **Results table**: added a **Link** column (`https://arxiv.org/abs/<id>`) with `no_wrap=True` — URLs are never truncated so they remain clickable
+- **ASCII banner**: running `audia` with no arguments now displays a block-art banner before the help text
+- **Paper selection always prompted**: `audia listen` and `audia research` both show the results table and ask the user to pick papers; `--convert` flag still skips the prompt for power users
+
 ## Version 0.1.1 (2026-03-29)
 
-`listen` command pipeline overhaul
+### `listen` command pipeline overhaul
 
 - **LLM query distillation**: raw transcribed speech is now passed through the configured LLM to extract a concise ArXiv search query (e.g. _"I would like to research agentic AI"_ → _"agentic AI research"_)
 - `distill_search_query()` moved to `audia.agents.stt` (proper agent layer, not CLI)
@@ -11,7 +28,7 @@
 
 ## Version 0.1.0 (2026-03-29)
 
-First fully working release: PDF to audio via mandatory LLM curation and edge-tts synthesis.
+### First fully working release: PDF to audio via mandatory LLM curation and edge-tts synthesis.
 
 - Linear LangGraph pipeline: PDF extraction → heuristic clean → LLM curation → TTS synthesis
 - LLM curation is mandatory; supports OpenAI and Anthropic backends via `AUDIA_LLM_PROVIDER`

@@ -151,7 +151,7 @@ class TestArxivSearcherDownload:
         assert result == existing
         assert paper.local_pdf_path == str(existing)
 
-    def test_download_calls_arxiv_sdk(self, tmp_path, tmp_settings):
+    def test_download_fetches_via_urllib(self, tmp_path, tmp_settings):
         from audia.agents.research import ArxivPaper, ArxivSearcher
 
         paper = ArxivPaper(
@@ -159,28 +159,28 @@ class TestArxivSearcherDownload:
             title="New",
             authors=[],
             abstract="",
-            pdf_url="https://example.com/pdf",
+            pdf_url="https://arxiv.org/pdf/2301.99999v1",
             published="2023-01-01",
         )
-        mock_result = MagicMock()
-        mock_arxiv = _build_arxiv_mock([mock_result])
 
-        def fake_download_pdf(*, dirpath, filename):
-            (Path(dirpath) / filename).write_bytes(b"%PDF-downloaded")
-
-        mock_result.download_pdf.side_effect = fake_download_pdf
+        fake_response = MagicMock()
+        fake_response.read.return_value = b"%PDF-downloaded"
+        fake_response.__enter__ = lambda s: s
+        fake_response.__exit__ = MagicMock(return_value=False)
 
         with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
-             patch.dict("sys.modules", {"arxiv": mock_arxiv}):
+             patch("audia.agents.research.urllib.request.urlopen", return_value=fake_response) as mock_open:
             searcher = ArxivSearcher()
             result = searcher.download_pdf(paper, dest_dir=tmp_path)
 
         assert result.name == "2301.99999v1.pdf"
+        assert result.read_bytes() == b"%PDF-downloaded"
         assert paper.local_pdf_path == str(result)
-        mock_result.download_pdf.assert_called_once()
+        mock_open.assert_called_once()
 
-    def test_download_raises_import_error(self, tmp_path, tmp_settings):
+    def test_download_raises_on_http_error(self, tmp_path, tmp_settings):
         from audia.agents.research import ArxivPaper, ArxivSearcher
+        import urllib.error
 
         paper = ArxivPaper(
             arxiv_id="2301.00002v1",
@@ -190,17 +190,12 @@ class TestArxivSearcherDownload:
             pdf_url="",
             published="2023-01-01",
         )
-        import builtins
-        real_import = builtins.__import__
 
-        def mock_import(name, *args, **kwargs):
-            if name == "arxiv":
-                raise ImportError("No module named 'arxiv'")
-            return real_import(name, *args, **kwargs)
-
-        with patch("audia.agents.research.get_settings", return_value=tmp_settings):
+        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
+             patch("audia.agents.research.urllib.request.urlopen",
+                   side_effect=urllib.error.HTTPError(
+                       url="", code=429, msg="Too Many Requests", hdrs={}, fp=None
+                   )):
             searcher = ArxivSearcher()
-
-        with patch("builtins.__import__", side_effect=mock_import):
-            with pytest.raises(ImportError):
+            with pytest.raises(urllib.error.HTTPError):
                 searcher.download_pdf(paper, dest_dir=tmp_path)

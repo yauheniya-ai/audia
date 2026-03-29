@@ -1,7 +1,12 @@
 # <img src="https://api.iconify.design/streamline-freehand:help-headphones-customer-support-human.svg" width="24" height="24"> audia — turn your ideas into audio
 
-<div align="center">
+<p align="center">
+  <img src="https://raw.githubusercontent.com/yauheniya-ai/audia/main/docs/images/Screenshot_CLI.png" width="100%" />
+  <em>Using AUDIA in Terminal</em>
+</p>
 
+
+<div align="center">
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 [![PyPI version](https://img.shields.io/pypi/v/audia?color=blue&label=PyPI)](https://pypi.org/project/audia/)
