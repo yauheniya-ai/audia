@@ -28,9 +28,23 @@ app = typer.Typer(
     name="audia",
     help="Turn documents and ideas into audio files.",
     rich_markup_mode="rich",
-    no_args_is_help=True,
+    invoke_without_command=True,
 )
 console = Console()
+
+_ASCII_BANNER = """
+ [bold cyan]▄▄▄▄▄▄▄▄▄▄▄  ▄         ▄  ▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄ 
+▐░░░░░░░░░░░▌▐░▌       ▐░▌▐░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌
+▐░█▀▀▀▀▀▀▀█░▌▐░▌       ▐░▌▐░█▀▀▀▀▀▀▀█░▌▀▀▀▀█░█▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌
+▐░▌       ▐░▌▐░▌       ▐░▌▐░▌       ▐░▌    ▐░▌     ▐░▌       ▐░▌
+▐░█▄▄▄▄▄▄▄█░▌▐░▌       ▐░▌▐░▌       ▐░▌    ▐░▌     ▐░█▄▄▄▄▄▄▄█░▌
+▐░░░░░░░░░░░▌▐░▌       ▐░▌▐░▌       ▐░▌    ▐░▌     ▐░░░░░░░░░░░▌
+▐░█▀▀▀▀▀▀▀█░▌▐░▌       ▐░▌▐░▌       ▐░▌    ▐░▌     ▐░█▀▀▀▀▀▀▀█░▌
+▐░▌       ▐░▌▐░▌       ▐░▌▐░▌       ▐░▌    ▐░▌     ▐░▌       ▐░▌
+▐░▌       ▐░▌▐░█▄▄▄▄▄▄▄█░▌▐░█▄▄▄▄▄▄▄█░▌▄▄▄▄█░█▄▄▄▄ ▐░▌       ▐░▌
+▐░▌       ▐░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░▌       ▐░▌
+ ▀         ▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀         ▀ [/bold cyan]
+"""
 
 
 def _version_callback(value: bool) -> None:
@@ -42,6 +56,7 @@ def _version_callback(value: bool) -> None:
 
 @app.callback()
 def _main(
+    ctx: typer.Context,
     version: Optional[bool] = typer.Option(
         None,
         "--version",
@@ -52,7 +67,10 @@ def _main(
     ),
 ) -> None:
     """audia – Turn documents and ideas into audio files."""
-    pass
+    if ctx.invoked_subcommand is None:
+        rprint(_ASCII_BANNER)
+        rprint(ctx.get_help())
+        raise typer.Exit()
 
 
 # ──────────────────────────────────────────────────────────── convert
@@ -178,15 +196,17 @@ def research(
 
     table = Table(title=f"ArXiv results for: [bold]{query}[/bold]", show_lines=True)
     table.add_column("#", style="dim", width=4)
-    table.add_column("Title", style="bold", max_width=60)
-    table.add_column("Authors", max_width=30)
+    table.add_column("Title", style="bold", max_width=50)
+    table.add_column("Authors", max_width=28)
     table.add_column("Date", width=12)
+    table.add_column("Link", style="cyan", max_width=40)
 
     for i, p in enumerate(papers, 1):
         authors_str = ", ".join(p.authors[:2])
         if len(p.authors) > 2:
             authors_str += " et al."
-        table.add_row(str(i), p.title, authors_str, p.published)
+        abs_url = f"https://arxiv.org/abs/{p.arxiv_id}"
+        table.add_row(str(i), p.title, authors_str, p.published, abs_url)
 
     console.print(table)
 
@@ -297,12 +317,12 @@ def listen(
             rprint("[yellow]Cancelled.[/yellow]")
             raise typer.Exit()
 
-    # Run research with auto-convert
+    # Run research — user always picks which papers to convert
     research(
         query=query,
         max_results=10,
         output_dir=output_dir,
-        auto_convert=True,
+        auto_convert=False,
     )
 
 
