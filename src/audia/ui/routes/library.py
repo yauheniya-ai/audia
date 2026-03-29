@@ -4,8 +4,10 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 
 from audia.storage import get_session, AudioFile, Paper
 from sqlalchemy import select, desc
@@ -74,3 +76,74 @@ async def delete_audio(audio_id: int) -> JSONResponse:
         path.unlink()
 
     return JSONResponse({"status": "deleted", "id": audio_id})
+
+
+@router.get("/papers/{paper_id}", summary="Get a single paper with its audio files")
+async def get_paper(paper_id: int) -> JSONResponse:
+    """Return a single paper record including linked audio files."""
+    with get_session() as session:
+        paper = session.get(Paper, paper_id)
+        if paper is None:
+            raise HTTPException(status_code=404, detail="Paper not found.")
+        return JSONResponse({
+            "id": paper.id,
+            "title": paper.title,
+            "authors": paper.authors_list,
+            "arxiv_id": paper.arxiv_id,
+            "pdf_path": paper.pdf_path,
+            "created_at": paper.created_at.isoformat(),
+            "audio_files": [
+                {
+                    "id": af.id,
+                    "filename": af.filename,
+                    "download_url": f"/api/convert/download/{af.id}",
+                    "tts_backend": af.tts_backend,
+                    "tts_voice": af.tts_voice,
+                    "created_at": af.created_at.isoformat(),
+                }
+                for af in paper.audio_files
+            ],
+        })
+
+
+@router.delete("/papers/{paper_id}", summary="Delete a paper and all its audio files")
+async def delete_paper(paper_id: int) -> JSONResponse:
+    """Remove a paper record, its audio file records, and the files from disk."""
+    with get_session() as session:
+        paper = session.get(Paper, paper_id)
+        if paper is None:
+            raise HTTPException(status_code=404, detail="Paper not found.")
+
+        # Collect paths before deletion
+        audio_paths = [Path(af.file_path) for af in paper.audio_files]
+        pdf_path = Path(paper.pdf_path) if paper.pdf_path else None
+
+        session.delete(paper)
+
+    # Remove files from disk
+    for p in audio_paths:
+        if p.exists():
+            p.unlink()
+    if pdf_path and pdf_path.exists():
+        pdf_path.unlink()
+
+    return JSONResponse({"status": "deleted", "id": paper_id})
+
+
+@router.get("/pdf/{paper_id}", summary="Serve the original PDF for a paper")
+async def serve_pdf(paper_id: int) -> FileResponse:
+    """Stream the original PDF file for in-browser preview."""
+    with get_session() as session:
+        paper = session.get(Paper, paper_id)
+        if paper is None:
+            raise HTTPException(status_code=404, detail="Paper not found.")
+        pdf_path = Path(paper.pdf_path) if paper.pdf_path else None
+
+    if pdf_path is None or not pdf_path.exists():
+        raise HTTPException(status_code=404, detail="PDF file not found on disk.")
+
+    return FileResponse(
+        path=str(pdf_path),
+        media_type="application/pdf",
+        headers={"Content-Disposition": "inline"},
+    )

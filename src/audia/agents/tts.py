@@ -34,6 +34,7 @@ def synthesize(
     output_dir: str | Path | None = None,
     filename: str | None = None,
     settings: Settings | None = None,
+    progress_cb=None,
 ) -> Path:
     """
     Convert *text* to an audio file and return its path.
@@ -53,7 +54,7 @@ def synthesize(
 
     backend = cfg.tts_backend
     if backend == "edge-tts":
-        return _edge_tts(text, out_dir, stem, cfg)
+        return _edge_tts(text, out_dir, stem, cfg, progress_cb)
     elif backend == "kokoro":
         return _kokoro_tts(text, out_dir, stem, cfg)
     elif backend == "openai":
@@ -64,7 +65,7 @@ def synthesize(
 
 # ──────────────────────────────────────────────────────────── edge-tts
 
-def _edge_tts(text: str, out_dir: Path, stem: str, cfg: Settings) -> Path:
+def _edge_tts(text: str, out_dir: Path, stem: str, cfg: Settings, progress_cb=None) -> Path:
     """Use Microsoft Edge TTS (free, no API key). Generates mp3 via network."""
     try:
         import edge_tts  # type: ignore
@@ -73,17 +74,26 @@ def _edge_tts(text: str, out_dir: Path, stem: str, cfg: Settings) -> Path:
 
     chunks = _split(text, cfg.tts_chunk_chars)
     total = len(chunks)
-    console.print(f"  [dim]TTS: {total} chunk(s) to synthesise[/dim]")
+    hdr = f"TTS: {total} chunk(s) to synthesise"
+    console.print(f"  [dim]{hdr}[/dim]")
+    if progress_cb:
+        progress_cb(hdr)
     chunk_paths: list[Path] = []
 
     for i, chunk in enumerate(chunks, 1):
         chunk_path = out_dir / f"{stem}_part{i:03d}.mp3"
-        console.print(f"  [dim]  Synthesising chunk {i}/{total} ({len(chunk):,} chars)…[/dim]")
+        msg_start = f"Synthesising chunk {i}/{total} ({len(chunk):,} chars)\u2026"
+        console.print(f"  [dim]  {msg_start}[/dim]")
+        if progress_cb:
+            progress_cb(msg_start)
         _run_async(
             _edge_speak(chunk, str(chunk_path), cfg.tts_voice, cfg.tts_rate, edge_tts)
         )
         chunk_paths.append(chunk_path)
-        console.print(f"  [dim]  Chunk {i}/{total} done → {chunk_path.name}[/dim]")
+        msg_done = f"Chunk {i}/{total} done \u2192 {chunk_path.name}"
+        console.print(f"  [dim]  {msg_done}[/dim]")
+        if progress_cb:
+            progress_cb(msg_done)
 
     if len(chunk_paths) == 1:
         final_path = out_dir / f"{stem}.mp3"

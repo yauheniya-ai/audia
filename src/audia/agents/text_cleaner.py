@@ -107,10 +107,21 @@ _USER_TEMPLATE_WITH_CONTEXT = (
 )
 
 
-def llm_curate(text: str, settings: Settings | None = None) -> str:
+def llm_curate(
+    text: str,
+    settings: Settings | None = None,
+    progress_cb=None,
+) -> str:
     """
     LLM curation pass – ALWAYS required, always runs.
     Raises RuntimeError on misconfiguration / missing API key.
+
+    Parameters
+    ----------
+    progress_cb : callable(str) | None
+        Optional callback invoked with a plain-text progress line for each
+        chunk so callers (e.g. the web job runner) can surface per-chunk
+        progress without parsing Rich markup.
     """
     cfg = settings or get_settings()
     llm = _build_llm(cfg)
@@ -122,9 +133,10 @@ def llm_curate(text: str, settings: Settings | None = None) -> str:
     prev_tail: str = ""
 
     for i, chunk in enumerate(chunks, 1):
-        console.print(
-            f"  [dim]  LLM curation chunk {i}/{total} ({len(chunk):,} chars)…[/dim]"
-        )
+        msg = f"LLM curation chunk {i}/{total} ({len(chunk):,} chars)\u2026"
+        console.print(f"  [dim]  {msg}[/dim]")
+        if progress_cb:
+            progress_cb(msg)
         if prev_tail:
             user_msg = _USER_TEMPLATE_WITH_CONTEXT.format(tail=prev_tail, chunk=chunk)
         else:

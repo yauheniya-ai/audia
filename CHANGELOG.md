@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## Version 0.2.0 (2026-03-29)
+
+### Web UI overhaul
+
+- **Async conversion jobs**: PDF upload and ArXiv research conversions now run in the background; a `job_id` is returned immediately and the frontend polls for live progress
+- **Streaming terminal log**: each pipeline stage (PDF extraction, heuristic cleaning, LLM curation chunk-by-chunk, TTS chunk-by-chunk) streams log lines into a scrollable terminal pane
+- **Cancel button**: any running conversion can be cancelled mid-pipeline via a cancel button that calls `DELETE /api/{convert,research}/jobs/{id}`
+- **Inline PDF preview**: clicking a paper in the sidebar now opens the PDF in a side panel instead of downloading it; `Content-Disposition: inline` is set on all PDF-serving endpoints
+- **Live PDF preview during conversion**: the preview panel opens automatically as soon as the PDF is available (right after upload or ArXiv download), before the pipeline finishes
+- **Research async pipeline**: `POST /api/research/enqueue` replaces the old blocking `/convert`; each ArXiv ID gets its own job with 6 stages (searching → downloading → extracting → pre-cleaning → LLM curation → TTS synthesis)
+- **Progress callbacks**: `llm_curate` and `synthesize`/`_edge_tts` accept a `progress_cb` parameter used by the web job runner to emit per-chunk log lines
+- **Shared job store**: `audia.ui.jobs.JOBS` dict is imported by both `convert.py` and `research.py` routers so cancel and PDF-serve endpoints work across both flows
+- **UI fixes**: "Convert another file" reset button only appears after conversion completes; PreviewPanel refactored to accept `title`/`pdfUrl` directly instead of a `Paper` object
+
 ## Version 0.1.2 (2026-03-29)
 
 ### ArXiv search robustness & CLI improvements

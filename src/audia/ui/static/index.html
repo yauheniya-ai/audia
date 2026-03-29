@@ -1,108 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>audia – Documents → Audio</title>
-  <link rel="stylesheet" href="/static/styles.css" />
-</head>
-<body>
-  <!-- ────────────────────────── HEADER -->
-  <header>
-    <div class="logo">
-      <span class="logo-icon">🎧</span>
-      <span class="logo-text">audia</span>
-      <span class="logo-sub">Documents → Audio</span>
-    </div>
-    <nav>
-      <button class="tab-btn active" data-tab="convert">Convert PDF</button>
-      <button class="tab-btn" data-tab="research">Research</button>
-      <button class="tab-btn" data-tab="library">Library</button>
-    </nav>
-  </header>
-
-  <!-- ────────────────────────── MAIN -->
-  <main>
-
-    <!-- ── TAB: Convert PDF ── -->
-    <section id="tab-convert" class="tab-section active">
-      <h2>Convert PDF to Audio</h2>
-      <p class="hint">
-        Upload one or more academic papers, reports, or any PDF document.
-        audia extracts the text, cleans it up using AI, and generates a high-quality audio file.
-      </p>
-
-      <div class="card" id="drop-zone">
-        <div class="drop-icon">📄</div>
-        <p>Drag &amp; drop a PDF here, or <label class="link" for="file-input">browse</label></p>
-        <input type="file" id="file-input" accept=".pdf" multiple hidden />
-        <p class="hint small">Supported: PDF • Max file size: 50 MB per file</p>
-      </div>
-
-      <div class="options-row">
-        <label for="voice-select">Voice</label>
-        <select id="voice-select">
-          <option value="en-US-AriaNeural">en-US-Aria (female)</option>
-          <option value="en-US-GuyNeural">en-US-Guy (male)</option>
-          <option value="en-GB-SoniaNeural">en-GB-Sonia (female)</option>
-          <option value="en-GB-RyanNeural">en-GB-Ryan (male)</option>
-          <option value="en-AU-NatashaNeural">en-AU-Natasha (female)</option>
-        </select>
-      </div>
-
-      <button id="convert-btn" class="btn primary" disabled>
-        Convert to Audio
-      </button>
-
-      <div id="convert-status" class="status hidden"></div>
-
-      <div id="results-list" class="results-list"></div>
-    </section>
-
-    <!-- ── TAB: Research ── -->
-    <section id="tab-research" class="tab-section">
-      <h2>Research on ArXiv</h2>
-      <p class="hint">
-        Search for recent papers on any topic. Select the ones you want to hear and
-        audia will download, clean, and convert them automatically.
-      </p>
-
-      <div class="search-row">
-        <input
-          type="text"
-          id="search-input"
-          placeholder="e.g. diffusion models text-to-image"
-          autocomplete="off"
-        />
-        <button id="search-btn" class="btn primary">Search</button>
-      </div>
-
-      <div id="search-status" class="status hidden"></div>
-      <div id="search-results" class="paper-list"></div>
-
-      <div id="convert-selected-row" class="hidden">
-        <button id="convert-selected-btn" class="btn primary">
-          Convert selected papers to audio
-        </button>
-      </div>
-    </section>
-
-    <!-- ── TAB: Library ── -->
-    <section id="tab-library" class="tab-section">
-      <h2>Your Library</h2>
-      <p class="hint">All audio files generated so far.</p>
-      <button id="refresh-library-btn" class="btn secondary">↺ Refresh</button>
-      <div id="library-list" class="results-list"></div>
-    </section>
-
-  </main>
-
-  <!-- ────────────────────────── LOADING OVERLAY -->
-  <div id="overlay" class="overlay hidden">
-    <div class="spinner"></div>
-    <p id="overlay-msg">Processing…</p>
-  </div>
-
-  <script src="/static/app.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>frontend</title>
+    <script type="module" crossorigin src="/assets/index-B4Y1OozC.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DGCB57LV.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
 </html>
