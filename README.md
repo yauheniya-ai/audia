@@ -125,10 +125,32 @@ audia serve
 
 ## Pipeline
 
-Each `audia convert` run executes a four-step [LangGraph](https://github.com/langchain-ai/langgraph) pipeline:
+The pipeline can be entered in three ways:
+
+| Entry point | Command |
+|---|---|
+| Voice input | `audia listen` — record speech, LLM distils a search query, confirm, then runs the full pipeline |
+| Text query | `audia research "retrieval augmented generation"` — search ArXiv by text, select papers, run pipeline |
+| Local PDF | `audia convert paper.pdf` — skip Steps 0, go straight to extraction |
+
+When starting from voice or text, the full five-step [LangGraph](https://github.com/langchain-ai/langgraph) pipeline runs. For local PDFs, Steps 1–4 run directly:
 
 ```
-PDF
+ [voice input]          [text query]
+      │                      │
+      ▼                      │
+  Microphone                 │
+  (faster-whisper STT)       │
+      │                      │
+      ▼                      │
+  LLM query distillation     │        ← extracts concise ArXiv search terms
+      │                      │           from natural speech
+      ▼                      │
+  Confirm / re-record?       │
+      │  yes                 │
+      ▼                      ▼
+Step 0 — ArXiv search    (or use local PDF)
+ │        arxiv API: fetch metadata, download PDF
  │
  ▼
 Step 1 — PDF extraction       PyMuPDF: text + metadata per page
