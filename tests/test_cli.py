@@ -15,10 +15,11 @@ runner = CliRunner()
 
 class TestVersionFlag:
     def test_version(self):
+        from audia import __version__
         result = runner.invoke(app, ["--version"])
         assert result.exit_code == 0
         assert "audia" in result.output
-        assert "0.1.0" in result.output
+        assert __version__ in result.output
 
 
 class TestInfoCommand:
@@ -114,7 +115,7 @@ class TestServeCommand:
         monkeypatch.setenv("AUDIA_LLM_PROVIDER", "openai")
         with patch("uvicorn.run") as mock_run, \
              patch("audia.storage.database.init_db"):
-            result = runner.invoke(app, ["serve", "--host", "0.0.0.0", "--port", "9000", "--no-open"])
+            result = runner.invoke(app, ["serve", "--host", "0.0.0.0", "--port", "9000", "--no-browser"])
         args, kwargs = mock_run.call_args
         assert kwargs.get("host") == "0.0.0.0" or args[1] == "0.0.0.0"
 

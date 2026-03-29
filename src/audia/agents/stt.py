@@ -107,7 +107,7 @@ def distill_search_query(speech: str) -> str:
             content=(
                 "You extract a short, precise academic search query from spoken input. "
                 "Return ONLY the query – no explanation, no punctuation at the end. "
-                "3–6 words maximum, suitable for searching ArXiv."
+                "4–7 words maximum, suitable for searching ArXiv."
             )
         ),
         HumanMessage(content=speech),

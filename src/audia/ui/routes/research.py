@@ -9,13 +9,15 @@ import json
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
+from audia.agents.graph import run_pipeline
 from audia.agents.research import ArxivSearcher
 from audia.agents.pdf_processor import extract_text
 from audia.agents.text_cleaner import heuristic_clean, llm_curate
+from audia.agents.stt import distill_search_query
 from audia.agents.tts import synthesize
 from audia.config import get_settings
 from audia.storage import get_session, AudioFile, Paper
@@ -29,8 +31,19 @@ class SearchRequest(BaseModel):
     max_results: int = 10
 
 
+class NormalizeRequest(BaseModel):
+    query: str
+
+
+class ConvertResearchRequest(BaseModel):
+    arxiv_ids: list[str]
+
+
 class EnqueueRequest(BaseModel):
     arxiv_ids: list[str]
+    llm_provider: str | None = None
+    llm_model: str | None = None
+    tts_backend: str | None = None
 
 
 def _make_job(pdf_title: str | None = None) -> dict:
@@ -52,6 +65,18 @@ def _make_job(pdf_title: str | None = None) -> dict:
 
 def _log(job: dict, line: str) -> None:
     job["log"].append(line)
+
+
+# ─────────────────────────────────────────────────── normalize
+
+@router.post("/normalize", summary="Distil a natural-language query into a short ArXiv search string via LLM")
+async def normalize(body: NormalizeRequest) -> JSONResponse:
+    """Uses the same distill_search_query function as the CLI speech pipeline."""
+    try:
+        search_string = await asyncio.to_thread(distill_search_query, body.query)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    return JSONResponse({"search_string": search_string})
 
 
 # ─────────────────────────────────────────────────── search
@@ -81,6 +106,69 @@ async def search(body: SearchRequest) -> JSONResponse:
     })
 
 
+# ─────────────────────────────────────────────────── convert (synchronous)
+
+@router.post("/convert", summary="Synchronously convert ArXiv papers to audio")
+async def convert_papers(body: ConvertResearchRequest) -> JSONResponse:
+    """Search, download, run pipeline, and save for each arxiv_id. Returns results synchronously."""
+    cfg = get_settings()
+    cfg.upload_dir.mkdir(parents=True, exist_ok=True)
+    cfg.audio_dir.mkdir(parents=True, exist_ok=True)
+
+    results = []
+    for arxiv_id in body.arxiv_ids:
+        searcher = ArxivSearcher()
+        papers = await asyncio.to_thread(searcher.search, f"id:{arxiv_id}")
+        if not papers:
+            results.append({"arxiv_id": arxiv_id, "error": "Not found on ArXiv"})
+            continue
+
+        paper = papers[0]
+        try:
+            pdf_path: Path = await asyncio.to_thread(
+                searcher.download_pdf, paper, cfg.upload_dir
+            )
+        except Exception as exc:
+            results.append({"arxiv_id": arxiv_id, "error": f"Download failed: {exc}"})
+            continue
+
+        state = await asyncio.to_thread(run_pipeline, str(pdf_path))
+        if state.get("error") or not state.get("audio_path"):
+            results.append({"arxiv_id": arxiv_id, "error": state.get("error", "Pipeline failed")})
+            continue
+
+        audio_path = Path(state["audio_path"])
+        with get_session() as session:
+            db_paper = Paper(
+                title=paper.title,
+                authors=json.dumps(paper.authors),
+                abstract=paper.abstract,
+                arxiv_id=paper.arxiv_id,
+                pdf_path=str(pdf_path),
+                pdf_url=paper.pdf_url,
+            )
+            session.add(db_paper)
+            session.flush()
+            af = AudioFile(
+                paper_id=db_paper.id,
+                filename=audio_path.name,
+                file_path=str(audio_path),
+                tts_backend=state.get("tts_backend", cfg.tts_backend),
+                tts_voice=state.get("tts_voice", cfg.tts_voice),
+            )
+            session.add(af)
+            session.flush()
+            audio_id = af.id
+
+        results.append({
+            "arxiv_id": arxiv_id,
+            "title": paper.title,
+            "download_url": f"/api/convert/download/{audio_id}",
+        })
+
+    return JSONResponse({"results": results})
+
+
 # ─────────────────────────────────────────────────── enqueue
 
 @router.post("/enqueue", summary="Enqueue ArXiv paper(s) for async conversion")
@@ -99,13 +187,24 @@ async def enqueue_research(body: EnqueueRequest) -> JSONResponse:
         job_id = uuid.uuid4().hex
         job = _make_job(pdf_title=arxiv_id)
         JOBS[job_id] = job
-        asyncio.create_task(_run_research_job(job_id, arxiv_id))
+        asyncio.create_task(_run_research_job(
+            job_id, arxiv_id,
+            llm_provider=body.llm_provider,
+            llm_model=body.llm_model,
+            tts_backend=body.tts_backend,
+        ))
         jobs_out.append({"arxiv_id": arxiv_id, "job_id": job_id})
 
     return JSONResponse({"jobs": jobs_out})
 
 
-async def _run_research_job(job_id: str, arxiv_id: str) -> None:
+async def _run_research_job(
+    job_id: str,
+    arxiv_id: str,
+    llm_provider: str | None = None,
+    llm_model: str | None = None,
+    tts_backend: str | None = None,
+) -> None:
     job = JOBS[job_id]
     cfg = get_settings()
     upload_id = uuid.uuid4().hex[:8]
@@ -163,6 +262,12 @@ async def _run_research_job(job_id: str, arxiv_id: str) -> None:
         job.update(stage="curating", stage_label="Step 5/6 \u2500 LLM curation", progress=55)
         _log(job, "Step 5/6 \u2500 LLM curation")
         cfg2 = get_settings()
+        if llm_provider:
+            cfg2.__dict__["llm_provider"] = llm_provider.lower()
+        if llm_model:
+            cfg2.__dict__["llm_model"] = llm_model
+        if tts_backend:
+            cfg2.__dict__["tts_backend"] = tts_backend
 
         def _cb_llm(msg: str) -> None:
             _log(job, f"  {msg}")
@@ -241,6 +346,28 @@ async def _run_research_job(job_id: str, arxiv_id: str) -> None:
     except Exception as exc:
         job.update(status="error", stage="error", stage_label="Failed", error=str(exc))
         _log(job, f"  \u2717 Error: {exc}")
+
+
+# ─────────────────────────────────────────────────── transcribe
+
+@router.post("/transcribe", summary="Transcribe uploaded audio to text")
+async def transcribe_audio(file: UploadFile = File(...)) -> JSONResponse:
+    """Accept a browser audio recording and return the Whisper transcription."""
+    import tempfile
+    cfg = get_settings()
+    suffix = Path(file.filename or "audio.webm").suffix or ".webm"
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+        content = await file.read()
+        tmp.write(content)
+        tmp_path = tmp.name
+    try:
+        from audia.agents.stt import transcribe_file
+        text = await asyncio.to_thread(
+            transcribe_file, tmp_path, cfg.stt_model, cfg.stt_device
+        )
+    finally:
+        Path(tmp_path).unlink(missing_ok=True)
+    return JSONResponse({"text": text})
 
 
 # ─────────────────────────────────────────────────── status / cancel / pdf

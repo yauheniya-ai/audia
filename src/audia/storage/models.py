@@ -98,3 +98,15 @@ class ResearchSession(Base):
 
     def __repr__(self) -> str:
         return f"<ResearchSession id={self.id} query={self.query!r}>"
+
+
+class UserSetting(Base):
+    """Persistent key-value store for user-configured pipeline settings."""
+
+    __tablename__ = "user_settings"
+
+    key: Mapped[str] = mapped_column(String(128), primary_key=True)
+    value: Mapped[str] = mapped_column(Text, nullable=False)
+
+    def __repr__(self) -> str:
+        return f"<UserSetting {self.key}={self.value!r}>"

@@ -16,6 +16,7 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 
 from audia.config import get_settings
+from audia.agents.graph import run_pipeline
 from audia.agents.pdf_processor import extract_text
 from audia.agents.text_cleaner import heuristic_clean, llm_curate
 from audia.agents.tts import synthesize
@@ -46,12 +47,71 @@ def _log(job: dict, line: str) -> None:
     job["log"].append(line)
 
 
+# ─────────────────────────────────────────────────── upload (synchronous)
+
+@router.post("/upload", summary="Upload a PDF and convert synchronously")
+async def upload_and_convert(
+    file: UploadFile = File(..., description="PDF file to convert"),
+    voice: Optional[str] = Form(None),
+    llm_provider: Optional[str] = Form(None),
+    llm_model: Optional[str] = Form(None),
+    tts_backend: Optional[str] = Form(None),
+) -> JSONResponse:
+    """Synchronous upload + convert. Returns the download URL when done."""
+    if not file.filename or not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files are accepted.")
+
+    cfg = get_settings()
+    cfg.upload_dir.mkdir(parents=True, exist_ok=True)
+    cfg.audio_dir.mkdir(parents=True, exist_ok=True)
+
+    upload_id = uuid.uuid4().hex[:8]
+    upload_path = cfg.upload_dir / f"{upload_id}_{file.filename}"
+    contents = await file.read()
+    upload_path.write_bytes(contents)
+
+    state = await asyncio.to_thread(run_pipeline, str(upload_path))
+
+    if state.get("error") or not state.get("audio_path"):
+        raise HTTPException(status_code=500, detail=state.get("error", "Pipeline failed"))
+
+    audio_path = Path(state["audio_path"])
+    with get_session() as session:
+        paper = Paper(
+            title=state.get("title", upload_path.stem),
+            authors=json.dumps([]),
+            pdf_path=str(upload_path),
+        )
+        session.add(paper)
+        session.flush()
+        af = AudioFile(
+            paper_id=paper.id,
+            filename=audio_path.name,
+            file_path=str(audio_path),
+            tts_backend=state.get("tts_backend", cfg.tts_backend),
+            tts_voice=state.get("tts_voice", cfg.tts_voice),
+        )
+        session.add(af)
+        session.flush()
+        audio_id = af.id
+
+    return JSONResponse({
+        "status": "ok",
+        "download_url": f"/api/convert/download/{audio_id}",
+        "title": state.get("title"),
+        "num_pages": state.get("num_pages"),
+    })
+
+
 # ─────────────────────────────────────────────────── enqueue (upload)
 
 @router.post("/enqueue", summary="Enqueue a PDF conversion job (with progress tracking)")
 async def enqueue_conversion(
     file: UploadFile = File(..., description="PDF file to convert"),
     voice: Optional[str] = Form(None, description="TTS voice override"),
+    llm_provider: Optional[str] = Form(None, description="LLM provider override"),
+    llm_model: Optional[str] = Form(None, description="LLM model override"),
+    tts_backend: Optional[str] = Form(None, description="TTS backend override"),
 ) -> JSONResponse:
     """Upload a PDF and return a job_id immediately; poll /status/{job_id} for progress."""
     cfg = get_settings()
@@ -99,6 +159,12 @@ async def enqueue_conversion(
             job.update(stage="curating", stage_label="Step 3/4 \u2500 LLM curation", progress=48)
             _log(job, "Step 3/4 \u2500 LLM curation")
             cfg2 = get_settings()
+            if llm_provider:
+                cfg2.__dict__["llm_provider"] = llm_provider.lower()
+            if llm_model:
+                cfg2.__dict__["llm_model"] = llm_model
+            if tts_backend:
+                cfg2.__dict__["tts_backend"] = tts_backend
             if effective_voice:
                 cfg2.__dict__["tts_voice"] = effective_voice
             def _cb_llm(msg: str):

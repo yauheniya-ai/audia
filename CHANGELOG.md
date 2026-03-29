@@ -1,5 +1,32 @@
 # CHANGELOG
 
+## Version 0.3.0 (2026-03-29)
+
+### Configuration, voice search & LLM query normalisation
+
+#### Configuration tab
+- **Pipeline diagram**: animated SVG diagram in the Configuration tab visualises the full pipeline (STT → LLM → ArXiv → PDF → TTS) with correct arrow routing (Text bypasses LLM and enters ArXiv directly)
+- **Persistent settings**: `UserSetting` SQLite model stores per-key config; `GET /api/settings` and `PUT /api/settings` endpoints load and upsert settings on demand
+- **Save button**: "Save configuration" button with "Saved ✓" confirmation; config state lifted to `Main` and loaded from the database on mount
+- **Settings applied to pipelines**: selected LLM provider/model and TTS backend are forwarded as optional overrides to `/api/convert/enqueue` and `/api/research/enqueue`
+
+#### Voice search (Research tab)
+- **Microphone button**: browser `MediaRecorder` captures audio; blob is `POST`ed to `/api/research/transcribe` which runs `faster-whisper` (`transcribe_file`) and returns the transcript into the query field
+
+#### LLM query normalisation (Research tab)
+- **Normalize query button**: calls `POST /api/research/normalize` which runs `distill_search_query` from `stt.py` (same prompt used by the CLI `listen` command — no duplicate prompt logic)
+- **Two-step search flow**: raw query → optional LLM normalisation → editable confirmation pane → "Search arXiv" button; normalisation errors surfaced as a dismissable red banner instead of silent fallback
+- **Single Search arXiv button**: removed duplicate search button; one full-width button below the input row handles both direct and post-normalisation searches; "No results found" only shown after an actual search attempt
+
+#### API additions
+- `POST /api/research/normalize` — wraps `distill_search_query`
+- `POST /api/research/transcribe` — wraps `transcribe_file`
+- `POST /api/convert/upload` — synchronous PDF upload + convert (used by tests)
+- `POST /api/research/convert` — synchronous ArXiv download + convert (used by tests)
+
+#### Code hygiene
+- Removed `_QUERY_SYSTEM` prompt and `normalize_query()` from `text_cleaner.py`; normalisation now reuses `distill_search_query` directly — two LLMs, two prompts, no duplication
+
 ## Version 0.2.0 (2026-03-29)
 
 ### Web UI overhaul
