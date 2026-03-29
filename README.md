@@ -1,11 +1,5 @@
 # <img src="https://api.iconify.design/streamline-freehand:help-headphones-customer-support-human.svg" width="24" height="24"> audia — turn your ideas into audio
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/yauheniya-ai/audia/main/docs/images/Screenshot_CLI.png" width="100%" />
-  <em>Using AUDIA in CLI</em>
-</p>
-
-
 <div align="center">
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
@@ -15,10 +9,16 @@
 [![Tests](https://github.com/yauheniya-ai/audia/actions/workflows/tests.yml/badge.svg)](https://github.com/yauheniya-ai/audia/actions/workflows/tests.yml)
 [![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/yauheniya-ai/88593f7c590674e0f8c99c66c7b58b36/raw/coverage.json)](https://github.com/yauheniya-ai/audia/actions/workflows/tests.yml)
 [![GitHub last commit](https://img.shields.io/github/last-commit/yauheniya-ai/audia)](https://github.com/yauheniya-ai/audia/commits/main)
+
 </div>
 
 **audia** is an agentic Python package that converts PDFs — academic papers, reports, regulations — into podcast-style audio files.
 It uses an LLM to rewrite content into natural spoken language (math in plain English, tables as sentences, no citations) before passing it to a TTS engine, so the result actually sounds good when read aloud.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/yauheniya-ai/audia/main/docs/images/Screenshot_CLI.png" width="100%" />
+  <em>The audia CLI</em>
+</p>
 
 ## Features
 
