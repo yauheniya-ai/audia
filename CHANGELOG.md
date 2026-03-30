@@ -1,5 +1,30 @@
 # CHANGELOG
 
+## Version 0.3.1 (2026-03-29)
+
+### Frontend refactor & database explorer
+
+#### Main.tsx split into tab components
+- **`MainConfiguration.tsx`**: pipeline diagram and model/backend selectors extracted into a standalone component
+- **`MainConvert.tsx`**: PDF upload, `ConversionProgress`, `AudioPlayer`, and `CONVERT_STAGES` extracted; all three are exported for reuse
+- **`MainResearch.tsx`**: ArXiv search, voice recording, LLM query normalisation, paper selection, and job progress extracted; exports `RESEARCH_STAGES`
+- **`Main.tsx`** reduced to a 159-line orchestrator: holds shared pipeline config state, loads/saves settings via `/api/settings`, renders a tab bar, and delegates to each sub-component
+
+#### Database tab (`MainDatabase.tsx`)
+- **Schema overview**: four cards (one per table — `papers`, `audio_files`, `research_sessions`, `user_settings`) showing all columns with types and PK/FK badges; relationship annotations (FK arrow and JSON logical link) displayed below
+- **Mermaid ERD**: collapsible `erDiagram` code block with a one-click copy button
+- **Data explorer**: dropdown to select any table; fetches all rows from the API and renders them in a full-width table with no truncation; JSON array columns rendered inline
+
+#### API additions (library router)
+- `GET /api/library/research_sessions` — returns all research sessions ordered by date
+- `GET /api/library/user_settings` — returns all key-value settings rows
+
+#### `scripts/explore_db.py`
+- Standalone stdlib-only script (no dependencies) that prints a full terminal dump of `~/.audia/audia.db`
+- Shows table list, per-table schema (column names, types, nullability, PK), foreign keys, row count, and all cell values with JSON pretty-printing
+- Accepts `--db /path/to/other.db` to point at a custom database file
+
+
 ## Version 0.3.0 (2026-03-29)
 
 ### Configuration, voice search & LLM query normalisation

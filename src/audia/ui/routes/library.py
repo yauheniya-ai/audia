@@ -10,6 +10,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
 
 from audia.storage import get_session, AudioFile, Paper
+from audia.storage.models import ResearchSession, UserSetting
 from sqlalchemy import select, desc
 
 router = APIRouter()
@@ -59,7 +60,42 @@ async def list_audio() -> JSONResponse:
         })
 
 
-@router.delete("/audio/{audio_id}", summary="Delete an audio file record")
+    return JSONResponse({"status": "deleted", "id": audio_id})
+
+
+@router.get("/research_sessions", summary="List all research sessions")
+async def list_research_sessions() -> JSONResponse:
+    """Return all research sessions stored in the local database."""
+    with get_session() as session:
+        rows = session.execute(
+            select(ResearchSession).order_by(desc(ResearchSession.created_at))
+        ).scalars().all()
+        return JSONResponse({
+            "research_sessions": [
+                {
+                    "id": rs.id,
+                    "query": rs.query,
+                    "paper_ids": rs.paper_ids_list,
+                    "created_at": rs.created_at.isoformat(),
+                }
+                for rs in rows
+            ]
+        })
+
+
+@router.get("/user_settings", summary="List all user settings key-value pairs")
+async def list_user_settings() -> JSONResponse:
+    """Return all user settings stored in the local database."""
+    with get_session() as session:
+        rows = session.execute(
+            select(UserSetting).order_by(UserSetting.key)
+        ).scalars().all()
+        return JSONResponse({
+            "user_settings": [{"key": r.key, "value": r.value} for r in rows]
+        })
+
+
+@router.get("/papers/{paper_id}", summary="Get a single paper with its audio files")
 async def delete_audio(audio_id: int) -> JSONResponse:
     """Remove an audio file record (and optionally the file on disk)."""
     import os
