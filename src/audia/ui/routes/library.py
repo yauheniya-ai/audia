@@ -60,9 +60,6 @@ async def list_audio() -> JSONResponse:
         })
 
 
-    return JSONResponse({"status": "deleted", "id": audio_id})
-
-
 @router.get("/research_sessions", summary="List all research sessions")
 async def list_research_sessions() -> JSONResponse:
     """Return all research sessions stored in the local database."""
@@ -95,12 +92,9 @@ async def list_user_settings() -> JSONResponse:
         })
 
 
-@router.get("/papers/{paper_id}", summary="Get a single paper with its audio files")
+@router.delete("/audio/{audio_id}", summary="Delete an audio file record")
 async def delete_audio(audio_id: int) -> JSONResponse:
     """Remove an audio file record (and optionally the file on disk)."""
-    import os
-    from pathlib import Path
-
     with get_session() as session:
         af = session.get(AudioFile, audio_id)
         if af is None:
