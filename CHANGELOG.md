@@ -1,6 +1,21 @@
 # CHANGELOG
 
-## Version 0.3.1 (2026-03-29)
+## Version 0.3.2 (2026-03-30)
+
+### Convert tab improvements
+
+#### Instant PDF preview on upload
+- Dropping a PDF or selecting one via the file browser immediately opens the **PreviewPanel** on the right using a local `blob:` URL — no conversion needs to start first
+- Clearing the file ("Convert another file") also closes the preview panel
+- During conversion the panel URL is transparently upgraded to the server-served PDF once the backend has processed it
+
+#### Collapsible full-progress log
+- The verbose log output (step-by-step stage details, chunk counts, etc.) is now **hidden by default** behind a "Show full progress" toggle
+- Clicking the toggle expands/collapses the log with a chevron indicator ("Show full progress" ▶ / "Hide full progress" ▼)
+- The log container background contrast raised (`bg-white/8` / `bg-black/8`) so the scrolling area is visually distinct
+
+
+## Version 0.3.1 (2026-03-30)
 
 ### Frontend refactor & database explorer
 
