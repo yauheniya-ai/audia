@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Version 0.3.8 (2026-03-31)
+
+Rebuild UI with the current state of implementation 
+
 ## Version 0.3.7 (2026-03-31)
 
 ### Fix browser opening before server is ready
