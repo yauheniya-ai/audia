@@ -9,12 +9,11 @@ build:
     python: "3.13"
 
 sphinx:
-  configuration: pypi/docs/conf.py
+  configuration: docs/conf.py
   fail_on_warning: false
 
 python:
   install:
+    - requirements: docs/requirements.txt
     - method: pip
-      path: pypi
-      extra_requirements:
-        - docs
+      path: .
