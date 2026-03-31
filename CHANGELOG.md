@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## Version 0.3.4 (2026-03-31)
+
+### Custom API base URLs for OpenAI and Anthropic
+
+- `AUDIA_OPENAI_API_BASE` — optional setting to redirect all OpenAI calls (LLM + TTS) to a custom endpoint (Azure OpenAI, corporate proxy, or any OpenAI-compatible URL)
+- `AUDIA_ANTHROPIC_API_BASE` — same for Anthropic LLM calls
+- Both settings wired through `config.py`, `text_cleaner.py` (`_build_llm`), and `tts.py`; `stt.py` inherits the base URL automatically via `_build_llm`
+- `.env.example` updated with commented examples for both options
+
 ## Version 0.3.3 (2026-03-31)
 
 ### Icon system, TTS voice selector & database editor

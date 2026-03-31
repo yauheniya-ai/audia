@@ -185,7 +185,10 @@ def _openai_tts(text: str, out_dir: Path, stem: str, cfg: Settings) -> Path:
             "OpenAI TTS requires: pip install audia[openai]"
         ) from e
 
-    client = OpenAI(api_key=cfg.openai_api_key)
+    client_kwargs: dict = dict(api_key=cfg.openai_api_key)
+    if cfg.openai_api_base:
+        client_kwargs["base_url"] = cfg.openai_api_base
+    client = OpenAI(**client_kwargs)
     chunks = _split(text, 4096)  # OpenAI limit
 
     chunk_paths: list[Path] = []

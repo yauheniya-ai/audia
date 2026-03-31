@@ -66,7 +66,24 @@ class Settings(BaseSettings):
         ),
     )
     openai_api_key: Optional[str] = Field(None, description="OpenAI API key (env: AUDIA_OPENAI_API_KEY)")
+    openai_api_base: Optional[str] = Field(
+        None,
+        description=(
+            "Custom OpenAI-compatible base URL, e.g. an Azure OpenAI endpoint or "
+            "a corporate proxy. When set, all OpenAI calls (LLM + TTS) use this URL "
+            "instead of the default https://api.openai.com/v1. "
+            "(env: AUDIA_OPENAI_API_BASE)"
+        ),
+    )
     anthropic_api_key: Optional[str] = Field(None, description="Anthropic API key (env: AUDIA_ANTHROPIC_API_KEY)")
+    anthropic_api_base: Optional[str] = Field(
+        None,
+        description=(
+            "Custom Anthropic-compatible base URL, e.g. a corporate proxy. "
+            "When set, all Anthropic LLM calls use this URL instead of the default. "
+            "(env: AUDIA_ANTHROPIC_API_BASE)"
+        ),
+    )
     llm_model: str = Field(
         "gpt-4o-mini",
         description="Model name, e.g. 'gpt-4o-mini', 'gpt-4o', 'claude-3-5-haiku-20241022'",

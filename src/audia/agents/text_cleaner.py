@@ -175,11 +175,14 @@ def _build_llm(cfg: Settings):
                 "AUDIA_OPENAI_API_KEY is not set.\n"
                 "Add it to your .env file:  AUDIA_OPENAI_API_KEY=sk-..."
             )
-        return ChatOpenAI(
+        kwargs: dict = dict(
             model=cfg.llm_model,
             temperature=cfg.llm_temperature,
             api_key=cfg.openai_api_key,
         )
+        if cfg.openai_api_base:
+            kwargs["base_url"] = cfg.openai_api_base
+        return ChatOpenAI(**kwargs)
     elif cfg.llm_provider == "anthropic":
         try:
             from langchain_anthropic import ChatAnthropic  # type: ignore
@@ -192,11 +195,14 @@ def _build_llm(cfg: Settings):
                 "AUDIA_ANTHROPIC_API_KEY is not set.\n"
                 "Add it to your .env file:  AUDIA_ANTHROPIC_API_KEY=sk-ant-..."
             )
-        return ChatAnthropic(
+        kwargs: dict = dict(
             model=cfg.llm_model,
             temperature=cfg.llm_temperature,
             api_key=cfg.anthropic_api_key,
         )
+        if cfg.anthropic_api_base:
+            kwargs["base_url"] = cfg.anthropic_api_base
+        return ChatAnthropic(**kwargs)
     else:
         raise ValueError(
             f"Unknown LLM provider: '{cfg.llm_provider}'. Valid: openai | anthropic"
