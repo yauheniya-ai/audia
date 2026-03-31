@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## Version 0.3.5 (2026-03-31)
+
+### Rebuild frontend
+
+- Rebuild UI with the current state of implementation 
+    - Add new db tab
+    - Update the HTML title
+
 ## Version 0.3.4 (2026-03-31)
 
 ### Custom API base URLs for OpenAI and Anthropic
