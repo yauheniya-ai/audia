@@ -203,9 +203,29 @@ def _build_llm(cfg: Settings):
         if cfg.anthropic_api_base:
             kwargs["base_url"] = cfg.anthropic_api_base
         return ChatAnthropic(**kwargs)
+    elif cfg.llm_provider == "google":
+        try:
+            from langchain_google_genai import ChatGoogleGenerativeAI  # type: ignore
+        except ImportError as e:
+            raise ImportError(
+                "Google Gemini support requires: pip install audia[gemini]"
+            ) from e
+        if not cfg.google_api_key:
+            raise RuntimeError(
+                "AUDIA_GOOGLE_API_KEY is not set.\n"
+                "Add it to your .env file:  AUDIA_GOOGLE_API_KEY=AIza..."
+            )
+        kwargs: dict = dict(
+            model=cfg.llm_model,
+            temperature=cfg.llm_temperature,
+            google_api_key=cfg.google_api_key,
+        )
+        if cfg.google_api_base:
+            kwargs["client_options"] = {"api_endpoint": cfg.google_api_base}
+        return ChatGoogleGenerativeAI(**kwargs)
     else:
         raise ValueError(
-            f"Unknown LLM provider: '{cfg.llm_provider}'. Valid: openai | anthropic"
+            f"Unknown LLM provider: '{cfg.llm_provider}'. Valid: openai | anthropic | google"
         )
 
 

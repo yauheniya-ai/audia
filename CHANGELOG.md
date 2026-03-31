@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## Version 0.3.6 (2026-03-31)
+
+### Google Gemini LLM support
+
+- `AUDIA_LLM_PROVIDER=google` — new provider option backed by `langchain-google-genai` / `ChatGoogleGenerativeAI`
+- `AUDIA_GOOGLE_API_KEY` — required when using the Google provider
+- `AUDIA_GOOGLE_API_BASE` — optional custom endpoint (Vertex AI or corporate proxy); mapped to `client_options.api_endpoint`
+- `llm_provider` Literal extended to `"openai" | "anthropic" | "google"` in `config.py`; validator error message updated accordingly
+- `_build_llm` in `text_cleaner.py` gains a `google` branch with clear import-error and missing-key messages
+- `langchain-google-genai>=2.0` and `google-generativeai>=0.8` added to core dependencies in `pyproject.toml`
+- `.env.example` updated with an "Option C – Google Gemini" block documenting `gemini-2.0-flash`, `gemini-2.0-flash-lite`, and `gemini-1.5-pro` as example models
+
+
 ## Version 0.3.5 (2026-03-31)
 
 ### Rebuild frontend

@@ -56,13 +56,13 @@ class Settings(BaseSettings):
     # ------------------------------------------------------------------ LLM
     # LLM curation is the core of audia – it MUST be configured.
     # Set AUDIA_LLM_PROVIDER=openai or anthropic, plus the matching API key.
-    llm_provider: Literal["openai", "anthropic"] = Field(
+    llm_provider: Literal["openai", "anthropic", "google"] = Field(
         "openai",
         description=(
             "LLM backend for intelligent text curation. "
             "The LLM rewrites math formulas in plain English, summarises tables, "
             "condenses acknowledgements, and removes citations. "
-            "Required – set AUDIA_LLM_PROVIDER=openai|anthropic."
+            "Required – set AUDIA_LLM_PROVIDER=openai|anthropic|google."
         ),
     )
     openai_api_key: Optional[str] = Field(None, description="OpenAI API key (env: AUDIA_OPENAI_API_KEY)")
@@ -84,9 +84,18 @@ class Settings(BaseSettings):
             "(env: AUDIA_ANTHROPIC_API_BASE)"
         ),
     )
+    google_api_key: Optional[str] = Field(None, description="Google AI API key (env: AUDIA_GOOGLE_API_KEY)")
+    google_api_base: Optional[str] = Field(
+        None,
+        description=(
+            "Custom Google AI-compatible base URL, e.g. a Vertex AI endpoint or "
+            "a corporate proxy. When set, all Google LLM calls use this URL instead "
+            "of the default. (env: AUDIA_GOOGLE_API_BASE)"
+        ),
+    )
     llm_model: str = Field(
         "gpt-4o-mini",
-        description="Model name, e.g. 'gpt-4o-mini', 'gpt-4o', 'claude-3-5-haiku-20241022'",
+        description="Model name, e.g. 'gpt-4o-mini', 'gpt-4o', 'claude-3-5-haiku-20241022', 'gemini-2.0-flash'",
     )
     llm_temperature: float = Field(0.1, ge=0.0, le=1.0)
     llm_max_chunk_chars: int = Field(
@@ -143,7 +152,7 @@ class Settings(BaseSettings):
         if v == "none":
             raise ValueError(
                 "AUDIA_LLM_PROVIDER cannot be 'none'. "
-                "LLM curation is required. Set it to 'openai' or 'anthropic'."
+                "LLM curation is required. Set it to 'openai', 'anthropic', or 'google'."
             )
         return v
 
