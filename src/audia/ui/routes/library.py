@@ -56,6 +56,7 @@ async def list_audio() -> JSONResponse:
                     "paper_id": af.paper_id,
                     "filename": af.filename,
                     "file_path": af.file_path,
+                    "download_url": f"/api/convert/download/{af.id}",
                     "duration_seconds": af.duration_seconds,
                     "tts_backend": af.tts_backend,
                     "tts_voice": af.tts_voice,

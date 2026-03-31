@@ -221,6 +221,22 @@ async def enqueue_conversion(
 
             job["paper_id"] = paper_id
             _log(job, f"  \u2713 Saved (paper_id={paper_id}, audio_id={audio_id})")
+
+            # Save debug texts
+            try:
+                from datetime import datetime, timezone as _tz
+                ts = datetime.now(_tz.utc).strftime("%Y%m%d_%H%M%S")
+                pdf_stem = upload_path.stem[:50]
+                run_id = f"{pdf_stem}_{ts}"
+                run_dir = cfg2.debug_dir / run_id
+                run_dir.mkdir(parents=True, exist_ok=True)
+                (run_dir / "1_raw.txt").write_text(pdf_result.text, encoding="utf-8")
+                (run_dir / "2_preprocessed.txt").write_text(precleaned, encoding="utf-8")
+                (run_dir / "3_curated.txt").write_text(curated, encoding="utf-8")
+                _log(job, f"  Debug texts saved → {run_dir}")
+            except Exception as _dbg_exc:
+                _log(job, f"  [warn] Could not save debug texts: {_dbg_exc}")
+
             job.update(
                 status="done",
                 stage="done",

@@ -8,7 +8,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from audia import __version__
@@ -66,11 +66,21 @@ def create_app() -> FastAPI:
     # React router can handle client-side navigation.
     @application.get("/", include_in_schema=False)
     @application.get("/{full_path:path}", include_in_schema=False)
-    async def serve_spa(full_path: str = "") -> FileResponse:
+    async def serve_spa(full_path: str = "") -> Response:
         candidate = _STATIC_DIR / full_path
         if full_path and candidate.exists() and candidate.is_file():
             return FileResponse(str(candidate))
-        return FileResponse(str(_STATIC_DIR / "index.html"))
+        # Always serve index.html with no-cache so the browser re-validates it
+        # after a pip upgrade (hashed JS/CSS assets can still be cached forever
+        # because Vite embeds a content hash in their filenames).
+        return FileResponse(
+            str(_STATIC_DIR / "index.html"),
+            headers={
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0",
+            },
+        )
 
     return application
 
