@@ -1,5 +1,37 @@
 # CHANGELOG
 
+## Version 0.3.3 (2026-03-31)
+
+### Icon system, TTS voice selector & database editor
+
+#### Icon system (`constants/index.ts`)
+- Introduced `IconDef` discriminated union type — `{ kind: 'icon'; name; adaptive? }` for Iconify icons or `{ kind: 'img'; src; alt }` for image assets — providing a single typed representation for all logos across the app
+- All asset imports (`arxiv.svg`, `systran.svg`, `hexgrad.webp`) moved from individual component files into `constants/index.ts`
+- `PROVIDER_ICONS` updated to `Record<LLMProvider, IconDef>`; OpenAI uses `simple-icons:openai` with `adaptive: true` (renders white in dark mode, black in light mode)
+- New exports: `STT_ICON`, `ARXIV_ICON`, `TTS_BACKEND_ICONS` — centralising all service/backend logos in one place
+- `renderIconDef(icon, isDark, className?)` helper in `MainConfiguration.tsx` handles both `img` and `icon` variants, applying theme-aware colouring for adaptive icons
+
+#### TTS voice selector (Configuration tab)
+- TTS card now shows a **2-column grid**: Engine selector + Voice selector side-by-side
+- Voice options are populated from `TTS_VOICES[backend]`; switching the engine automatically resets the voice to the first option for that backend
+- `ttsVoice` state added to `Main.tsx`, persisted to and loaded from `/api/settings` via a new `tts_voice` key
+
+#### Database explorer — editable cells
+- All cells in editable columns (`title`, `authors`, `abstract`, `arxiv_id`, `pdf_url` for papers; `filename`, `duration_seconds`, `tts_backend`, `tts_voice`, `paper_id` for audio files; `query` for research sessions; `value` for user settings) are now **inline-editable**
+- Click a cell → `<input>` or `<textarea>` (for `abstract`/`query`) appear inline; **Enter** commits, **Escape** cancels, **⌘/Ctrl+Enter** commits multiline fields; blur also commits
+- `tts_backend` and `tts_voice` cells use a **portal-based custom dropdown** that escapes the `overflow-x-auto` container; `tts_voice` options reflect the current row's backend
+- Brief lime flash on successful save; spinner while saving
+- `authors` is edited as comma-separated text and sent as a JSON array; `paper_id`/`duration_seconds` are coerced to numbers; clearing nullable fields sends `null`
+- New backend PATCH endpoints for all four tables: `PATCH /api/library/papers/{id}`, `PATCH /api/library/audio/{id}`, `PATCH /api/library/research_sessions/{id}`, `PATCH /api/library/user_settings/{key}`
+
+#### Database explorer — table UX
+- Table is now **horizontally scrollable** — uses `table-auto min-w-max` so columns never line-wrap; `overflow-x-auto` wrapper scrolls instead
+- **Full column sets returned**: `list_papers` now includes `abstract`, `pdf_path`, `pdf_url`; `list_audio` now includes `file_path`, `duration_seconds` (previously omitted)
+- **Column hide/show**: each column header has an eye-off icon; clicking hides the column; hidden columns appear as chips above the table that restore on click; hidden set resets when switching tables
+- **Table picker** replaced native `<select>` with a fully custom styled dropdown
+- Clicking a `papers.id` cell (or `audio_files.paper_id`) opens the PDF in the **PreviewPanel** — links rendered as rose-coloured buttons instead of editable cells
+
+
 ## Version 0.3.2 (2026-03-30)
 
 ### Convert tab improvements

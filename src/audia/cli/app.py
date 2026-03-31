@@ -391,7 +391,7 @@ def serve(
 
 @app.command()
 def info() -> None:
-    """Show current audia configuration."""
+    """Show current configuration."""
     from audia.config import get_settings
     from audia import __version__
 

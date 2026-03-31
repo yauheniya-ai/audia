@@ -1,9 +1,5 @@
 """
 Speech-to-Text input – record from microphone and transcribe.
-
-Requires: pip install audia[stt]
-  - faster-whisper
-  - sounddevice
 """
 
 from __future__ import annotations

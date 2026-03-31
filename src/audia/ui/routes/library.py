@@ -4,10 +4,12 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
+from pydantic import BaseModel
 
 from audia.storage import get_session, AudioFile, Paper
 from audia.storage.models import ResearchSession, UserSetting
@@ -29,7 +31,10 @@ async def list_papers() -> JSONResponse:
                     "id": p.id,
                     "title": p.title,
                     "authors": p.authors_list,
+                    "abstract": p.abstract,
                     "arxiv_id": p.arxiv_id,
+                    "pdf_path": p.pdf_path,
+                    "pdf_url": p.pdf_url,
                     "created_at": p.created_at.isoformat(),
                 }
                 for p in rows
@@ -50,7 +55,8 @@ async def list_audio() -> JSONResponse:
                     "id": af.id,
                     "paper_id": af.paper_id,
                     "filename": af.filename,
-                    "download_url": f"/api/convert/download/{af.id}",
+                    "file_path": af.file_path,
+                    "duration_seconds": af.duration_seconds,
                     "tts_backend": af.tts_backend,
                     "tts_voice": af.tts_voice,
                     "created_at": af.created_at.isoformat(),
@@ -91,6 +97,94 @@ async def list_user_settings() -> JSONResponse:
             "user_settings": [{"key": r.key, "value": r.value} for r in rows]
         })
 
+
+# ─────────────────────────────────────────────── PATCH models
+
+class PaperPatch(BaseModel):
+    title: str | None = None
+    authors: list[str] | None = None
+    abstract: str | None = None
+    arxiv_id: str | None = None
+    pdf_url: str | None = None
+
+
+class AudioPatch(BaseModel):
+    filename: str | None = None
+    file_path: str | None = None
+    duration_seconds: float | None = None
+    tts_backend: str | None = None
+    tts_voice: str | None = None
+    paper_id: int | None = None
+
+
+class ResearchSessionPatch(BaseModel):
+    query: str | None = None
+
+
+class UserSettingPatch(BaseModel):
+    value: str
+
+
+# ─────────────────────────────────────────────── PATCH endpoints
+
+@router.patch("/papers/{paper_id}", summary="Update paper fields")
+async def patch_paper(paper_id: int, body: PaperPatch) -> JSONResponse:
+    """Partially update a paper's editable fields."""
+    updates = body.model_dump(exclude_unset=True)
+    with get_session() as session:
+        paper = session.get(Paper, paper_id)
+        if paper is None:
+            raise HTTPException(status_code=404, detail="Paper not found.")
+        for field, val in updates.items():
+            if field == "authors":
+                paper.authors = json.dumps(val)
+            else:
+                setattr(paper, field, val)
+        session.commit()
+    return JSONResponse({"status": "updated", "id": paper_id})
+
+
+@router.patch("/audio/{audio_id}", summary="Update audio file fields")
+async def patch_audio(audio_id: int, body: AudioPatch) -> JSONResponse:
+    """Partially update an audio file's editable fields."""
+    updates = body.model_dump(exclude_unset=True)
+    with get_session() as session:
+        af = session.get(AudioFile, audio_id)
+        if af is None:
+            raise HTTPException(status_code=404, detail="Audio file not found.")
+        for field, val in updates.items():
+            setattr(af, field, val)
+        session.commit()
+    return JSONResponse({"status": "updated", "id": audio_id})
+
+
+@router.patch("/research_sessions/{session_id}", summary="Update research session")
+async def patch_research_session(session_id: int, body: ResearchSessionPatch) -> JSONResponse:
+    """Partially update a research session's editable fields."""
+    updates = body.model_dump(exclude_unset=True)
+    with get_session() as session:
+        rs = session.get(ResearchSession, session_id)
+        if rs is None:
+            raise HTTPException(status_code=404, detail="Research session not found.")
+        for field, val in updates.items():
+            setattr(rs, field, val)
+        session.commit()
+    return JSONResponse({"status": "updated", "id": session_id})
+
+
+@router.patch("/user_settings/{key}", summary="Update a user setting value")
+async def patch_user_setting(key: str, body: UserSettingPatch) -> JSONResponse:
+    """Update the value for an existing user setting key."""
+    with get_session() as session:
+        row = session.get(UserSetting, key)
+        if row is None:
+            raise HTTPException(status_code=404, detail="Setting not found.")
+        row.value = body.value
+        session.commit()
+    return JSONResponse({"status": "updated", "key": key})
+
+
+# ─────────────────────────────────────────────── DELETE
 
 @router.delete("/audio/{audio_id}", summary="Delete an audio file record")
 async def delete_audio(audio_id: int) -> JSONResponse:

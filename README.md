@@ -66,7 +66,7 @@ pip install audia
 For CLI usage, [pipx](https://pipx.pypa.io/) is recommended — it installs `audia` in an isolated environment while exposing the command globally:
 
 ```bash
-pipx install "audia"
+pipx install audia
 ```
 
 Optional extras:
@@ -76,7 +76,7 @@ Optional extras:
 | `kokoro` | local Kokoro TTS |
 
 ```bash
-pip install audia[kokoro]
+pip install "audia[kokoro]"
 ```
 
 ## Configuration
