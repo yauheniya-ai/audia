@@ -373,10 +373,21 @@ def serve(
         )
     )
     if open_browser:
-        import threading, time, webbrowser
-        def _open():
-            time.sleep(1.2)
+        import socket
+        import threading
+        import time
+        import webbrowser
+
+        def _open() -> None:
+            deadline = time.monotonic() + 30  # give up after 30 s
+            while time.monotonic() < deadline:
+                try:
+                    with socket.create_connection((_host, _port), timeout=0.5):
+                        break
+                except OSError:
+                    time.sleep(0.2)
             webbrowser.open(f"http://{_host}:{_port}")
+
         threading.Thread(target=_open, daemon=True).start()
 
     uvicorn.run(

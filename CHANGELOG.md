@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## Version 0.3.7 (2026-03-31)
+
+### Fix browser opening before server is ready
+
+- Replaced the hardcoded `time.sleep(1.2)` delay in `audia serve` with a TCP poll loop that opens the browser only once the server is actually accepting connections (checks every 200 ms, 30 s timeout)
+- Eliminates the "unable to reach" error seen on first load when uvicorn had not finished starting within the fixed delay
+
 ## Version 0.3.6 (2026-03-31)
 
 ### Google Gemini LLM support
