@@ -1,0 +1,781 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Changelog &mdash; audia</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=f6161c1a" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=25a77296"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=fc97db16"></script>
+      <script src="_static/theme_toggle.js?v=14b0a03b"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="audia.ui — Web UI (FastAPI)" href="api/ui.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #0d0d14" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            audia
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#standard-install">Standard install</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#recommended-pipx">Recommended: pipx</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#optional-extras">Optional extras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#install-from-source">Install from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#verify">Verify</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#configure">1. Configure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#convert-a-local-pdf">2. Convert a local PDF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#search-arxiv-and-convert">3. Search ArXiv and convert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#voice-input">4. Voice input</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#web-ui">5. Web UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#show-active-config">6. Show active config</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#llm-provider-required">LLM provider (required)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#option-a-openai">Option A — OpenAI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#option-b-anthropic">Option B — Anthropic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#shared-llm-settings">Shared LLM settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#tts-backend">TTS backend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#stt-voice-input">STT (voice input)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#storage">Storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#web-server">Web server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#research">Research</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#full-env-example">Full <code class="docutils literal notranslate"><span class="pre">.env.example</span></code></a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guides/pipeline.html">Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guides/pipeline.html#entry-points">Entry points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/pipeline.html#step-1-pdf-extraction-pdf-processor-py">Step 1 — PDF extraction (<code class="docutils literal notranslate"><span class="pre">pdf_processor.py</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/pipeline.html#step-2-heuristic-pre-pass-text-cleaner-py">Step 2 — Heuristic pre-pass (<code class="docutils literal notranslate"><span class="pre">text_cleaner.py</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/pipeline.html#step-3-llm-curation-text-cleaner-py-llm-curate">Step 3 — LLM curation (<code class="docutils literal notranslate"><span class="pre">text_cleaner.py</span> <span class="pre">—</span> <span class="pre">llm_curate</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/pipeline.html#step-4-tts-synthesis-tts-py">Step 4 — TTS synthesis (<code class="docutils literal notranslate"><span class="pre">tts.py</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/pipeline.html#state-state-py">State (<code class="docutils literal notranslate"><span class="pre">state.py</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/pipeline.html#debug-output">Debug output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guides/cli.html">CLI Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guides/cli.html#audia-convert"><code class="docutils literal notranslate"><span class="pre">audia</span> <span class="pre">convert</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/cli.html#audia-research"><code class="docutils literal notranslate"><span class="pre">audia</span> <span class="pre">research</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/cli.html#audia-listen"><code class="docutils literal notranslate"><span class="pre">audia</span> <span class="pre">listen</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/cli.html#audia-serve"><code class="docutils literal notranslate"><span class="pre">audia</span> <span class="pre">serve</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/cli.html#audia-info"><code class="docutils literal notranslate"><span class="pre">audia</span> <span class="pre">info</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/cli.html#audia-version"><code class="docutils literal notranslate"><span class="pre">audia</span> <span class="pre">--version</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guides/web_ui.html">Web UI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guides/web_ui.html#starting-the-server">Starting the server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/web_ui.html#tabs">Tabs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/web_ui.html#convert">Convert</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/web_ui.html#research">Research</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/web_ui.html#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/web_ui.html#library-database">Library (Database)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/web_ui.html#api-endpoints-summary">API endpoints (summary)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guides/tts_backends.html">TTS Backends</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guides/tts_backends.html#edge-tts-default">edge-tts (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/tts_backends.html#kokoro-local">Kokoro (local)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/tts_backends.html#openai-tts">OpenAI TTS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/tts_backends.html#chunk-size-tuning">Chunk size tuning</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guides/llm_backends.html">LLM Backends</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guides/llm_backends.html#openai">OpenAI</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/llm_backends.html#custom-endpoint">Custom endpoint</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/llm_backends.html#anthropic">Anthropic</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/llm_backends.html#id1">Custom endpoint</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/llm_backends.html#shared-settings">Shared settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/llm_backends.html#how-the-llm-is-used">How the LLM is used</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guides/storage.html">Storage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guides/storage.html#location">Location</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/storage.html#schema">Schema</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/storage.html#papers"><code class="docutils literal notranslate"><span class="pre">papers</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/storage.html#audio-files"><code class="docutils literal notranslate"><span class="pre">audio_files</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/storage.html#research-sessions"><code class="docutils literal notranslate"><span class="pre">research_sessions</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/storage.html#user-settings"><code class="docutils literal notranslate"><span class="pre">user_settings</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/storage.html#exploring-the-database">Exploring the database</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/audia.html"><code class="docutils literal notranslate"><span class="pre">audia</span></code> — top-level package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/audia.html#audia.Settings"><code class="docutils literal notranslate"><span class="pre">Settings</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.model_config"><code class="docutils literal notranslate"><span class="pre">Settings.model_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.server_host"><code class="docutils literal notranslate"><span class="pre">Settings.server_host</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.server_port"><code class="docutils literal notranslate"><span class="pre">Settings.server_port</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.reload"><code class="docutils literal notranslate"><span class="pre">Settings.reload</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.data_dir"><code class="docutils literal notranslate"><span class="pre">Settings.data_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.db_path"><code class="docutils literal notranslate"><span class="pre">Settings.db_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.audio_dir"><code class="docutils literal notranslate"><span class="pre">Settings.audio_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.upload_dir"><code class="docutils literal notranslate"><span class="pre">Settings.upload_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.debug_dir"><code class="docutils literal notranslate"><span class="pre">Settings.debug_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.ensure_dirs"><code class="docutils literal notranslate"><span class="pre">Settings.ensure_dirs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.llm_provider"><code class="docutils literal notranslate"><span class="pre">Settings.llm_provider</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.openai_api_key"><code class="docutils literal notranslate"><span class="pre">Settings.openai_api_key</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.openai_api_base"><code class="docutils literal notranslate"><span class="pre">Settings.openai_api_base</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.anthropic_api_key"><code class="docutils literal notranslate"><span class="pre">Settings.anthropic_api_key</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.anthropic_api_base"><code class="docutils literal notranslate"><span class="pre">Settings.anthropic_api_base</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.llm_model"><code class="docutils literal notranslate"><span class="pre">Settings.llm_model</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.llm_temperature"><code class="docutils literal notranslate"><span class="pre">Settings.llm_temperature</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.llm_max_chunk_chars"><code class="docutils literal notranslate"><span class="pre">Settings.llm_max_chunk_chars</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.tts_backend"><code class="docutils literal notranslate"><span class="pre">Settings.tts_backend</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.tts_voice"><code class="docutils literal notranslate"><span class="pre">Settings.tts_voice</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.tts_rate"><code class="docutils literal notranslate"><span class="pre">Settings.tts_rate</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.tts_chunk_chars"><code class="docutils literal notranslate"><span class="pre">Settings.tts_chunk_chars</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.stt_model"><code class="docutils literal notranslate"><span class="pre">Settings.stt_model</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.stt_device"><code class="docutils literal notranslate"><span class="pre">Settings.stt_device</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.stt_record_seconds"><code class="docutils literal notranslate"><span class="pre">Settings.stt_record_seconds</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/audia.html#audia.Settings.arxiv_max_results"><code class="docutils literal notranslate"><span class="pre">Settings.arxiv_max_results</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/audia.html#audia.get_settings"><code class="docutils literal notranslate"><span class="pre">get_settings()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/config.html"><code class="docutils literal notranslate"><span class="pre">audia.config</span></code> — Settings</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/config.html#audia.config.Settings"><code class="docutils literal notranslate"><span class="pre">Settings</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.model_config"><code class="docutils literal notranslate"><span class="pre">Settings.model_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.server_host"><code class="docutils literal notranslate"><span class="pre">Settings.server_host</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.server_port"><code class="docutils literal notranslate"><span class="pre">Settings.server_port</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.reload"><code class="docutils literal notranslate"><span class="pre">Settings.reload</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.data_dir"><code class="docutils literal notranslate"><span class="pre">Settings.data_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.db_path"><code class="docutils literal notranslate"><span class="pre">Settings.db_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.audio_dir"><code class="docutils literal notranslate"><span class="pre">Settings.audio_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.upload_dir"><code class="docutils literal notranslate"><span class="pre">Settings.upload_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.debug_dir"><code class="docutils literal notranslate"><span class="pre">Settings.debug_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.ensure_dirs"><code class="docutils literal notranslate"><span class="pre">Settings.ensure_dirs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.llm_provider"><code class="docutils literal notranslate"><span class="pre">Settings.llm_provider</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.openai_api_key"><code class="docutils literal notranslate"><span class="pre">Settings.openai_api_key</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.openai_api_base"><code class="docutils literal notranslate"><span class="pre">Settings.openai_api_base</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.anthropic_api_key"><code class="docutils literal notranslate"><span class="pre">Settings.anthropic_api_key</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.anthropic_api_base"><code class="docutils literal notranslate"><span class="pre">Settings.anthropic_api_base</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.llm_model"><code class="docutils literal notranslate"><span class="pre">Settings.llm_model</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.llm_temperature"><code class="docutils literal notranslate"><span class="pre">Settings.llm_temperature</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.llm_max_chunk_chars"><code class="docutils literal notranslate"><span class="pre">Settings.llm_max_chunk_chars</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.tts_backend"><code class="docutils literal notranslate"><span class="pre">Settings.tts_backend</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.tts_voice"><code class="docutils literal notranslate"><span class="pre">Settings.tts_voice</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.tts_rate"><code class="docutils literal notranslate"><span class="pre">Settings.tts_rate</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.tts_chunk_chars"><code class="docutils literal notranslate"><span class="pre">Settings.tts_chunk_chars</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.stt_model"><code class="docutils literal notranslate"><span class="pre">Settings.stt_model</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.stt_device"><code class="docutils literal notranslate"><span class="pre">Settings.stt_device</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.stt_record_seconds"><code class="docutils literal notranslate"><span class="pre">Settings.stt_record_seconds</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#audia.config.Settings.arxiv_max_results"><code class="docutils literal notranslate"><span class="pre">Settings.arxiv_max_results</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/config.html#audia.config.get_settings"><code class="docutils literal notranslate"><span class="pre">get_settings()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/agents.html"><code class="docutils literal notranslate"><span class="pre">audia.agents</span></code> — Pipeline agents</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/agents.html#module-audia.agents.graph"><code class="docutils literal notranslate"><span class="pre">audia.agents.graph</span></code> — LangGraph pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.graph.node_extract_text"><code class="docutils literal notranslate"><span class="pre">node_extract_text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.graph.node_preprocess"><code class="docutils literal notranslate"><span class="pre">node_preprocess()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.graph.node_curate"><code class="docutils literal notranslate"><span class="pre">node_curate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.graph.node_synthesize_audio"><code class="docutils literal notranslate"><span class="pre">node_synthesize_audio()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.graph.build_pipeline"><code class="docutils literal notranslate"><span class="pre">build_pipeline()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.graph.run_pipeline"><code class="docutils literal notranslate"><span class="pre">run_pipeline()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/agents.html#module-audia.agents.state"><code class="docutils literal notranslate"><span class="pre">audia.agents.state</span></code> — Pipeline state</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.state.PipelineState"><code class="docutils literal notranslate"><span class="pre">PipelineState</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.state.PipelineState.pdf_path"><code class="docutils literal notranslate"><span class="pre">PipelineState.pdf_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.state.PipelineState.output_dir"><code class="docutils literal notranslate"><span class="pre">PipelineState.output_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.state.PipelineState.raw_text"><code class="docutils literal notranslate"><span class="pre">PipelineState.raw_text</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.state.PipelineState.preprocessed_text"><code class="docutils literal notranslate"><span class="pre">PipelineState.preprocessed_text</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.state.PipelineState.cleaned_text"><code class="docutils literal notranslate"><span class="pre">PipelineState.cleaned_text</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.state.PipelineState.audio_path"><code class="docutils literal notranslate"><span class="pre">PipelineState.audio_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.state.PipelineState.audio_filename"><code class="docutils literal notranslate"><span class="pre">PipelineState.audio_filename</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.state.PipelineState.title"><code class="docutils literal notranslate"><span class="pre">PipelineState.title</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.state.PipelineState.num_pages"><code class="docutils literal notranslate"><span class="pre">PipelineState.num_pages</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.state.PipelineState.tts_backend"><code class="docutils literal notranslate"><span class="pre">PipelineState.tts_backend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.state.PipelineState.tts_voice"><code class="docutils literal notranslate"><span class="pre">PipelineState.tts_voice</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.state.PipelineState.run_id"><code class="docutils literal notranslate"><span class="pre">PipelineState.run_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.state.PipelineState.error"><code class="docutils literal notranslate"><span class="pre">PipelineState.error</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/agents.html#module-audia.agents.pdf_processor"><code class="docutils literal notranslate"><span class="pre">audia.agents.pdf_processor</span></code> — PDF extraction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.pdf_processor.ExtractionResult"><code class="docutils literal notranslate"><span class="pre">ExtractionResult</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.pdf_processor.ExtractionResult.text"><code class="docutils literal notranslate"><span class="pre">ExtractionResult.text</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.pdf_processor.ExtractionResult.num_pages"><code class="docutils literal notranslate"><span class="pre">ExtractionResult.num_pages</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.pdf_processor.ExtractionResult.title"><code class="docutils literal notranslate"><span class="pre">ExtractionResult.title</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.pdf_processor.extract_text"><code class="docutils literal notranslate"><span class="pre">extract_text()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/agents.html#module-audia.agents.text_cleaner"><code class="docutils literal notranslate"><span class="pre">audia.agents.text_cleaner</span></code> — Heuristic + LLM curation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.text_cleaner.heuristic_clean"><code class="docutils literal notranslate"><span class="pre">heuristic_clean()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.text_cleaner.llm_curate"><code class="docutils literal notranslate"><span class="pre">llm_curate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.text_cleaner.llm_clean"><code class="docutils literal notranslate"><span class="pre">llm_clean()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.text_cleaner.curate_text"><code class="docutils literal notranslate"><span class="pre">curate_text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.text_cleaner.clean_text"><code class="docutils literal notranslate"><span class="pre">clean_text()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/agents.html#module-audia.agents.tts"><code class="docutils literal notranslate"><span class="pre">audia.agents.tts</span></code> — Text-to-speech synthesis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.tts.synthesize"><code class="docutils literal notranslate"><span class="pre">synthesize()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/agents.html#module-audia.agents.stt"><code class="docutils literal notranslate"><span class="pre">audia.agents.stt</span></code> — Speech-to-text + query distillation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.stt.record_and_transcribe"><code class="docutils literal notranslate"><span class="pre">record_and_transcribe()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.stt.transcribe_file"><code class="docutils literal notranslate"><span class="pre">transcribe_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.stt.distill_search_query"><code class="docutils literal notranslate"><span class="pre">distill_search_query()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/agents.html#module-audia.agents.research"><code class="docutils literal notranslate"><span class="pre">audia.agents.research</span></code> — ArXiv research</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.research.ArxivPaper"><code class="docutils literal notranslate"><span class="pre">ArxivPaper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.research.ArxivPaper.arxiv_id"><code class="docutils literal notranslate"><span class="pre">ArxivPaper.arxiv_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.research.ArxivPaper.title"><code class="docutils literal notranslate"><span class="pre">ArxivPaper.title</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.research.ArxivPaper.authors"><code class="docutils literal notranslate"><span class="pre">ArxivPaper.authors</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.research.ArxivPaper.abstract"><code class="docutils literal notranslate"><span class="pre">ArxivPaper.abstract</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.research.ArxivPaper.pdf_url"><code class="docutils literal notranslate"><span class="pre">ArxivPaper.pdf_url</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.research.ArxivPaper.published"><code class="docutils literal notranslate"><span class="pre">ArxivPaper.published</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.research.ArxivPaper.local_pdf_path"><code class="docutils literal notranslate"><span class="pre">ArxivPaper.local_pdf_path</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/agents.html#audia.agents.research.ArxivSearcher"><code class="docutils literal notranslate"><span class="pre">ArxivSearcher</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.research.ArxivSearcher.search"><code class="docutils literal notranslate"><span class="pre">ArxivSearcher.search()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/agents.html#audia.agents.research.ArxivSearcher.download_pdf"><code class="docutils literal notranslate"><span class="pre">ArxivSearcher.download_pdf()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/storage.html"><code class="docutils literal notranslate"><span class="pre">audia.storage</span></code> — Database models &amp; access</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/storage.html#module-audia.storage.models"><code class="docutils literal notranslate"><span class="pre">audia.storage.models</span></code> — SQLAlchemy ORM models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/storage.html#audia.storage.models.Base"><code class="docutils literal notranslate"><span class="pre">Base</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/storage.html#audia.storage.models.Paper"><code class="docutils literal notranslate"><span class="pre">Paper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/storage.html#audia.storage.models.Paper.audio_files"><code class="docutils literal notranslate"><span class="pre">Paper.audio_files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/storage.html#audia.storage.models.Paper.authors_list"><code class="docutils literal notranslate"><span class="pre">Paper.authors_list</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/storage.html#audia.storage.models.AudioFile"><code class="docutils literal notranslate"><span class="pre">AudioFile</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/storage.html#audia.storage.models.AudioFile.paper"><code class="docutils literal notranslate"><span class="pre">AudioFile.paper</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/storage.html#audia.storage.models.ResearchSession"><code class="docutils literal notranslate"><span class="pre">ResearchSession</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/storage.html#audia.storage.models.ResearchSession.paper_ids_list"><code class="docutils literal notranslate"><span class="pre">ResearchSession.paper_ids_list</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/storage.html#audia.storage.models.UserSetting"><code class="docutils literal notranslate"><span class="pre">UserSetting</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/storage.html#module-audia.storage.database"><code class="docutils literal notranslate"><span class="pre">audia.storage.database</span></code> — Session factory &amp; helpers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/storage.html#audia.storage.database.engine"><code class="docutils literal notranslate"><span class="pre">engine()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/storage.html#audia.storage.database.init_db"><code class="docutils literal notranslate"><span class="pre">init_db()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/storage.html#audia.storage.database.get_session"><code class="docutils literal notranslate"><span class="pre">get_session()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/cli.html"><code class="docutils literal notranslate"><span class="pre">audia.cli</span></code> — Command-line interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/cli.html#commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/cli.html#audia.cli.app.convert"><code class="docutils literal notranslate"><span class="pre">convert()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/cli.html#audia.cli.app.research"><code class="docutils literal notranslate"><span class="pre">research()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/cli.html#audia.cli.app.listen"><code class="docutils literal notranslate"><span class="pre">listen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/cli.html#audia.cli.app.serve"><code class="docutils literal notranslate"><span class="pre">serve()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/cli.html#audia.cli.app.info"><code class="docutils literal notranslate"><span class="pre">info()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/ui.html"><code class="docutils literal notranslate"><span class="pre">audia.ui</span></code> — Web UI (FastAPI)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/ui.html#module-audia.ui.app"><code class="docutils literal notranslate"><span class="pre">audia.ui.app</span></code> — FastAPI application</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ui.html#audia.ui.app.create_app"><code class="docutils literal notranslate"><span class="pre">create_app()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/ui.html#module-audia.ui.jobs"><code class="docutils literal notranslate"><span class="pre">audia.ui.jobs</span></code> — Background job store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/ui.html#routes">Routes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ui.html#module-audia.ui.routes.convert"><code class="docutils literal notranslate"><span class="pre">audia.ui.routes.convert</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.convert.upload_and_convert"><code class="docutils literal notranslate"><span class="pre">upload_and_convert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.convert.enqueue_conversion"><code class="docutils literal notranslate"><span class="pre">enqueue_conversion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.convert.get_job_status"><code class="docutils literal notranslate"><span class="pre">get_job_status()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.convert.cancel_job"><code class="docutils literal notranslate"><span class="pre">cancel_job()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.convert.serve_job_pdf"><code class="docutils literal notranslate"><span class="pre">serve_job_pdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.convert.download_audio"><code class="docutils literal notranslate"><span class="pre">download_audio()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/ui.html#module-audia.ui.routes.research"><code class="docutils literal notranslate"><span class="pre">audia.ui.routes.research</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.research.SearchRequest"><code class="docutils literal notranslate"><span class="pre">SearchRequest</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.research.NormalizeRequest"><code class="docutils literal notranslate"><span class="pre">NormalizeRequest</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.research.ConvertResearchRequest"><code class="docutils literal notranslate"><span class="pre">ConvertResearchRequest</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.research.EnqueueRequest"><code class="docutils literal notranslate"><span class="pre">EnqueueRequest</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.research.normalize"><code class="docutils literal notranslate"><span class="pre">normalize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.research.search"><code class="docutils literal notranslate"><span class="pre">search()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.research.convert_papers"><code class="docutils literal notranslate"><span class="pre">convert_papers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.research.enqueue_research"><code class="docutils literal notranslate"><span class="pre">enqueue_research()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.research.transcribe_audio"><code class="docutils literal notranslate"><span class="pre">transcribe_audio()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.research.get_job_status"><code class="docutils literal notranslate"><span class="pre">get_job_status()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.research.cancel_job"><code class="docutils literal notranslate"><span class="pre">cancel_job()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.research.serve_job_pdf"><code class="docutils literal notranslate"><span class="pre">serve_job_pdf()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/ui.html#module-audia.ui.routes.library"><code class="docutils literal notranslate"><span class="pre">audia.ui.routes.library</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.library.list_papers"><code class="docutils literal notranslate"><span class="pre">list_papers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.library.list_audio"><code class="docutils literal notranslate"><span class="pre">list_audio()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.library.list_research_sessions"><code class="docutils literal notranslate"><span class="pre">list_research_sessions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.library.list_user_settings"><code class="docutils literal notranslate"><span class="pre">list_user_settings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.library.PaperPatch"><code class="docutils literal notranslate"><span class="pre">PaperPatch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.library.AudioPatch"><code class="docutils literal notranslate"><span class="pre">AudioPatch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.library.ResearchSessionPatch"><code class="docutils literal notranslate"><span class="pre">ResearchSessionPatch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.library.UserSettingPatch"><code class="docutils literal notranslate"><span class="pre">UserSettingPatch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.library.patch_paper"><code class="docutils literal notranslate"><span class="pre">patch_paper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.library.patch_audio"><code class="docutils literal notranslate"><span class="pre">patch_audio()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.library.patch_research_session"><code class="docutils literal notranslate"><span class="pre">patch_research_session()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.library.patch_user_setting"><code class="docutils literal notranslate"><span class="pre">patch_user_setting()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.library.delete_audio"><code class="docutils literal notranslate"><span class="pre">delete_audio()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.library.get_paper"><code class="docutils literal notranslate"><span class="pre">get_paper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.library.delete_paper"><code class="docutils literal notranslate"><span class="pre">delete_paper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.library.serve_pdf"><code class="docutils literal notranslate"><span class="pre">serve_pdf()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/ui.html#module-audia.ui.routes.settings"><code class="docutils literal notranslate"><span class="pre">audia.ui.routes.settings</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.settings.SettingsBody"><code class="docutils literal notranslate"><span class="pre">SettingsBody</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.settings.get_ui_settings"><code class="docutils literal notranslate"><span class="pre">get_ui_settings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ui.html#audia.ui.routes.settings.save_ui_settings"><code class="docutils literal notranslate"><span class="pre">save_ui_settings()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#id1">CHANGELOG</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-3-5-2026-03-31">Version 0.3.5 (2026-03-31)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#rebuild-frontend">Rebuild frontend</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-3-4-2026-03-31">Version 0.3.4 (2026-03-31)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#custom-api-base-urls-for-openai-and-anthropic">Custom API base URLs for OpenAI and Anthropic</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-3-3-2026-03-31">Version 0.3.3 (2026-03-31)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#icon-system-tts-voice-selector-database-editor">Icon system, TTS voice selector &amp; database editor</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#icon-system-constants-index-ts">Icon system (<code class="docutils literal notranslate"><span class="pre">constants/index.ts</span></code>)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tts-voice-selector-configuration-tab">TTS voice selector (Configuration tab)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#database-explorer-editable-cells">Database explorer — editable cells</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#database-explorer-table-ux">Database explorer — table UX</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-3-2-2026-03-30">Version 0.3.2 (2026-03-30)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#convert-tab-improvements">Convert tab improvements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#instant-pdf-preview-on-upload">Instant PDF preview on upload</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#collapsible-full-progress-log">Collapsible full-progress log</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-3-1-2026-03-30">Version 0.3.1 (2026-03-30)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#frontend-refactor-database-explorer">Frontend refactor &amp; database explorer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#main-tsx-split-into-tab-components">Main.tsx split into tab components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#database-tab-maindatabase-tsx">Database tab (<code class="docutils literal notranslate"><span class="pre">MainDatabase.tsx</span></code>)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#api-additions-library-router">API additions (library router)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#scripts-explore-db-py"><code class="docutils literal notranslate"><span class="pre">scripts/explore_db.py</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-3-0-2026-03-29">Version 0.3.0 (2026-03-29)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-voice-search-llm-query-normalisation">Configuration, voice search &amp; LLM query normalisation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#configuration-tab">Configuration tab</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#voice-search-research-tab">Voice search (Research tab)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#llm-query-normalisation-research-tab">LLM query normalisation (Research tab)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#api-additions">API additions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#code-hygiene">Code hygiene</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-2-0-2026-03-29">Version 0.2.0 (2026-03-29)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#web-ui-overhaul">Web UI overhaul</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-1-2-2026-03-29">Version 0.1.2 (2026-03-29)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#arxiv-search-robustness-cli-improvements">ArXiv search robustness &amp; CLI improvements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#arxiv-search">ArXiv search</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pdf-download">PDF download</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cli-output">CLI output</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-1-1-2026-03-29">Version 0.1.1 (2026-03-29)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#listen-command-pipeline-overhaul"><code class="docutils literal notranslate"><span class="pre">listen</span></code> command pipeline overhaul</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-1-0-2026-03-29">Version 0.1.0 (2026-03-29)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#first-fully-working-release-pdf-to-audio-via-mandatory-llm-curation-and-edge-tts-synthesis">First fully working release: PDF to audio via mandatory LLM curation and edge-tts synthesis.</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-0-1-2026-03-28">Version 0.0.1 (2026-03-28)</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #0d0d14" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">audia</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Changelog</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading"></a></h1>
+</section>
+<section id="id1">
+<h1>CHANGELOG<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<section id="version-0-3-5-2026-03-31">
+<h2>Version 0.3.5 (2026-03-31)<a class="headerlink" href="#version-0-3-5-2026-03-31" title="Link to this heading"></a></h2>
+<section id="rebuild-frontend">
+<h3>Rebuild frontend<a class="headerlink" href="#rebuild-frontend" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Rebuild UI with the current state of implementation</p>
+<ul>
+<li><p>Add new db tab</p></li>
+<li><p>Update the HTML title</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="version-0-3-4-2026-03-31">
+<h2>Version 0.3.4 (2026-03-31)<a class="headerlink" href="#version-0-3-4-2026-03-31" title="Link to this heading"></a></h2>
+<section id="custom-api-base-urls-for-openai-and-anthropic">
+<h3>Custom API base URLs for OpenAI and Anthropic<a class="headerlink" href="#custom-api-base-urls-for-openai-and-anthropic" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">AUDIA_OPENAI_API_BASE</span></code> — optional setting to redirect all OpenAI calls (LLM + TTS) to a custom endpoint (Azure OpenAI, corporate proxy, or any OpenAI-compatible URL)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AUDIA_ANTHROPIC_API_BASE</span></code> — same for Anthropic LLM calls</p></li>
+<li><p>Both settings wired through <code class="docutils literal notranslate"><span class="pre">config.py</span></code>, <code class="docutils literal notranslate"><span class="pre">text_cleaner.py</span></code> (<code class="docutils literal notranslate"><span class="pre">_build_llm</span></code>), and <code class="docutils literal notranslate"><span class="pre">tts.py</span></code>; <code class="docutils literal notranslate"><span class="pre">stt.py</span></code> inherits the base URL automatically via <code class="docutils literal notranslate"><span class="pre">_build_llm</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.env.example</span></code> updated with commented examples for both options</p></li>
+</ul>
+</section>
+</section>
+<section id="version-0-3-3-2026-03-31">
+<h2>Version 0.3.3 (2026-03-31)<a class="headerlink" href="#version-0-3-3-2026-03-31" title="Link to this heading"></a></h2>
+<section id="icon-system-tts-voice-selector-database-editor">
+<h3>Icon system, TTS voice selector &amp; database editor<a class="headerlink" href="#icon-system-tts-voice-selector-database-editor" title="Link to this heading"></a></h3>
+<section id="icon-system-constants-index-ts">
+<h4>Icon system (<code class="docutils literal notranslate"><span class="pre">constants/index.ts</span></code>)<a class="headerlink" href="#icon-system-constants-index-ts" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Introduced <code class="docutils literal notranslate"><span class="pre">IconDef</span></code> discriminated union type — <code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">kind:</span> <span class="pre">'icon';</span> <span class="pre">name;</span> <span class="pre">adaptive?</span> <span class="pre">}</span></code> for Iconify icons or <code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">kind:</span> <span class="pre">'img';</span> <span class="pre">src;</span> <span class="pre">alt</span> <span class="pre">}</span></code> for image assets — providing a single typed representation for all logos across the app</p></li>
+<li><p>All asset imports (<code class="docutils literal notranslate"><span class="pre">arxiv.svg</span></code>, <code class="docutils literal notranslate"><span class="pre">systran.svg</span></code>, <code class="docutils literal notranslate"><span class="pre">hexgrad.webp</span></code>) moved from individual component files into <code class="docutils literal notranslate"><span class="pre">constants/index.ts</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PROVIDER_ICONS</span></code> updated to <code class="docutils literal notranslate"><span class="pre">Record&lt;LLMProvider,</span> <span class="pre">IconDef&gt;</span></code>; OpenAI uses <code class="docutils literal notranslate"><span class="pre">simple-icons:openai</span></code> with <code class="docutils literal notranslate"><span class="pre">adaptive:</span> <span class="pre">true</span></code> (renders white in dark mode, black in light mode)</p></li>
+<li><p>New exports: <code class="docutils literal notranslate"><span class="pre">STT_ICON</span></code>, <code class="docutils literal notranslate"><span class="pre">ARXIV_ICON</span></code>, <code class="docutils literal notranslate"><span class="pre">TTS_BACKEND_ICONS</span></code> — centralising all service/backend logos in one place</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">renderIconDef(icon,</span> <span class="pre">isDark,</span> <span class="pre">className?)</span></code> helper in <code class="docutils literal notranslate"><span class="pre">MainConfiguration.tsx</span></code> handles both <code class="docutils literal notranslate"><span class="pre">img</span></code> and <code class="docutils literal notranslate"><span class="pre">icon</span></code> variants, applying theme-aware colouring for adaptive icons</p></li>
+</ul>
+</section>
+<section id="tts-voice-selector-configuration-tab">
+<h4>TTS voice selector (Configuration tab)<a class="headerlink" href="#tts-voice-selector-configuration-tab" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>TTS card now shows a <strong>2-column grid</strong>: Engine selector + Voice selector side-by-side</p></li>
+<li><p>Voice options are populated from <code class="docutils literal notranslate"><span class="pre">TTS_VOICES[backend]</span></code>; switching the engine automatically resets the voice to the first option for that backend</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ttsVoice</span></code> state added to <code class="docutils literal notranslate"><span class="pre">Main.tsx</span></code>, persisted to and loaded from <code class="docutils literal notranslate"><span class="pre">/api/settings</span></code> via a new <code class="docutils literal notranslate"><span class="pre">tts_voice</span></code> key</p></li>
+</ul>
+</section>
+<section id="database-explorer-editable-cells">
+<h4>Database explorer — editable cells<a class="headerlink" href="#database-explorer-editable-cells" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>All cells in editable columns (<code class="docutils literal notranslate"><span class="pre">title</span></code>, <code class="docutils literal notranslate"><span class="pre">authors</span></code>, <code class="docutils literal notranslate"><span class="pre">abstract</span></code>, <code class="docutils literal notranslate"><span class="pre">arxiv_id</span></code>, <code class="docutils literal notranslate"><span class="pre">pdf_url</span></code> for papers; <code class="docutils literal notranslate"><span class="pre">filename</span></code>, <code class="docutils literal notranslate"><span class="pre">duration_seconds</span></code>, <code class="docutils literal notranslate"><span class="pre">tts_backend</span></code>, <code class="docutils literal notranslate"><span class="pre">tts_voice</span></code>, <code class="docutils literal notranslate"><span class="pre">paper_id</span></code> for audio files; <code class="docutils literal notranslate"><span class="pre">query</span></code> for research sessions; <code class="docutils literal notranslate"><span class="pre">value</span></code> for user settings) are now <strong>inline-editable</strong></p></li>
+<li><p>Click a cell → <code class="docutils literal notranslate"><span class="pre">&lt;input&gt;</span></code> or <code class="docutils literal notranslate"><span class="pre">&lt;textarea&gt;</span></code> (for <code class="docutils literal notranslate"><span class="pre">abstract</span></code>/<code class="docutils literal notranslate"><span class="pre">query</span></code>) appear inline; <strong>Enter</strong> commits, <strong>Escape</strong> cancels, <strong>⌘/Ctrl+Enter</strong> commits multiline fields; blur also commits</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tts_backend</span></code> and <code class="docutils literal notranslate"><span class="pre">tts_voice</span></code> cells use a <strong>portal-based custom dropdown</strong> that escapes the <code class="docutils literal notranslate"><span class="pre">overflow-x-auto</span></code> container; <code class="docutils literal notranslate"><span class="pre">tts_voice</span></code> options reflect the current row’s backend</p></li>
+<li><p>Brief lime flash on successful save; spinner while saving</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">authors</span></code> is edited as comma-separated text and sent as a JSON array; <code class="docutils literal notranslate"><span class="pre">paper_id</span></code>/<code class="docutils literal notranslate"><span class="pre">duration_seconds</span></code> are coerced to numbers; clearing nullable fields sends <code class="docutils literal notranslate"><span class="pre">null</span></code></p></li>
+<li><p>New backend PATCH endpoints for all four tables: <code class="docutils literal notranslate"><span class="pre">PATCH</span> <span class="pre">/api/library/papers/{id}</span></code>, <code class="docutils literal notranslate"><span class="pre">PATCH</span> <span class="pre">/api/library/audio/{id}</span></code>, <code class="docutils literal notranslate"><span class="pre">PATCH</span> <span class="pre">/api/library/research_sessions/{id}</span></code>, <code class="docutils literal notranslate"><span class="pre">PATCH</span> <span class="pre">/api/library/user_settings/{key}</span></code></p></li>
+</ul>
+</section>
+<section id="database-explorer-table-ux">
+<h4>Database explorer — table UX<a class="headerlink" href="#database-explorer-table-ux" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Table is now <strong>horizontally scrollable</strong> — uses <code class="docutils literal notranslate"><span class="pre">table-auto</span> <span class="pre">min-w-max</span></code> so columns never line-wrap; <code class="docutils literal notranslate"><span class="pre">overflow-x-auto</span></code> wrapper scrolls instead</p></li>
+<li><p><strong>Full column sets returned</strong>: <code class="docutils literal notranslate"><span class="pre">list_papers</span></code> now includes <code class="docutils literal notranslate"><span class="pre">abstract</span></code>, <code class="docutils literal notranslate"><span class="pre">pdf_path</span></code>, <code class="docutils literal notranslate"><span class="pre">pdf_url</span></code>; <code class="docutils literal notranslate"><span class="pre">list_audio</span></code> now includes <code class="docutils literal notranslate"><span class="pre">file_path</span></code>, <code class="docutils literal notranslate"><span class="pre">duration_seconds</span></code> (previously omitted)</p></li>
+<li><p><strong>Column hide/show</strong>: each column header has an eye-off icon; clicking hides the column; hidden columns appear as chips above the table that restore on click; hidden set resets when switching tables</p></li>
+<li><p><strong>Table picker</strong> replaced native <code class="docutils literal notranslate"><span class="pre">&lt;select&gt;</span></code> with a fully custom styled dropdown</p></li>
+<li><p>Clicking a <code class="docutils literal notranslate"><span class="pre">papers.id</span></code> cell (or <code class="docutils literal notranslate"><span class="pre">audio_files.paper_id</span></code>) opens the PDF in the <strong>PreviewPanel</strong> — links rendered as rose-coloured buttons instead of editable cells</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="version-0-3-2-2026-03-30">
+<h2>Version 0.3.2 (2026-03-30)<a class="headerlink" href="#version-0-3-2-2026-03-30" title="Link to this heading"></a></h2>
+<section id="convert-tab-improvements">
+<h3>Convert tab improvements<a class="headerlink" href="#convert-tab-improvements" title="Link to this heading"></a></h3>
+<section id="instant-pdf-preview-on-upload">
+<h4>Instant PDF preview on upload<a class="headerlink" href="#instant-pdf-preview-on-upload" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Dropping a PDF or selecting one via the file browser immediately opens the <strong>PreviewPanel</strong> on the right using a local <code class="docutils literal notranslate"><span class="pre">blob:</span></code> URL — no conversion needs to start first</p></li>
+<li><p>Clearing the file (“Convert another file”) also closes the preview panel</p></li>
+<li><p>During conversion the panel URL is transparently upgraded to the server-served PDF once the backend has processed it</p></li>
+</ul>
+</section>
+<section id="collapsible-full-progress-log">
+<h4>Collapsible full-progress log<a class="headerlink" href="#collapsible-full-progress-log" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>The verbose log output (step-by-step stage details, chunk counts, etc.) is now <strong>hidden by default</strong> behind a “Show full progress” toggle</p></li>
+<li><p>Clicking the toggle expands/collapses the log with a chevron indicator (“Show full progress” ▶ / “Hide full progress” ▼)</p></li>
+<li><p>The log container background contrast raised (<code class="docutils literal notranslate"><span class="pre">bg-white/8</span></code> / <code class="docutils literal notranslate"><span class="pre">bg-black/8</span></code>) so the scrolling area is visually distinct</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="version-0-3-1-2026-03-30">
+<h2>Version 0.3.1 (2026-03-30)<a class="headerlink" href="#version-0-3-1-2026-03-30" title="Link to this heading"></a></h2>
+<section id="frontend-refactor-database-explorer">
+<h3>Frontend refactor &amp; database explorer<a class="headerlink" href="#frontend-refactor-database-explorer" title="Link to this heading"></a></h3>
+<section id="main-tsx-split-into-tab-components">
+<h4>Main.tsx split into tab components<a class="headerlink" href="#main-tsx-split-into-tab-components" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">MainConfiguration.tsx</span></code></strong>: pipeline diagram and model/backend selectors extracted into a standalone component</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">MainConvert.tsx</span></code></strong>: PDF upload, <code class="docutils literal notranslate"><span class="pre">ConversionProgress</span></code>, <code class="docutils literal notranslate"><span class="pre">AudioPlayer</span></code>, and <code class="docutils literal notranslate"><span class="pre">CONVERT_STAGES</span></code> extracted; all three are exported for reuse</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">MainResearch.tsx</span></code></strong>: ArXiv search, voice recording, LLM query normalisation, paper selection, and job progress extracted; exports <code class="docutils literal notranslate"><span class="pre">RESEARCH_STAGES</span></code></p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">Main.tsx</span></code></strong> reduced to a 159-line orchestrator: holds shared pipeline config state, loads/saves settings via <code class="docutils literal notranslate"><span class="pre">/api/settings</span></code>, renders a tab bar, and delegates to each sub-component</p></li>
+</ul>
+</section>
+<section id="database-tab-maindatabase-tsx">
+<h4>Database tab (<code class="docutils literal notranslate"><span class="pre">MainDatabase.tsx</span></code>)<a class="headerlink" href="#database-tab-maindatabase-tsx" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>Schema overview</strong>: four cards (one per table — <code class="docutils literal notranslate"><span class="pre">papers</span></code>, <code class="docutils literal notranslate"><span class="pre">audio_files</span></code>, <code class="docutils literal notranslate"><span class="pre">research_sessions</span></code>, <code class="docutils literal notranslate"><span class="pre">user_settings</span></code>) showing all columns with types and PK/FK badges; relationship annotations (FK arrow and JSON logical link) displayed below</p></li>
+<li><p><strong>Mermaid ERD</strong>: collapsible <code class="docutils literal notranslate"><span class="pre">erDiagram</span></code> code block with a one-click copy button</p></li>
+<li><p><strong>Data explorer</strong>: dropdown to select any table; fetches all rows from the API and renders them in a full-width table with no truncation; JSON array columns rendered inline</p></li>
+</ul>
+</section>
+<section id="api-additions-library-router">
+<h4>API additions (library router)<a class="headerlink" href="#api-additions-library-router" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/library/research_sessions</span></code> — returns all research sessions ordered by date</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/library/user_settings</span></code> — returns all key-value settings rows</p></li>
+</ul>
+</section>
+<section id="scripts-explore-db-py">
+<h4><code class="docutils literal notranslate"><span class="pre">scripts/explore_db.py</span></code><a class="headerlink" href="#scripts-explore-db-py" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Standalone stdlib-only script (no dependencies) that prints a full terminal dump of <code class="docutils literal notranslate"><span class="pre">~/.audia/audia.db</span></code></p></li>
+<li><p>Shows table list, per-table schema (column names, types, nullability, PK), foreign keys, row count, and all cell values with JSON pretty-printing</p></li>
+<li><p>Accepts <code class="docutils literal notranslate"><span class="pre">--db</span> <span class="pre">/path/to/other.db</span></code> to point at a custom database file</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="version-0-3-0-2026-03-29">
+<h2>Version 0.3.0 (2026-03-29)<a class="headerlink" href="#version-0-3-0-2026-03-29" title="Link to this heading"></a></h2>
+<section id="configuration-voice-search-llm-query-normalisation">
+<h3>Configuration, voice search &amp; LLM query normalisation<a class="headerlink" href="#configuration-voice-search-llm-query-normalisation" title="Link to this heading"></a></h3>
+<section id="configuration-tab">
+<h4>Configuration tab<a class="headerlink" href="#configuration-tab" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>Pipeline diagram</strong>: animated SVG diagram in the Configuration tab visualises the full pipeline (STT → LLM → ArXiv → PDF → TTS) with correct arrow routing (Text bypasses LLM and enters ArXiv directly)</p></li>
+<li><p><strong>Persistent settings</strong>: <code class="docutils literal notranslate"><span class="pre">UserSetting</span></code> SQLite model stores per-key config; <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/settings</span></code> and <code class="docutils literal notranslate"><span class="pre">PUT</span> <span class="pre">/api/settings</span></code> endpoints load and upsert settings on demand</p></li>
+<li><p><strong>Save button</strong>: “Save configuration” button with “Saved ✓” confirmation; config state lifted to <code class="docutils literal notranslate"><span class="pre">Main</span></code> and loaded from the database on mount</p></li>
+<li><p><strong>Settings applied to pipelines</strong>: selected LLM provider/model and TTS backend are forwarded as optional overrides to <code class="docutils literal notranslate"><span class="pre">/api/convert/enqueue</span></code> and <code class="docutils literal notranslate"><span class="pre">/api/research/enqueue</span></code></p></li>
+</ul>
+</section>
+<section id="voice-search-research-tab">
+<h4>Voice search (Research tab)<a class="headerlink" href="#voice-search-research-tab" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>Microphone button</strong>: browser <code class="docutils literal notranslate"><span class="pre">MediaRecorder</span></code> captures audio; blob is <code class="docutils literal notranslate"><span class="pre">POST</span></code>ed to <code class="docutils literal notranslate"><span class="pre">/api/research/transcribe</span></code> which runs <code class="docutils literal notranslate"><span class="pre">faster-whisper</span></code> (<code class="docutils literal notranslate"><span class="pre">transcribe_file</span></code>) and returns the transcript into the query field</p></li>
+</ul>
+</section>
+<section id="llm-query-normalisation-research-tab">
+<h4>LLM query normalisation (Research tab)<a class="headerlink" href="#llm-query-normalisation-research-tab" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>Normalize query button</strong>: calls <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/research/normalize</span></code> which runs <code class="docutils literal notranslate"><span class="pre">distill_search_query</span></code> from <code class="docutils literal notranslate"><span class="pre">stt.py</span></code> (same prompt used by the CLI <code class="docutils literal notranslate"><span class="pre">listen</span></code> command — no duplicate prompt logic)</p></li>
+<li><p><strong>Two-step search flow</strong>: raw query → optional LLM normalisation → editable confirmation pane → “Search arXiv” button; normalisation errors surfaced as a dismissable red banner instead of silent fallback</p></li>
+<li><p><strong>Single Search arXiv button</strong>: removed duplicate search button; one full-width button below the input row handles both direct and post-normalisation searches; “No results found” only shown after an actual search attempt</p></li>
+</ul>
+</section>
+<section id="api-additions">
+<h4>API additions<a class="headerlink" href="#api-additions" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/research/normalize</span></code> — wraps <code class="docutils literal notranslate"><span class="pre">distill_search_query</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/research/transcribe</span></code> — wraps <code class="docutils literal notranslate"><span class="pre">transcribe_file</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/convert/upload</span></code> — synchronous PDF upload + convert (used by tests)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/research/convert</span></code> — synchronous ArXiv download + convert (used by tests)</p></li>
+</ul>
+</section>
+<section id="code-hygiene">
+<h4>Code hygiene<a class="headerlink" href="#code-hygiene" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Removed <code class="docutils literal notranslate"><span class="pre">_QUERY_SYSTEM</span></code> prompt and <code class="docutils literal notranslate"><span class="pre">normalize_query()</span></code> from <code class="docutils literal notranslate"><span class="pre">text_cleaner.py</span></code>; normalisation now reuses <code class="docutils literal notranslate"><span class="pre">distill_search_query</span></code> directly — two LLMs, two prompts, no duplication</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="version-0-2-0-2026-03-29">
+<h2>Version 0.2.0 (2026-03-29)<a class="headerlink" href="#version-0-2-0-2026-03-29" title="Link to this heading"></a></h2>
+<section id="web-ui-overhaul">
+<h3>Web UI overhaul<a class="headerlink" href="#web-ui-overhaul" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Async conversion jobs</strong>: PDF upload and ArXiv research conversions now run in the background; a <code class="docutils literal notranslate"><span class="pre">job_id</span></code> is returned immediately and the frontend polls for live progress</p></li>
+<li><p><strong>Streaming terminal log</strong>: each pipeline stage (PDF extraction, heuristic cleaning, LLM curation chunk-by-chunk, TTS chunk-by-chunk) streams log lines into a scrollable terminal pane</p></li>
+<li><p><strong>Cancel button</strong>: any running conversion can be cancelled mid-pipeline via a cancel button that calls <code class="docutils literal notranslate"><span class="pre">DELETE</span> <span class="pre">/api/{convert,research}/jobs/{id}</span></code></p></li>
+<li><p><strong>Inline PDF preview</strong>: clicking a paper in the sidebar now opens the PDF in a side panel instead of downloading it; <code class="docutils literal notranslate"><span class="pre">Content-Disposition:</span> <span class="pre">inline</span></code> is set on all PDF-serving endpoints</p></li>
+<li><p><strong>Live PDF preview during conversion</strong>: the preview panel opens automatically as soon as the PDF is available (right after upload or ArXiv download), before the pipeline finishes</p></li>
+<li><p><strong>Research async pipeline</strong>: <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/research/enqueue</span></code> replaces the old blocking <code class="docutils literal notranslate"><span class="pre">/convert</span></code>; each ArXiv ID gets its own job with 6 stages (searching → downloading → extracting → pre-cleaning → LLM curation → TTS synthesis)</p></li>
+<li><p><strong>Progress callbacks</strong>: <code class="docutils literal notranslate"><span class="pre">llm_curate</span></code> and <code class="docutils literal notranslate"><span class="pre">synthesize</span></code>/<code class="docutils literal notranslate"><span class="pre">_edge_tts</span></code> accept a <code class="docutils literal notranslate"><span class="pre">progress_cb</span></code> parameter used by the web job runner to emit per-chunk log lines</p></li>
+<li><p><strong>Shared job store</strong>: <code class="docutils literal notranslate"><span class="pre">audia.ui.jobs.JOBS</span></code> dict is imported by both <code class="docutils literal notranslate"><span class="pre">convert.py</span></code> and <code class="docutils literal notranslate"><span class="pre">research.py</span></code> routers so cancel and PDF-serve endpoints work across both flows</p></li>
+<li><p><strong>UI fixes</strong>: “Convert another file” reset button only appears after conversion completes; PreviewPanel refactored to accept <code class="docutils literal notranslate"><span class="pre">title</span></code>/<code class="docutils literal notranslate"><span class="pre">pdfUrl</span></code> directly instead of a <code class="docutils literal notranslate"><span class="pre">Paper</span></code> object</p></li>
+</ul>
+</section>
+</section>
+<section id="version-0-1-2-2026-03-29">
+<h2>Version 0.1.2 (2026-03-29)<a class="headerlink" href="#version-0-1-2-2026-03-29" title="Link to this heading"></a></h2>
+<section id="arxiv-search-robustness-cli-improvements">
+<h3>ArXiv search robustness &amp; CLI improvements<a class="headerlink" href="#arxiv-search-robustness-cli-improvements" title="Link to this heading"></a></h3>
+<section id="arxiv-search">
+<h4>ArXiv search<a class="headerlink" href="#arxiv-search" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>HTTP fallback</strong>: when the ArXiv export API returns HTTP 429, the search automatically retries via HTML scraping of <code class="docutils literal notranslate"><span class="pre">arxiv.org/search</span></code> — no user action required; a short one-line warning is shown instead of a full traceback</p></li>
+<li><p><strong>Date from arxiv ID</strong>: publication date is now derived from the paper ID (<code class="docutils literal notranslate"><span class="pre">YYMM</span></code> prefix, e.g. <code class="docutils literal notranslate"><span class="pre">2603</span></code> → <code class="docutils literal notranslate"><span class="pre">Mar</span> <span class="pre">2026</span></code>) instead of unreliable HTML scraping</p></li>
+</ul>
+</section>
+<section id="pdf-download">
+<h4>PDF download<a class="headerlink" href="#pdf-download" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>SDK-free download</strong>: PDFs are now fetched directly from <code class="docutils literal notranslate"><span class="pre">https://arxiv.org/pdf/&lt;id&gt;</span></code> via <code class="docutils literal notranslate"><span class="pre">urllib</span></code>, bypassing the export API entirely and eliminating 429 rate-limit failures on download</p></li>
+<li><p><strong>Manual fallback prompt</strong>: if a download still fails, the user is shown the <code class="docutils literal notranslate"><span class="pre">arxiv.org/abs/</span></code> link and prompted to provide a local PDF path to continue conversion</p></li>
+</ul>
+</section>
+<section id="cli-output">
+<h4>CLI output<a class="headerlink" href="#cli-output" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>Results table</strong>: added a <strong>Link</strong> column (<code class="docutils literal notranslate"><span class="pre">https://arxiv.org/abs/&lt;id&gt;</span></code>) with <code class="docutils literal notranslate"><span class="pre">no_wrap=True</span></code> — URLs are never truncated so they remain clickable</p></li>
+<li><p><strong>ASCII banner</strong>: running <code class="docutils literal notranslate"><span class="pre">audia</span></code> with no arguments now displays a block-art banner before the help text</p></li>
+<li><p><strong>Paper selection always prompted</strong>: <code class="docutils literal notranslate"><span class="pre">audia</span> <span class="pre">listen</span></code> and <code class="docutils literal notranslate"><span class="pre">audia</span> <span class="pre">research</span></code> both show the results table and ask the user to pick papers; <code class="docutils literal notranslate"><span class="pre">--convert</span></code> flag still skips the prompt for power users</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="version-0-1-1-2026-03-29">
+<h2>Version 0.1.1 (2026-03-29)<a class="headerlink" href="#version-0-1-1-2026-03-29" title="Link to this heading"></a></h2>
+<section id="listen-command-pipeline-overhaul">
+<h3><code class="docutils literal notranslate"><span class="pre">listen</span></code> command pipeline overhaul<a class="headerlink" href="#listen-command-pipeline-overhaul" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>LLM query distillation</strong>: raw transcribed speech is now passed through the configured LLM to extract a concise ArXiv search query (e.g. <em>“I would like to research agentic AI”</em> → <em>“agentic AI research”</em>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">distill_search_query()</span></code> moved to <code class="docutils literal notranslate"><span class="pre">audia.agents.stt</span></code> (proper agent layer, not CLI)</p></li>
+<li><p><strong>Confirmation loop before searching</strong>: after distillation the user sees the extracted query and can confirm (<code class="docutils literal notranslate"><span class="pre">y</span></code>), re-record (<code class="docutils literal notranslate"><span class="pre">r</span></code>), or quit (<code class="docutils literal notranslate"><span class="pre">q</span></code>) — prevents accidental searches from mis-transcriptions</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">typer.confirm()</span></code> replaced with explicit <code class="docutils literal notranslate"><span class="pre">typer.prompt()</span></code> to support the three-way choice</p></li>
+</ul>
+</section>
+</section>
+<section id="version-0-1-0-2026-03-29">
+<h2>Version 0.1.0 (2026-03-29)<a class="headerlink" href="#version-0-1-0-2026-03-29" title="Link to this heading"></a></h2>
+<section id="first-fully-working-release-pdf-to-audio-via-mandatory-llm-curation-and-edge-tts-synthesis">
+<h3>First fully working release: PDF to audio via mandatory LLM curation and edge-tts synthesis.<a class="headerlink" href="#first-fully-working-release-pdf-to-audio-via-mandatory-llm-curation-and-edge-tts-synthesis" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Linear LangGraph pipeline: PDF extraction → heuristic clean → LLM curation → TTS synthesis</p></li>
+<li><p>LLM curation is mandatory; supports OpenAI and Anthropic backends via <code class="docutils literal notranslate"><span class="pre">AUDIA_LLM_PROVIDER</span></code></p></li>
+<li><p>Chunk-level LLM curation with tail-context stitching for smooth spoken transitions</p></li>
+<li><p>edge-tts default TTS backend: async with 90 s per-chunk timeout and asyncio context fix for FastAPI</p></li>
+<li><p>Rich per-step progress output; <code class="docutils literal notranslate"><span class="pre">audia</span> <span class="pre">--version</span></code> flag</p></li>
+<li><p>Consistent run ID (<code class="docutils literal notranslate"><span class="pre">&lt;pdf_stem&gt;_&lt;YYYYMMDD_HHMMSS&gt;</span></code>) shared by audio filename and debug folder</p></li>
+<li><p>Debug text snapshots saved to <code class="docutils literal notranslate"><span class="pre">~/.audia/debug/&lt;run_id&gt;/</span></code> (raw, preprocessed, curated)</p></li>
+<li><p>SQLite storage for papers and audio files via SQLAlchemy</p></li>
+<li><p>FastAPI web UI (SPA) and Typer CLI with <code class="docutils literal notranslate"><span class="pre">convert</span></code>, <code class="docutils literal notranslate"><span class="pre">research</span></code>, <code class="docutils literal notranslate"><span class="pre">listen</span></code>, <code class="docutils literal notranslate"><span class="pre">serve</span></code>, <code class="docutils literal notranslate"><span class="pre">info</span></code> commands</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.env.example</span></code> with full documentation of all <code class="docutils literal notranslate"><span class="pre">AUDIA_*</span></code> settings</p></li>
+</ul>
+</section>
+</section>
+<section id="version-0-0-1-2026-03-28">
+<h2>Version 0.0.1 (2026-03-28)<a class="headerlink" href="#version-0-0-1-2026-03-28" title="Link to this heading"></a></h2>
+<p>First release of the basic package structure</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api/ui.html" class="btn btn-neutral float-left" title="audia.ui — Web UI (FastAPI)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Yauheniya Varabyova.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

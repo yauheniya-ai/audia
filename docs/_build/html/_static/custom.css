@@ -1,0 +1,467 @@
+/* ============================================================
+   audia docs — custom theme
+   Color palette (Tailwind CSS -500)
+     purple : #a855f7
+     cyan   : #06b6d4
+     rose   : #f43f5e
+     lime   : #84cc16
+   Dark mode is default; .light-mode toggled via JS
+   ============================================================ */
+
+/* ── CSS custom properties ──────────────────────────────────── */
+:root {
+  --bg-base:          #0d0d14;
+  --bg-nav:           #0a0a10;
+  --bg-content:       #0d0d14;
+  --bg-sidebar:       #0a0a10;
+  --bg-code:          #131320;
+  --bg-admonition:    #14141f;
+  --bg-table-head:    #131320;
+  --bg-table-row-alt: #101019;
+  --bg-highlight:     #1a1a2e;
+
+  --text-primary:     #e2e4ef;
+  --text-secondary:   #9ca3b8;
+  --text-muted:       #6b7280;
+  --text-nav:         #d1d5e8;
+  --text-nav-active:  #ffffff;
+
+  --accent-purple:    #a855f7;
+  --accent-cyan:      #06b6d4;
+  --accent-rose:      #f43f5e;
+  --accent-lime:      #84cc16;
+
+  --border:           #1e1e32;
+  --border-accent:    #a855f7;
+
+  --link:             #06b6d4;
+  --link-hover:       #a855f7;
+  --link-visited:     #818cf8;
+
+  --scrollbar-track:  #0d0d14;
+  --scrollbar-thumb:  #2d2d4a;
+
+  --toggle-btn-bg:    #1a1a2e;
+  --toggle-btn-fg:    #a855f7;
+  --toggle-btn-border:#a855f7;
+}
+
+/* ── Light mode overrides ────────────────────────────────────── */
+body.light-mode {
+  --bg-base:          #f8f8fc;
+  --bg-nav:           #f0f0f8;
+  --bg-content:       #ffffff;
+  --bg-sidebar:       #f0f0f8;
+  --bg-code:          #f1f0fa;
+  --bg-admonition:    #faf9ff;
+  --bg-table-head:    #ede9fb;
+  --bg-table-row-alt: #f7f5ff;
+  --bg-highlight:     #ede9fb;
+
+  --text-primary:     #111827;
+  --text-secondary:   #374151;
+  --text-muted:       #6b7280;
+  --text-nav:         #1f2937;
+  --text-nav-active:  #000000;
+
+  --accent-purple:    #9333ea;
+  --accent-cyan:      #0891b2;
+  --accent-rose:      #e11d48;
+  --accent-lime:      #65a30d;
+
+  --border:           #e0daf5;
+  --border-accent:    #9333ea;
+
+  --link:             #0891b2;
+  --link-hover:       #9333ea;
+  --link-visited:     #6366f1;
+
+  --scrollbar-track:  #f0f0f8;
+  --scrollbar-thumb:  #c4b5fd;
+
+  --toggle-btn-bg:    #ede9fb;
+  --toggle-btn-fg:    #9333ea;
+  --toggle-btn-border:#9333ea;
+}
+
+/* ── Base + body ─────────────────────────────────────────────── */
+html, body {
+  background-color: var(--bg-base) !important;
+  color: var(--text-primary) !important;
+}
+
+/* ── RTD nav (sidebar) ───────────────────────────────────────── */
+.wy-nav-side {
+  background: var(--bg-sidebar) !important;
+  border-right: 1px solid var(--border) !important;
+}
+
+.wy-side-nav-search {
+  background: var(--bg-nav) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+.wy-side-nav-search a,
+.wy-side-nav-search .project,
+.wy-side-nav-search .version {
+  color: var(--accent-purple) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em;
+}
+
+.wy-side-nav-search input[type="text"] {
+  background: var(--bg-base) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+}
+
+/* Nav tree */
+.wy-menu-vertical {
+  background: var(--bg-sidebar) !important;
+}
+
+.wy-menu-vertical a,
+.wy-menu-vertical li span {
+  color: var(--text-nav) !important;
+}
+
+.wy-menu-vertical a:hover {
+  background: var(--bg-highlight) !important;
+  color: var(--accent-cyan) !important;
+}
+
+.wy-menu-vertical li.current > a,
+.wy-menu-vertical li.current > a:hover {
+  background: var(--bg-highlight) !important;
+  color: var(--text-nav-active) !important;
+  border-right: 3px solid var(--accent-purple) !important;
+}
+
+.wy-menu-vertical li.on a,
+.wy-menu-vertical li.current li.current > a {
+  background: var(--bg-highlight) !important;
+  color: var(--accent-cyan) !important;
+}
+
+.wy-menu-vertical li.toctree-l1.current > a {
+  border-top: 1px solid var(--border) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+.wy-menu-vertical li.toctree-l2 > a {
+  padding-left: 2em !important;
+}
+
+/* Header captions in nav */
+.wy-menu-vertical p.caption {
+  color: var(--accent-lime) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.10em !important;
+  text-transform: uppercase !important;
+  padding: 1em 1em 0.4em !important;
+  border-top: 1px solid var(--border) !important;
+}
+
+/* ── Main content area ───────────────────────────────────────── */
+.wy-nav-content-wrap {
+  background: var(--bg-content) !important;
+}
+
+.wy-nav-content {
+  background: var(--bg-content) !important;
+  color: var(--text-primary) !important;
+  max-width: 980px !important;
+}
+
+/* ── Typography ──────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary) !important;
+  font-weight: 700 !important;
+}
+
+h1 {
+  border-bottom: 2px solid var(--accent-purple) !important;
+  padding-bottom: 0.4em !important;
+  color: var(--accent-purple) !important;
+}
+
+h2 {
+  border-bottom: 1px solid var(--border) !important;
+  padding-bottom: 0.3em !important;
+  color: var(--accent-cyan) !important;
+}
+
+h3 {
+  color: var(--text-primary) !important;
+}
+
+p, li, dd, dt {
+  color: var(--text-primary) !important;
+}
+
+/* ── Links ───────────────────────────────────────────────────── */
+a, a:link {
+  color: var(--link) !important;
+  text-decoration: none !important;
+}
+
+a:visited {
+  color: var(--link-visited) !important;
+}
+
+a:hover {
+  color: var(--link-hover) !important;
+  text-decoration: underline !important;
+}
+
+/* ── Code blocks ─────────────────────────────────────────────── */
+pre, code, kbd, samp, tt {
+  background: var(--bg-code) !important;
+  color: var(--accent-lime) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 4px !important;
+}
+
+pre {
+  border-left: 3px solid var(--accent-purple) !important;
+  padding: 1em 1.2em !important;
+}
+
+code {
+  padding: 0.1em 0.4em !important;
+  font-size: 0.88em !important;
+}
+
+/* Syntax highlight token colours */
+.highlight .k,
+.highlight .kn,
+.highlight .kd  { color: var(--accent-purple) !important; font-weight: bold; }
+.highlight .s,
+.highlight .s1,
+.highlight .s2  { color: var(--accent-lime) !important; }
+.highlight .c,
+.highlight .c1,
+.highlight .cm  { color: var(--text-muted) !important; font-style: italic; }
+.highlight .n   { color: var(--text-primary) !important; }
+.highlight .mi,
+.highlight .mf  { color: var(--accent-rose) !important; }
+.highlight .nc  { color: var(--accent-cyan) !important; font-weight: bold; }
+.highlight .nf,
+.highlight .nb  { color: var(--accent-cyan) !important; }
+.highlight .nd  { color: var(--accent-rose) !important; }
+.highlight .o   { color: var(--text-secondary) !important; }
+.highlight .ow  { color: var(--accent-purple) !important; }
+.highlight .bp  { color: var(--accent-rose) !important; }
+.highlight      { background: var(--bg-code) !important; }
+
+/* Copybutton */
+button.copybtn {
+  background: var(--bg-highlight) !important;
+  color: var(--accent-purple) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 4px !important;
+}
+
+button.copybtn:hover {
+  background: var(--accent-purple) !important;
+  color: #fff !important;
+}
+
+/* ── Tables ──────────────────────────────────────────────────── */
+table.docutils {
+  background: var(--bg-base) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+  overflow: hidden !important;
+}
+
+table.docutils th {
+  background: var(--bg-table-head) !important;
+  color: var(--accent-cyan) !important;
+  border-bottom: 2px solid var(--border-accent) !important;
+  border-right: 1px solid var(--border) !important;
+  font-weight: 700 !important;
+  padding: 0.6em 0.9em !important;
+}
+
+table.docutils td {
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+  padding: 0.5em 0.9em !important;
+}
+
+table.docutils tr:nth-child(even) td {
+  background: var(--bg-table-row-alt) !important;
+}
+
+/* ── Admonitions ──────────────────────────────────────────────── */
+.admonition {
+  background: var(--bg-admonition) !important;
+  border: 1px solid var(--border) !important;
+  border-left: 4px solid var(--accent-purple) !important;
+  border-radius: 4px !important;
+  color: var(--text-primary) !important;
+}
+
+.admonition .admonition-title {
+  background: var(--bg-highlight) !important;
+  color: var(--accent-purple) !important;
+  font-weight: 700 !important;
+}
+
+.admonition.note {
+  border-left-color: var(--accent-cyan) !important;
+}
+.admonition.note .admonition-title {
+  color: var(--accent-cyan) !important;
+}
+
+.admonition.warning,
+.admonition.caution {
+  border-left-color: var(--accent-rose) !important;
+}
+.admonition.warning .admonition-title,
+.admonition.caution .admonition-title {
+  color: var(--accent-rose) !important;
+}
+
+.admonition.tip,
+.admonition.hint {
+  border-left-color: var(--accent-lime) !important;
+}
+.admonition.tip .admonition-title,
+.admonition.hint .admonition-title {
+  color: var(--accent-lime) !important;
+}
+
+/* ── API docs (autodoc) ──────────────────────────────────────── */
+dl.class > dt,
+dl.function > dt,
+dl.method > dt,
+dl.attribute > dt,
+dl.data > dt,
+dl.exception > dt {
+  background: var(--bg-highlight) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+  border-left: 4px solid var(--accent-purple) !important;
+  border-radius: 4px !important;
+  padding: 0.5em 0.8em !important;
+  font-family: monospace !important;
+}
+
+dl.class > dt .sig-name,
+dl.function > dt .sig-name,
+dl.method > dt .sig-name {
+  color: var(--accent-cyan) !important;
+  font-weight: 700 !important;
+}
+
+dl.class > dt em.sig-param,
+dl.function > dt em.sig-param,
+dl.method > dt em.sig-param {
+  color: var(--accent-lime) !important;
+  font-style: normal !important;
+}
+
+dl.class > dt .sig-return-typehint,
+dl.function > dt .sig-return-typehint,
+dl.method > dt .sig-return-typehint {
+  color: var(--accent-rose) !important;
+}
+
+.viewcode-link {
+  color: var(--text-muted) !important;
+  font-size: 0.8em !important;
+}
+
+/* Field lists (Parameters, Returns, etc.) */
+.field-list strong {
+  color: var(--accent-purple) !important;
+}
+
+/* ── Breadcrumbs & nav header ────────────────────────────────── */
+.wy-breadcrumbs {
+  background: transparent !important;
+}
+
+.wy-breadcrumbs li a {
+  color: var(--accent-cyan) !important;
+}
+
+.wy-breadcrumbs li.wy-breadcrumbs-aside a {
+  color: var(--accent-purple) !important;
+}
+
+/* ── Footer ──────────────────────────────────────────────────── */
+footer {
+  background: var(--bg-nav) !important;
+  border-top: 1px solid var(--border) !important;
+  color: var(--text-muted) !important;
+}
+
+footer a {
+  color: var(--accent-cyan) !important;
+}
+
+/* ── Scrollbars ──────────────────────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-purple); }
+
+/* ── Dark/Light toggle button ────────────────────────────────── */
+#audia-theme-toggle {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 9999;
+  background: var(--toggle-btn-bg);
+  color: var(--toggle-btn-fg);
+  border: 1px solid var(--toggle-btn-border);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-family: monospace;
+  letter-spacing: 0.05em;
+  transition: background 0.2s, color 0.2s;
+  user-select: none;
+}
+
+#audia-theme-toggle:hover {
+  background: var(--accent-purple);
+  color: #fff;
+  border-color: var(--accent-purple);
+}
+
+/* ── Highlight on search ────────────────────────────────────── */
+.highlighted {
+  background: var(--accent-purple) !important;
+  color: #fff !important;
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* ── Version badge in nav ────────────────────────────────────── */
+.wy-side-nav-search .version {
+  color: var(--accent-lime) !important;
+  font-size: 0.78rem !important;
+}
+
+/* ── Mobile header bar ────────────────────────────────────────── */
+.wy-nav-top {
+  background: var(--bg-nav) !important;
+  color: var(--text-primary) !important;
+}
+
+.wy-nav-top a {
+  color: var(--accent-purple) !important;
+}

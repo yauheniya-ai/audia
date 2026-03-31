@@ -1,0 +1,1289 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>audia.ui — Web UI (FastAPI) &mdash; audia</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=f6161c1a" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=25a77296"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=fc97db16"></script>
+      <script src="../_static/theme_toggle.js?v=14b0a03b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Changelog" href="../changelog.html" />
+    <link rel="prev" title="audia.cli — Command-line interface" href="cli.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #0d0d14" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            audia
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#standard-install">Standard install</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#recommended-pipx">Recommended: pipx</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#optional-extras">Optional extras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#install-from-source">Install from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#verify">Verify</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#configure">1. Configure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#convert-a-local-pdf">2. Convert a local PDF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#search-arxiv-and-convert">3. Search ArXiv and convert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#voice-input">4. Voice input</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#web-ui">5. Web UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#show-active-config">6. Show active config</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#llm-provider-required">LLM provider (required)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#option-a-openai">Option A — OpenAI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#option-b-anthropic">Option B — Anthropic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#shared-llm-settings">Shared LLM settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#tts-backend">TTS backend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#stt-voice-input">STT (voice input)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#storage">Storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#web-server">Web server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#research">Research</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#full-env-example">Full <code class="docutils literal notranslate"><span class="pre">.env.example</span></code></a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/pipeline.html">Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../guides/pipeline.html#entry-points">Entry points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/pipeline.html#step-1-pdf-extraction-pdf-processor-py">Step 1 — PDF extraction (<code class="docutils literal notranslate"><span class="pre">pdf_processor.py</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/pipeline.html#step-2-heuristic-pre-pass-text-cleaner-py">Step 2 — Heuristic pre-pass (<code class="docutils literal notranslate"><span class="pre">text_cleaner.py</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/pipeline.html#step-3-llm-curation-text-cleaner-py-llm-curate">Step 3 — LLM curation (<code class="docutils literal notranslate"><span class="pre">text_cleaner.py</span> <span class="pre">—</span> <span class="pre">llm_curate</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/pipeline.html#step-4-tts-synthesis-tts-py">Step 4 — TTS synthesis (<code class="docutils literal notranslate"><span class="pre">tts.py</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/pipeline.html#state-state-py">State (<code class="docutils literal notranslate"><span class="pre">state.py</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/pipeline.html#debug-output">Debug output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/cli.html">CLI Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../guides/cli.html#audia-convert"><code class="docutils literal notranslate"><span class="pre">audia</span> <span class="pre">convert</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/cli.html#audia-research"><code class="docutils literal notranslate"><span class="pre">audia</span> <span class="pre">research</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/cli.html#audia-listen"><code class="docutils literal notranslate"><span class="pre">audia</span> <span class="pre">listen</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/cli.html#audia-serve"><code class="docutils literal notranslate"><span class="pre">audia</span> <span class="pre">serve</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/cli.html#audia-info"><code class="docutils literal notranslate"><span class="pre">audia</span> <span class="pre">info</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/cli.html#audia-version"><code class="docutils literal notranslate"><span class="pre">audia</span> <span class="pre">--version</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/web_ui.html">Web UI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../guides/web_ui.html#starting-the-server">Starting the server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/web_ui.html#tabs">Tabs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../guides/web_ui.html#convert">Convert</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../guides/web_ui.html#research">Research</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../guides/web_ui.html#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../guides/web_ui.html#library-database">Library (Database)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/web_ui.html#api-endpoints-summary">API endpoints (summary)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/tts_backends.html">TTS Backends</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../guides/tts_backends.html#edge-tts-default">edge-tts (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/tts_backends.html#kokoro-local">Kokoro (local)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/tts_backends.html#openai-tts">OpenAI TTS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/tts_backends.html#chunk-size-tuning">Chunk size tuning</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/llm_backends.html">LLM Backends</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../guides/llm_backends.html#openai">OpenAI</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../guides/llm_backends.html#custom-endpoint">Custom endpoint</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/llm_backends.html#anthropic">Anthropic</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../guides/llm_backends.html#id1">Custom endpoint</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/llm_backends.html#shared-settings">Shared settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/llm_backends.html#how-the-llm-is-used">How the LLM is used</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/storage.html">Storage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../guides/storage.html#location">Location</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/storage.html#schema">Schema</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../guides/storage.html#papers"><code class="docutils literal notranslate"><span class="pre">papers</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../guides/storage.html#audio-files"><code class="docutils literal notranslate"><span class="pre">audio_files</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../guides/storage.html#research-sessions"><code class="docutils literal notranslate"><span class="pre">research_sessions</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../guides/storage.html#user-settings"><code class="docutils literal notranslate"><span class="pre">user_settings</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/storage.html#exploring-the-database">Exploring the database</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="audia.html"><code class="docutils literal notranslate"><span class="pre">audia</span></code> — top-level package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="audia.html#audia.Settings"><code class="docutils literal notranslate"><span class="pre">Settings</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.model_config"><code class="docutils literal notranslate"><span class="pre">Settings.model_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.server_host"><code class="docutils literal notranslate"><span class="pre">Settings.server_host</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.server_port"><code class="docutils literal notranslate"><span class="pre">Settings.server_port</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.reload"><code class="docutils literal notranslate"><span class="pre">Settings.reload</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.data_dir"><code class="docutils literal notranslate"><span class="pre">Settings.data_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.db_path"><code class="docutils literal notranslate"><span class="pre">Settings.db_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.audio_dir"><code class="docutils literal notranslate"><span class="pre">Settings.audio_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.upload_dir"><code class="docutils literal notranslate"><span class="pre">Settings.upload_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.debug_dir"><code class="docutils literal notranslate"><span class="pre">Settings.debug_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.ensure_dirs"><code class="docutils literal notranslate"><span class="pre">Settings.ensure_dirs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.llm_provider"><code class="docutils literal notranslate"><span class="pre">Settings.llm_provider</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.openai_api_key"><code class="docutils literal notranslate"><span class="pre">Settings.openai_api_key</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.openai_api_base"><code class="docutils literal notranslate"><span class="pre">Settings.openai_api_base</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.anthropic_api_key"><code class="docutils literal notranslate"><span class="pre">Settings.anthropic_api_key</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.anthropic_api_base"><code class="docutils literal notranslate"><span class="pre">Settings.anthropic_api_base</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.llm_model"><code class="docutils literal notranslate"><span class="pre">Settings.llm_model</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.llm_temperature"><code class="docutils literal notranslate"><span class="pre">Settings.llm_temperature</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.llm_max_chunk_chars"><code class="docutils literal notranslate"><span class="pre">Settings.llm_max_chunk_chars</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.tts_backend"><code class="docutils literal notranslate"><span class="pre">Settings.tts_backend</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.tts_voice"><code class="docutils literal notranslate"><span class="pre">Settings.tts_voice</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.tts_rate"><code class="docutils literal notranslate"><span class="pre">Settings.tts_rate</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.tts_chunk_chars"><code class="docutils literal notranslate"><span class="pre">Settings.tts_chunk_chars</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.stt_model"><code class="docutils literal notranslate"><span class="pre">Settings.stt_model</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.stt_device"><code class="docutils literal notranslate"><span class="pre">Settings.stt_device</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.stt_record_seconds"><code class="docutils literal notranslate"><span class="pre">Settings.stt_record_seconds</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="audia.html#audia.Settings.arxiv_max_results"><code class="docutils literal notranslate"><span class="pre">Settings.arxiv_max_results</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="audia.html#audia.get_settings"><code class="docutils literal notranslate"><span class="pre">get_settings()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config.html"><code class="docutils literal notranslate"><span class="pre">audia.config</span></code> — Settings</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config.html#audia.config.Settings"><code class="docutils literal notranslate"><span class="pre">Settings</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.model_config"><code class="docutils literal notranslate"><span class="pre">Settings.model_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.server_host"><code class="docutils literal notranslate"><span class="pre">Settings.server_host</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.server_port"><code class="docutils literal notranslate"><span class="pre">Settings.server_port</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.reload"><code class="docutils literal notranslate"><span class="pre">Settings.reload</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.data_dir"><code class="docutils literal notranslate"><span class="pre">Settings.data_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.db_path"><code class="docutils literal notranslate"><span class="pre">Settings.db_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.audio_dir"><code class="docutils literal notranslate"><span class="pre">Settings.audio_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.upload_dir"><code class="docutils literal notranslate"><span class="pre">Settings.upload_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.debug_dir"><code class="docutils literal notranslate"><span class="pre">Settings.debug_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.ensure_dirs"><code class="docutils literal notranslate"><span class="pre">Settings.ensure_dirs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.llm_provider"><code class="docutils literal notranslate"><span class="pre">Settings.llm_provider</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.openai_api_key"><code class="docutils literal notranslate"><span class="pre">Settings.openai_api_key</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.openai_api_base"><code class="docutils literal notranslate"><span class="pre">Settings.openai_api_base</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.anthropic_api_key"><code class="docutils literal notranslate"><span class="pre">Settings.anthropic_api_key</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.anthropic_api_base"><code class="docutils literal notranslate"><span class="pre">Settings.anthropic_api_base</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.llm_model"><code class="docutils literal notranslate"><span class="pre">Settings.llm_model</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.llm_temperature"><code class="docutils literal notranslate"><span class="pre">Settings.llm_temperature</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.llm_max_chunk_chars"><code class="docutils literal notranslate"><span class="pre">Settings.llm_max_chunk_chars</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.tts_backend"><code class="docutils literal notranslate"><span class="pre">Settings.tts_backend</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.tts_voice"><code class="docutils literal notranslate"><span class="pre">Settings.tts_voice</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.tts_rate"><code class="docutils literal notranslate"><span class="pre">Settings.tts_rate</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.tts_chunk_chars"><code class="docutils literal notranslate"><span class="pre">Settings.tts_chunk_chars</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.stt_model"><code class="docutils literal notranslate"><span class="pre">Settings.stt_model</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.stt_device"><code class="docutils literal notranslate"><span class="pre">Settings.stt_device</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.stt_record_seconds"><code class="docutils literal notranslate"><span class="pre">Settings.stt_record_seconds</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#audia.config.Settings.arxiv_max_results"><code class="docutils literal notranslate"><span class="pre">Settings.arxiv_max_results</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="config.html#audia.config.get_settings"><code class="docutils literal notranslate"><span class="pre">get_settings()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="agents.html"><code class="docutils literal notranslate"><span class="pre">audia.agents</span></code> — Pipeline agents</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="agents.html#module-audia.agents.graph"><code class="docutils literal notranslate"><span class="pre">audia.agents.graph</span></code> — LangGraph pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.graph.node_extract_text"><code class="docutils literal notranslate"><span class="pre">node_extract_text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.graph.node_preprocess"><code class="docutils literal notranslate"><span class="pre">node_preprocess()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.graph.node_curate"><code class="docutils literal notranslate"><span class="pre">node_curate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.graph.node_synthesize_audio"><code class="docutils literal notranslate"><span class="pre">node_synthesize_audio()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.graph.build_pipeline"><code class="docutils literal notranslate"><span class="pre">build_pipeline()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.graph.run_pipeline"><code class="docutils literal notranslate"><span class="pre">run_pipeline()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="agents.html#module-audia.agents.state"><code class="docutils literal notranslate"><span class="pre">audia.agents.state</span></code> — Pipeline state</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.state.PipelineState"><code class="docutils literal notranslate"><span class="pre">PipelineState</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.state.PipelineState.pdf_path"><code class="docutils literal notranslate"><span class="pre">PipelineState.pdf_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.state.PipelineState.output_dir"><code class="docutils literal notranslate"><span class="pre">PipelineState.output_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.state.PipelineState.raw_text"><code class="docutils literal notranslate"><span class="pre">PipelineState.raw_text</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.state.PipelineState.preprocessed_text"><code class="docutils literal notranslate"><span class="pre">PipelineState.preprocessed_text</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.state.PipelineState.cleaned_text"><code class="docutils literal notranslate"><span class="pre">PipelineState.cleaned_text</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.state.PipelineState.audio_path"><code class="docutils literal notranslate"><span class="pre">PipelineState.audio_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.state.PipelineState.audio_filename"><code class="docutils literal notranslate"><span class="pre">PipelineState.audio_filename</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.state.PipelineState.title"><code class="docutils literal notranslate"><span class="pre">PipelineState.title</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.state.PipelineState.num_pages"><code class="docutils literal notranslate"><span class="pre">PipelineState.num_pages</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.state.PipelineState.tts_backend"><code class="docutils literal notranslate"><span class="pre">PipelineState.tts_backend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.state.PipelineState.tts_voice"><code class="docutils literal notranslate"><span class="pre">PipelineState.tts_voice</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.state.PipelineState.run_id"><code class="docutils literal notranslate"><span class="pre">PipelineState.run_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.state.PipelineState.error"><code class="docutils literal notranslate"><span class="pre">PipelineState.error</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="agents.html#module-audia.agents.pdf_processor"><code class="docutils literal notranslate"><span class="pre">audia.agents.pdf_processor</span></code> — PDF extraction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.pdf_processor.ExtractionResult"><code class="docutils literal notranslate"><span class="pre">ExtractionResult</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.pdf_processor.ExtractionResult.text"><code class="docutils literal notranslate"><span class="pre">ExtractionResult.text</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.pdf_processor.ExtractionResult.num_pages"><code class="docutils literal notranslate"><span class="pre">ExtractionResult.num_pages</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.pdf_processor.ExtractionResult.title"><code class="docutils literal notranslate"><span class="pre">ExtractionResult.title</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.pdf_processor.extract_text"><code class="docutils literal notranslate"><span class="pre">extract_text()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="agents.html#module-audia.agents.text_cleaner"><code class="docutils literal notranslate"><span class="pre">audia.agents.text_cleaner</span></code> — Heuristic + LLM curation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.text_cleaner.heuristic_clean"><code class="docutils literal notranslate"><span class="pre">heuristic_clean()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.text_cleaner.llm_curate"><code class="docutils literal notranslate"><span class="pre">llm_curate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.text_cleaner.llm_clean"><code class="docutils literal notranslate"><span class="pre">llm_clean()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.text_cleaner.curate_text"><code class="docutils literal notranslate"><span class="pre">curate_text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.text_cleaner.clean_text"><code class="docutils literal notranslate"><span class="pre">clean_text()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="agents.html#module-audia.agents.tts"><code class="docutils literal notranslate"><span class="pre">audia.agents.tts</span></code> — Text-to-speech synthesis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.tts.synthesize"><code class="docutils literal notranslate"><span class="pre">synthesize()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="agents.html#module-audia.agents.stt"><code class="docutils literal notranslate"><span class="pre">audia.agents.stt</span></code> — Speech-to-text + query distillation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.stt.record_and_transcribe"><code class="docutils literal notranslate"><span class="pre">record_and_transcribe()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.stt.transcribe_file"><code class="docutils literal notranslate"><span class="pre">transcribe_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.stt.distill_search_query"><code class="docutils literal notranslate"><span class="pre">distill_search_query()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="agents.html#module-audia.agents.research"><code class="docutils literal notranslate"><span class="pre">audia.agents.research</span></code> — ArXiv research</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.research.ArxivPaper"><code class="docutils literal notranslate"><span class="pre">ArxivPaper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.research.ArxivPaper.arxiv_id"><code class="docutils literal notranslate"><span class="pre">ArxivPaper.arxiv_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.research.ArxivPaper.title"><code class="docutils literal notranslate"><span class="pre">ArxivPaper.title</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.research.ArxivPaper.authors"><code class="docutils literal notranslate"><span class="pre">ArxivPaper.authors</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.research.ArxivPaper.abstract"><code class="docutils literal notranslate"><span class="pre">ArxivPaper.abstract</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.research.ArxivPaper.pdf_url"><code class="docutils literal notranslate"><span class="pre">ArxivPaper.pdf_url</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.research.ArxivPaper.published"><code class="docutils literal notranslate"><span class="pre">ArxivPaper.published</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.research.ArxivPaper.local_pdf_path"><code class="docutils literal notranslate"><span class="pre">ArxivPaper.local_pdf_path</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="agents.html#audia.agents.research.ArxivSearcher"><code class="docutils literal notranslate"><span class="pre">ArxivSearcher</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.research.ArxivSearcher.search"><code class="docutils literal notranslate"><span class="pre">ArxivSearcher.search()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="agents.html#audia.agents.research.ArxivSearcher.download_pdf"><code class="docutils literal notranslate"><span class="pre">ArxivSearcher.download_pdf()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="storage.html"><code class="docutils literal notranslate"><span class="pre">audia.storage</span></code> — Database models &amp; access</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="storage.html#module-audia.storage.models"><code class="docutils literal notranslate"><span class="pre">audia.storage.models</span></code> — SQLAlchemy ORM models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="storage.html#audia.storage.models.Base"><code class="docutils literal notranslate"><span class="pre">Base</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="storage.html#audia.storage.models.Paper"><code class="docutils literal notranslate"><span class="pre">Paper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="storage.html#audia.storage.models.Paper.audio_files"><code class="docutils literal notranslate"><span class="pre">Paper.audio_files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="storage.html#audia.storage.models.Paper.authors_list"><code class="docutils literal notranslate"><span class="pre">Paper.authors_list</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="storage.html#audia.storage.models.AudioFile"><code class="docutils literal notranslate"><span class="pre">AudioFile</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="storage.html#audia.storage.models.AudioFile.paper"><code class="docutils literal notranslate"><span class="pre">AudioFile.paper</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="storage.html#audia.storage.models.ResearchSession"><code class="docutils literal notranslate"><span class="pre">ResearchSession</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="storage.html#audia.storage.models.ResearchSession.paper_ids_list"><code class="docutils literal notranslate"><span class="pre">ResearchSession.paper_ids_list</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="storage.html#audia.storage.models.UserSetting"><code class="docutils literal notranslate"><span class="pre">UserSetting</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="storage.html#module-audia.storage.database"><code class="docutils literal notranslate"><span class="pre">audia.storage.database</span></code> — Session factory &amp; helpers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="storage.html#audia.storage.database.engine"><code class="docutils literal notranslate"><span class="pre">engine()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="storage.html#audia.storage.database.init_db"><code class="docutils literal notranslate"><span class="pre">init_db()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="storage.html#audia.storage.database.get_session"><code class="docutils literal notranslate"><span class="pre">get_session()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html"><code class="docutils literal notranslate"><span class="pre">audia.cli</span></code> — Command-line interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#audia.cli.app.convert"><code class="docutils literal notranslate"><span class="pre">convert()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#audia.cli.app.research"><code class="docutils literal notranslate"><span class="pre">research()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#audia.cli.app.listen"><code class="docutils literal notranslate"><span class="pre">listen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#audia.cli.app.serve"><code class="docutils literal notranslate"><span class="pre">serve()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#audia.cli.app.info"><code class="docutils literal notranslate"><span class="pre">info()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">audia.ui</span></code> — Web UI (FastAPI)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-audia.ui.app"><code class="docutils literal notranslate"><span class="pre">audia.ui.app</span></code> — FastAPI application</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audia.ui.app.create_app"><code class="docutils literal notranslate"><span class="pre">create_app()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-audia.ui.jobs"><code class="docutils literal notranslate"><span class="pre">audia.ui.jobs</span></code> — Background job store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#routes">Routes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-audia.ui.routes.convert"><code class="docutils literal notranslate"><span class="pre">audia.ui.routes.convert</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.convert.upload_and_convert"><code class="docutils literal notranslate"><span class="pre">upload_and_convert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.convert.enqueue_conversion"><code class="docutils literal notranslate"><span class="pre">enqueue_conversion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.convert.get_job_status"><code class="docutils literal notranslate"><span class="pre">get_job_status()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.convert.cancel_job"><code class="docutils literal notranslate"><span class="pre">cancel_job()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.convert.serve_job_pdf"><code class="docutils literal notranslate"><span class="pre">serve_job_pdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.convert.download_audio"><code class="docutils literal notranslate"><span class="pre">download_audio()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-audia.ui.routes.research"><code class="docutils literal notranslate"><span class="pre">audia.ui.routes.research</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.research.SearchRequest"><code class="docutils literal notranslate"><span class="pre">SearchRequest</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.research.NormalizeRequest"><code class="docutils literal notranslate"><span class="pre">NormalizeRequest</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.research.ConvertResearchRequest"><code class="docutils literal notranslate"><span class="pre">ConvertResearchRequest</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.research.EnqueueRequest"><code class="docutils literal notranslate"><span class="pre">EnqueueRequest</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.research.normalize"><code class="docutils literal notranslate"><span class="pre">normalize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.research.search"><code class="docutils literal notranslate"><span class="pre">search()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.research.convert_papers"><code class="docutils literal notranslate"><span class="pre">convert_papers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.research.enqueue_research"><code class="docutils literal notranslate"><span class="pre">enqueue_research()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.research.transcribe_audio"><code class="docutils literal notranslate"><span class="pre">transcribe_audio()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.research.get_job_status"><code class="docutils literal notranslate"><span class="pre">get_job_status()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.research.cancel_job"><code class="docutils literal notranslate"><span class="pre">cancel_job()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.research.serve_job_pdf"><code class="docutils literal notranslate"><span class="pre">serve_job_pdf()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-audia.ui.routes.library"><code class="docutils literal notranslate"><span class="pre">audia.ui.routes.library</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.library.list_papers"><code class="docutils literal notranslate"><span class="pre">list_papers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.library.list_audio"><code class="docutils literal notranslate"><span class="pre">list_audio()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.library.list_research_sessions"><code class="docutils literal notranslate"><span class="pre">list_research_sessions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.library.list_user_settings"><code class="docutils literal notranslate"><span class="pre">list_user_settings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.library.PaperPatch"><code class="docutils literal notranslate"><span class="pre">PaperPatch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.library.AudioPatch"><code class="docutils literal notranslate"><span class="pre">AudioPatch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.library.ResearchSessionPatch"><code class="docutils literal notranslate"><span class="pre">ResearchSessionPatch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.library.UserSettingPatch"><code class="docutils literal notranslate"><span class="pre">UserSettingPatch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.library.patch_paper"><code class="docutils literal notranslate"><span class="pre">patch_paper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.library.patch_audio"><code class="docutils literal notranslate"><span class="pre">patch_audio()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.library.patch_research_session"><code class="docutils literal notranslate"><span class="pre">patch_research_session()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.library.patch_user_setting"><code class="docutils literal notranslate"><span class="pre">patch_user_setting()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.library.delete_audio"><code class="docutils literal notranslate"><span class="pre">delete_audio()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.library.get_paper"><code class="docutils literal notranslate"><span class="pre">get_paper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.library.delete_paper"><code class="docutils literal notranslate"><span class="pre">delete_paper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.library.serve_pdf"><code class="docutils literal notranslate"><span class="pre">serve_pdf()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-audia.ui.routes.settings"><code class="docutils literal notranslate"><span class="pre">audia.ui.routes.settings</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.settings.SettingsBody"><code class="docutils literal notranslate"><span class="pre">SettingsBody</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.settings.get_ui_settings"><code class="docutils literal notranslate"><span class="pre">get_ui_settings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audia.ui.routes.settings.save_ui_settings"><code class="docutils literal notranslate"><span class="pre">save_ui_settings()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html#id1">CHANGELOG</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#version-0-3-5-2026-03-31">Version 0.3.5 (2026-03-31)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#rebuild-frontend">Rebuild frontend</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#version-0-3-4-2026-03-31">Version 0.3.4 (2026-03-31)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#custom-api-base-urls-for-openai-and-anthropic">Custom API base URLs for OpenAI and Anthropic</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#version-0-3-3-2026-03-31">Version 0.3.3 (2026-03-31)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#icon-system-tts-voice-selector-database-editor">Icon system, TTS voice selector &amp; database editor</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../changelog.html#icon-system-constants-index-ts">Icon system (<code class="docutils literal notranslate"><span class="pre">constants/index.ts</span></code>)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../changelog.html#tts-voice-selector-configuration-tab">TTS voice selector (Configuration tab)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../changelog.html#database-explorer-editable-cells">Database explorer — editable cells</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../changelog.html#database-explorer-table-ux">Database explorer — table UX</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#version-0-3-2-2026-03-30">Version 0.3.2 (2026-03-30)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#convert-tab-improvements">Convert tab improvements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../changelog.html#instant-pdf-preview-on-upload">Instant PDF preview on upload</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../changelog.html#collapsible-full-progress-log">Collapsible full-progress log</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#version-0-3-1-2026-03-30">Version 0.3.1 (2026-03-30)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#frontend-refactor-database-explorer">Frontend refactor &amp; database explorer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../changelog.html#main-tsx-split-into-tab-components">Main.tsx split into tab components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../changelog.html#database-tab-maindatabase-tsx">Database tab (<code class="docutils literal notranslate"><span class="pre">MainDatabase.tsx</span></code>)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../changelog.html#api-additions-library-router">API additions (library router)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../changelog.html#scripts-explore-db-py"><code class="docutils literal notranslate"><span class="pre">scripts/explore_db.py</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#version-0-3-0-2026-03-29">Version 0.3.0 (2026-03-29)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#configuration-voice-search-llm-query-normalisation">Configuration, voice search &amp; LLM query normalisation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../changelog.html#configuration-tab">Configuration tab</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../changelog.html#voice-search-research-tab">Voice search (Research tab)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../changelog.html#llm-query-normalisation-research-tab">LLM query normalisation (Research tab)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../changelog.html#api-additions">API additions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../changelog.html#code-hygiene">Code hygiene</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#version-0-2-0-2026-03-29">Version 0.2.0 (2026-03-29)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#web-ui-overhaul">Web UI overhaul</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#version-0-1-2-2026-03-29">Version 0.1.2 (2026-03-29)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#arxiv-search-robustness-cli-improvements">ArXiv search robustness &amp; CLI improvements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../changelog.html#arxiv-search">ArXiv search</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../changelog.html#pdf-download">PDF download</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../changelog.html#cli-output">CLI output</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#version-0-1-1-2026-03-29">Version 0.1.1 (2026-03-29)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#listen-command-pipeline-overhaul"><code class="docutils literal notranslate"><span class="pre">listen</span></code> command pipeline overhaul</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#version-0-1-0-2026-03-29">Version 0.1.0 (2026-03-29)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#first-fully-working-release-pdf-to-audio-via-mandatory-llm-curation-and-edge-tts-synthesis">First fully working release: PDF to audio via mandatory LLM curation and edge-tts synthesis.</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#version-0-0-1-2026-03-28">Version 0.0.1 (2026-03-28)</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #0d0d14" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">audia</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><code class="docutils literal notranslate"><span class="pre">audia.ui</span></code> — Web UI (FastAPI)</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="audia-ui-web-ui-fastapi">
+<h1><code class="docutils literal notranslate"><span class="pre">audia.ui</span></code> — Web UI (FastAPI)<a class="headerlink" href="#audia-ui-web-ui-fastapi" title="Link to this heading"></a></h1>
+<hr class="docutils" />
+<section id="module-audia.ui.app">
+<span id="audia-ui-app-fastapi-application"></span><h2><code class="docutils literal notranslate"><span class="pre">audia.ui.app</span></code> — FastAPI application<a class="headerlink" href="#module-audia.ui.app" title="Link to this heading"></a></h2>
+<p>FastAPI application factory for the audia web UI.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.app.create_app">
+<span class="sig-prename descclassname"><span class="pre">audia.ui.app.</span></span><span class="sig-name descname"><span class="pre">create_app</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audia/ui/app.html#create_app"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audia.ui.app.create_app" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>fastapi.FastAPI</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<hr class="docutils" />
+<section id="module-audia.ui.jobs">
+<span id="audia-ui-jobs-background-job-store"></span><h2><code class="docutils literal notranslate"><span class="pre">audia.ui.jobs</span></code> — Background job store<a class="headerlink" href="#module-audia.ui.jobs" title="Link to this heading"></a></h2>
+<p>Shared in-memory job store for background conversion tasks.</p>
+<p>Both /api/convert/enqueue and /api/research/enqueue write here.
+The status endpoint and the cancel endpoint read/write here.</p>
+</section>
+<hr class="docutils" />
+<section id="routes">
+<h2>Routes<a class="headerlink" href="#routes" title="Link to this heading"></a></h2>
+<section id="module-audia.ui.routes.convert">
+<span id="audia-ui-routes-convert"></span><h3><code class="docutils literal notranslate"><span class="pre">audia.ui.routes.convert</span></code><a class="headerlink" href="#module-audia.ui.routes.convert" title="Link to this heading"></a></h3>
+<p>/api/convert – Upload PDF → run pipeline → return audio file path.
+Includes background-job endpoints for granular progress tracking.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.convert.upload_and_convert">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.convert.</span></span><span class="sig-name descname"><span class="pre">upload_and_convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">fastapi.File</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">fastapi.Form</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm_provider</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">fastapi.Form</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">fastapi.Form</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tts_backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">fastapi.Form</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.convert.upload_and_convert" title="Link to this definition"></a></dt>
+<dd><p>Synchronous upload + convert. Returns the download URL when done.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file</strong> (<em>fastapi.UploadFile</em>)</p></li>
+<li><p><strong>voice</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>llm_provider</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>llm_model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>tts_backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.convert.enqueue_conversion">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.convert.</span></span><span class="sig-name descname"><span class="pre">enqueue_conversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">fastapi.File</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">fastapi.Form</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm_provider</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">fastapi.Form</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">fastapi.Form</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tts_backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">fastapi.Form</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.convert.enqueue_conversion" title="Link to this definition"></a></dt>
+<dd><p>Upload a PDF and return a job_id immediately; poll /status/{job_id} for progress.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file</strong> (<em>fastapi.UploadFile</em>)</p></li>
+<li><p><strong>voice</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>llm_provider</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>llm_model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>tts_backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.convert.get_job_status">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.convert.</span></span><span class="sig-name descname"><span class="pre">get_job_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.convert.get_job_status" title="Link to this definition"></a></dt>
+<dd><p>Return current status, stage, progress, log, result when done.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>job_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.convert.cancel_job">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.convert.</span></span><span class="sig-name descname"><span class="pre">cancel_job</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.convert.cancel_job" title="Link to this definition"></a></dt>
+<dd><p>Signal the job runner to stop after the current stage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>job_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.convert.serve_job_pdf">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.convert.</span></span><span class="sig-name descname"><span class="pre">serve_job_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.convert.serve_job_pdf" title="Link to this definition"></a></dt>
+<dd><p>Stream the PDF associated with a conversion job (available as soon as uploaded/downloaded).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>job_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.FileResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.convert.download_audio">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.convert.</span></span><span class="sig-name descname"><span class="pre">download_audio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">audio_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.convert.download_audio" title="Link to this definition"></a></dt>
+<dd><p>Stream the generated audio file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>audio_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.FileResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-audia.ui.routes.research">
+<span id="audia-ui-routes-research"></span><h3><code class="docutils literal notranslate"><span class="pre">audia.ui.routes.research</span></code><a class="headerlink" href="#module-audia.ui.routes.research" title="Link to this heading"></a></h3>
+<p>/api/research – Search ArXiv and convert selected papers to audio.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="audia.ui.routes.research.SearchRequest">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.research.</span></span><span class="sig-name descname"><span class="pre">SearchRequest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_results</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audia/ui/routes/research.html#SearchRequest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audia.ui.routes.research.SearchRequest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>max_results</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.research.SearchRequest.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="headerlink" href="#audia.ui.routes.research.SearchRequest.query" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.research.SearchRequest.max_results">
+<span class="sig-name descname"><span class="pre">max_results</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="headerlink" href="#audia.ui.routes.research.SearchRequest.max_results" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.research.SearchRequest.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#audia.ui.routes.research.SearchRequest.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="audia.ui.routes.research.NormalizeRequest">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.research.</span></span><span class="sig-name descname"><span class="pre">NormalizeRequest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audia/ui/routes/research.html#NormalizeRequest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audia.ui.routes.research.NormalizeRequest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.research.NormalizeRequest.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="headerlink" href="#audia.ui.routes.research.NormalizeRequest.query" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.research.NormalizeRequest.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#audia.ui.routes.research.NormalizeRequest.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="audia.ui.routes.research.ConvertResearchRequest">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.research.</span></span><span class="sig-name descname"><span class="pre">ConvertResearchRequest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">arxiv_ids</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audia/ui/routes/research.html#ConvertResearchRequest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audia.ui.routes.research.ConvertResearchRequest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>arxiv_ids</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.research.ConvertResearchRequest.arxiv_ids">
+<span class="sig-name descname"><span class="pre">arxiv_ids</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#audia.ui.routes.research.ConvertResearchRequest.arxiv_ids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.research.ConvertResearchRequest.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#audia.ui.routes.research.ConvertResearchRequest.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="audia.ui.routes.research.EnqueueRequest">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.research.</span></span><span class="sig-name descname"><span class="pre">EnqueueRequest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">arxiv_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm_provider</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tts_backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audia/ui/routes/research.html#EnqueueRequest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audia.ui.routes.research.EnqueueRequest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arxiv_ids</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>llm_provider</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>llm_model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>tts_backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.research.EnqueueRequest.arxiv_ids">
+<span class="sig-name descname"><span class="pre">arxiv_ids</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#audia.ui.routes.research.EnqueueRequest.arxiv_ids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.research.EnqueueRequest.llm_provider">
+<span class="sig-name descname"><span class="pre">llm_provider</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.research.EnqueueRequest.llm_provider" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.research.EnqueueRequest.llm_model">
+<span class="sig-name descname"><span class="pre">llm_model</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.research.EnqueueRequest.llm_model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.research.EnqueueRequest.tts_backend">
+<span class="sig-name descname"><span class="pre">tts_backend</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.research.EnqueueRequest.tts_backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.research.EnqueueRequest.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#audia.ui.routes.research.EnqueueRequest.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.research.normalize">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.research.</span></span><span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.research.normalize" title="Link to this definition"></a></dt>
+<dd><p>Uses the same distill_search_query function as the CLI speech pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>body</strong> (<a class="reference internal" href="#audia.ui.routes.research.NormalizeRequest" title="audia.ui.routes.research.NormalizeRequest"><em>NormalizeRequest</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.research.search">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.research.</span></span><span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.research.search" title="Link to this definition"></a></dt>
+<dd><p>Search ArXiv and return paper metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>body</strong> (<a class="reference internal" href="#audia.ui.routes.research.SearchRequest" title="audia.ui.routes.research.SearchRequest"><em>SearchRequest</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.research.convert_papers">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.research.</span></span><span class="sig-name descname"><span class="pre">convert_papers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.research.convert_papers" title="Link to this definition"></a></dt>
+<dd><p>Search, download, run pipeline, and save for each arxiv_id. Returns results synchronously.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>body</strong> (<a class="reference internal" href="#audia.ui.routes.research.ConvertResearchRequest" title="audia.ui.routes.research.ConvertResearchRequest"><em>ConvertResearchRequest</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.research.enqueue_research">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.research.</span></span><span class="sig-name descname"><span class="pre">enqueue_research</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.research.enqueue_research" title="Link to this definition"></a></dt>
+<dd><p>For each arxiv_id, create an async job that downloads, processes, and
+saves to the library.  Returns job_ids immediately; poll
+/api/research/status/{job_id} for progress.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>body</strong> (<a class="reference internal" href="#audia.ui.routes.research.EnqueueRequest" title="audia.ui.routes.research.EnqueueRequest"><em>EnqueueRequest</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.research.transcribe_audio">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.research.</span></span><span class="sig-name descname"><span class="pre">transcribe_audio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">fastapi.File</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.research.transcribe_audio" title="Link to this definition"></a></dt>
+<dd><p>Accept a browser audio recording and return the Whisper transcription.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> (<em>fastapi.UploadFile</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.research.get_job_status">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.research.</span></span><span class="sig-name descname"><span class="pre">get_job_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.research.get_job_status" title="Link to this definition"></a></dt>
+<dd><p>Return current status, stage, progress, log, result when done.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>job_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.research.cancel_job">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.research.</span></span><span class="sig-name descname"><span class="pre">cancel_job</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.research.cancel_job" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>job_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.research.serve_job_pdf">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.research.</span></span><span class="sig-name descname"><span class="pre">serve_job_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.research.serve_job_pdf" title="Link to this definition"></a></dt>
+<dd><p>Stream the PDF associated with a research job (once downloaded).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>job_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.FileResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-audia.ui.routes.library">
+<span id="audia-ui-routes-library"></span><h3><code class="docutils literal notranslate"><span class="pre">audia.ui.routes.library</span></code><a class="headerlink" href="#module-audia.ui.routes.library" title="Link to this heading"></a></h3>
+<p>/api/library – Query the local SQLite library of papers and audio files.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.library.list_papers">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.library.</span></span><span class="sig-name descname"><span class="pre">list_papers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.library.list_papers" title="Link to this definition"></a></dt>
+<dd><p>Return all papers stored in the local database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.library.list_audio">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.library.</span></span><span class="sig-name descname"><span class="pre">list_audio</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.library.list_audio" title="Link to this definition"></a></dt>
+<dd><p>Return all audio files stored in the local database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.library.list_research_sessions">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.library.</span></span><span class="sig-name descname"><span class="pre">list_research_sessions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.library.list_research_sessions" title="Link to this definition"></a></dt>
+<dd><p>Return all research sessions stored in the local database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.library.list_user_settings">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.library.</span></span><span class="sig-name descname"><span class="pre">list_user_settings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.library.list_user_settings" title="Link to this definition"></a></dt>
+<dd><p>Return all user settings stored in the local database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="audia.ui.routes.library.PaperPatch">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.library.</span></span><span class="sig-name descname"><span class="pre">PaperPatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abstract</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arxiv_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdf_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audia/ui/routes/library.html#PaperPatch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audia.ui.routes.library.PaperPatch" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>authors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>abstract</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>arxiv_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>pdf_url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.library.PaperPatch.title">
+<span class="sig-name descname"><span class="pre">title</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.library.PaperPatch.title" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.library.PaperPatch.authors">
+<span class="sig-name descname"><span class="pre">authors</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.library.PaperPatch.authors" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.library.PaperPatch.abstract">
+<span class="sig-name descname"><span class="pre">abstract</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.library.PaperPatch.abstract" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.library.PaperPatch.arxiv_id">
+<span class="sig-name descname"><span class="pre">arxiv_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.library.PaperPatch.arxiv_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.library.PaperPatch.pdf_url">
+<span class="sig-name descname"><span class="pre">pdf_url</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.library.PaperPatch.pdf_url" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.library.PaperPatch.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#audia.ui.routes.library.PaperPatch.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="audia.ui.routes.library.AudioPatch">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.library.</span></span><span class="sig-name descname"><span class="pre">AudioPatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration_seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tts_backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tts_voice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paper_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audia/ui/routes/library.html#AudioPatch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audia.ui.routes.library.AudioPatch" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>file_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>duration_seconds</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>tts_backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>tts_voice</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>paper_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.library.AudioPatch.filename">
+<span class="sig-name descname"><span class="pre">filename</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.library.AudioPatch.filename" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.library.AudioPatch.file_path">
+<span class="sig-name descname"><span class="pre">file_path</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.library.AudioPatch.file_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.library.AudioPatch.duration_seconds">
+<span class="sig-name descname"><span class="pre">duration_seconds</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.library.AudioPatch.duration_seconds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.library.AudioPatch.tts_backend">
+<span class="sig-name descname"><span class="pre">tts_backend</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.library.AudioPatch.tts_backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.library.AudioPatch.tts_voice">
+<span class="sig-name descname"><span class="pre">tts_voice</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.library.AudioPatch.tts_voice" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.library.AudioPatch.paper_id">
+<span class="sig-name descname"><span class="pre">paper_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.library.AudioPatch.paper_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.library.AudioPatch.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#audia.ui.routes.library.AudioPatch.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="audia.ui.routes.library.ResearchSessionPatch">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.library.</span></span><span class="sig-name descname"><span class="pre">ResearchSessionPatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audia/ui/routes/library.html#ResearchSessionPatch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audia.ui.routes.library.ResearchSessionPatch" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.library.ResearchSessionPatch.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.library.ResearchSessionPatch.query" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.library.ResearchSessionPatch.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#audia.ui.routes.library.ResearchSessionPatch.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="audia.ui.routes.library.UserSettingPatch">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.library.</span></span><span class="sig-name descname"><span class="pre">UserSettingPatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audia/ui/routes/library.html#UserSettingPatch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audia.ui.routes.library.UserSettingPatch" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.library.UserSettingPatch.value">
+<span class="sig-name descname"><span class="pre">value</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="headerlink" href="#audia.ui.routes.library.UserSettingPatch.value" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.library.UserSettingPatch.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#audia.ui.routes.library.UserSettingPatch.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.library.patch_paper">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.library.</span></span><span class="sig-name descname"><span class="pre">patch_paper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paper_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.library.patch_paper" title="Link to this definition"></a></dt>
+<dd><p>Partially update a paper’s editable fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>paper_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>body</strong> (<a class="reference internal" href="#audia.ui.routes.library.PaperPatch" title="audia.ui.routes.library.PaperPatch"><em>PaperPatch</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.library.patch_audio">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.library.</span></span><span class="sig-name descname"><span class="pre">patch_audio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">audio_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.library.patch_audio" title="Link to this definition"></a></dt>
+<dd><p>Partially update an audio file’s editable fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>audio_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>body</strong> (<a class="reference internal" href="#audia.ui.routes.library.AudioPatch" title="audia.ui.routes.library.AudioPatch"><em>AudioPatch</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.library.patch_research_session">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.library.</span></span><span class="sig-name descname"><span class="pre">patch_research_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.library.patch_research_session" title="Link to this definition"></a></dt>
+<dd><p>Partially update a research session’s editable fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>body</strong> (<a class="reference internal" href="#audia.ui.routes.library.ResearchSessionPatch" title="audia.ui.routes.library.ResearchSessionPatch"><em>ResearchSessionPatch</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.library.patch_user_setting">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.library.</span></span><span class="sig-name descname"><span class="pre">patch_user_setting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.library.patch_user_setting" title="Link to this definition"></a></dt>
+<dd><p>Update the value for an existing user setting key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>body</strong> (<a class="reference internal" href="#audia.ui.routes.library.UserSettingPatch" title="audia.ui.routes.library.UserSettingPatch"><em>UserSettingPatch</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.library.delete_audio">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.library.</span></span><span class="sig-name descname"><span class="pre">delete_audio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">audio_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.library.delete_audio" title="Link to this definition"></a></dt>
+<dd><p>Remove an audio file record (and optionally the file on disk).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>audio_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.library.get_paper">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.library.</span></span><span class="sig-name descname"><span class="pre">get_paper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paper_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.library.get_paper" title="Link to this definition"></a></dt>
+<dd><p>Return a single paper record including linked audio files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>paper_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.library.delete_paper">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.library.</span></span><span class="sig-name descname"><span class="pre">delete_paper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paper_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.library.delete_paper" title="Link to this definition"></a></dt>
+<dd><p>Remove a paper record, its audio file records, and the files from disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>paper_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.library.serve_pdf">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.library.</span></span><span class="sig-name descname"><span class="pre">serve_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paper_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.library.serve_pdf" title="Link to this definition"></a></dt>
+<dd><p>Stream the original PDF file for in-browser preview.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>paper_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.FileResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-audia.ui.routes.settings">
+<span id="audia-ui-routes-settings"></span><h3><code class="docutils literal notranslate"><span class="pre">audia.ui.routes.settings</span></code><a class="headerlink" href="#module-audia.ui.routes.settings" title="Link to this heading"></a></h3>
+<p>/api/settings – Persist and retrieve user-configured pipeline settings.
+Settings are stored in the SQLite DB as key-value pairs so they survive
+server restarts and are pre-loaded by the frontend on every page open.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="audia.ui.routes.settings.SettingsBody">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.settings.</span></span><span class="sig-name descname"><span class="pre">SettingsBody</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">stt_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm1_provider</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm1_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm2_provider</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm2_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tts_backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audia/ui/routes/settings.html#SettingsBody"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audia.ui.routes.settings.SettingsBody" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stt_model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>llm1_provider</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>llm1_model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>llm2_provider</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>llm2_model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>tts_backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.settings.SettingsBody.stt_model">
+<span class="sig-name descname"><span class="pre">stt_model</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.settings.SettingsBody.stt_model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.settings.SettingsBody.llm1_provider">
+<span class="sig-name descname"><span class="pre">llm1_provider</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.settings.SettingsBody.llm1_provider" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.settings.SettingsBody.llm1_model">
+<span class="sig-name descname"><span class="pre">llm1_model</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.settings.SettingsBody.llm1_model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.settings.SettingsBody.llm2_provider">
+<span class="sig-name descname"><span class="pre">llm2_provider</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.settings.SettingsBody.llm2_provider" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.settings.SettingsBody.llm2_model">
+<span class="sig-name descname"><span class="pre">llm2_model</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.settings.SettingsBody.llm2_model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.settings.SettingsBody.tts_backend">
+<span class="sig-name descname"><span class="pre">tts_backend</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#audia.ui.routes.settings.SettingsBody.tts_backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audia.ui.routes.settings.SettingsBody.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#audia.ui.routes.settings.SettingsBody.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.settings.get_ui_settings">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.settings.</span></span><span class="sig-name descname"><span class="pre">get_ui_settings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.settings.get_ui_settings" title="Link to this definition"></a></dt>
+<dd><p>Return the user-saved pipeline settings merged with defaults.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="audia.ui.routes.settings.save_ui_settings">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audia.ui.routes.settings.</span></span><span class="sig-name descname"><span class="pre">save_ui_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audia.ui.routes.settings.save_ui_settings" title="Link to this definition"></a></dt>
+<dd><p>Persist the provided settings; omitted fields are left unchanged.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>body</strong> (<a class="reference internal" href="#audia.ui.routes.settings.SettingsBody" title="audia.ui.routes.settings.SettingsBody"><em>SettingsBody</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fastapi.responses.JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cli.html" class="btn btn-neutral float-left" title="audia.cli — Command-line interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Yauheniya Varabyova.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
