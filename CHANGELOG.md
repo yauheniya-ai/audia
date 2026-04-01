@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## Version 0.4.2 (2026-04-01)
+
+### Bug fixes & UI improvements
+
+#### LLM provider ignored during query normalisation
+- Root cause: `NormalizeRequest` only had a `query` field; the `llm_provider` and `llm_model` values sent by the frontend were silently dropped, so `distill_search_query` always fell back to the global `.env` defaults (Anthropic)
+- `NormalizeRequest` now accepts `llm_provider` and `llm_model`; the `/api/research/normalize` handler applies them to the settings object before building the LLM — consistent with how `_run_research_job` already handled overrides
+- The handler now inlines the LLM call directly (no longer delegates to `distill_search_query`) so provider/model overrides are guaranteed to take effect
+
+#### Research sessions not saved to the database
+- Root cause: `EnqueueRequest` had no `query` field so there was nothing to store; `_run_research_job` saved `Paper` and `AudioFile` rows but never wrote a `ResearchSession`
+- `EnqueueRequest` and `_run_research_job` now accept an optional `query` parameter
+- After each job saves the paper, a `ResearchSession` row is written with the search query and the new `paper_id`
+- Frontend updated to include `query: normalizedQuery ?? query` in the enqueue payload
+
+#### Database tab colour scheme
+- `audio_files` card/heading: violet → **lime**
+- `user_settings` card/heading: amber → **purple**
+- Amber removed from the colour palette entirely; lime and purple added
+
+#### Abstract cell scrollable
+- Display div for multiline cells (`abstract`, `query`) now carries `max-h-24 overflow-y-auto`, capping height at 6 rem and making the cell scrollable when content overflows
+
 ## Version 0.4.1 (2026-04-01)
 
 - Set the display div for multiline cells to max-h-24 overflow-y-auto, so abstract (and query) cells will be capped at 6rem tall and scroll vertically when the content overflows

@@ -17,10 +17,9 @@ from audia.agents.graph import run_pipeline
 from audia.agents.research import ArxivSearcher
 from audia.agents.pdf_processor import extract_text
 from audia.agents.text_cleaner import heuristic_clean, llm_curate
-from audia.agents.stt import distill_search_query
 from audia.agents.tts import synthesize
 from audia.config import get_settings
-from audia.storage import get_session, AudioFile, Paper
+from audia.storage import get_session, AudioFile, Paper, ResearchSession
 from audia.ui.jobs import JOBS
 
 router = APIRouter()
@@ -33,6 +32,8 @@ class SearchRequest(BaseModel):
 
 class NormalizeRequest(BaseModel):
     query: str
+    llm_provider: str | None = None
+    llm_model: str | None = None
 
 
 class ConvertResearchRequest(BaseModel):
@@ -41,6 +42,7 @@ class ConvertResearchRequest(BaseModel):
 
 class EnqueueRequest(BaseModel):
     arxiv_ids: list[str]
+    query: str | None = None
     llm_provider: str | None = None
     llm_model: str | None = None
     tts_backend: str | None = None
@@ -73,8 +75,31 @@ def _log(job: dict, line: str) -> None:
 @router.post("/normalize", summary="Distil a natural-language query into a short ArXiv search string via LLM")
 async def normalize(body: NormalizeRequest) -> JSONResponse:
     """Uses the same distill_search_query function as the CLI speech pipeline."""
+    from audia.agents.text_cleaner import _build_llm
+    from langchain_core.messages import HumanMessage, SystemMessage  # type: ignore
+
+    cfg = get_settings()
+    # Apply user-selected provider/model overrides (sent from the UI settings)
+    if body.llm_provider:
+        cfg.__dict__["llm_provider"] = body.llm_provider.lower()
+    if body.llm_model:
+        cfg.__dict__["llm_model"] = body.llm_model
+
     try:
-        search_string = await asyncio.to_thread(distill_search_query, body.query)
+        def _run() -> str:
+            llm = _build_llm(cfg)
+            messages = [
+                SystemMessage(content=(
+                    "You are a search query assistant. "
+                    "Extract a concise ArXiv search query (3-8 words) from the user's message. "
+                    "Return ONLY the search query, nothing else."
+                )),
+                HumanMessage(content=body.query),
+            ]
+            result = llm.invoke(messages)
+            return getattr(result, "content", str(result)).strip()
+
+        search_string = await asyncio.to_thread(_run)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
     return JSONResponse({"search_string": search_string})
@@ -190,6 +215,7 @@ async def enqueue_research(body: EnqueueRequest) -> JSONResponse:
         JOBS[job_id] = job
         asyncio.create_task(_run_research_job(
             job_id, arxiv_id,
+            query=body.query,
             llm_provider=body.llm_provider,
             llm_model=body.llm_model,
             tts_backend=body.tts_backend,
@@ -203,6 +229,7 @@ async def enqueue_research(body: EnqueueRequest) -> JSONResponse:
 async def _run_research_job(
     job_id: str,
     arxiv_id: str,
+    query: str | None = None,
     llm_provider: str | None = None,
     llm_model: str | None = None,
     tts_backend: str | None = None,
@@ -330,6 +357,12 @@ async def _run_research_job(
             session.flush()
             audio_id = af.id
             paper_id = db_paper.id
+            # Save research session so the Database tab shows the query history
+            if query:
+                session.add(ResearchSession(
+                    query=query,
+                    paper_ids=json.dumps([paper_id]),
+                ))
 
         job["paper_id"] = paper_id
         _log(job, f"  \u2713 Saved (paper_id={paper_id}, audio_id={audio_id})")
