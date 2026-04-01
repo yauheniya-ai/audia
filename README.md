@@ -130,6 +130,11 @@ audia serve
 # → http://localhost:8000
 ```
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/yauheniya-ai/audia/main/docs/images/ScreenRecordingAudia.webp" width="100%" />
+  <em>The audia UI</em>
+</p>
+
 ## Pipeline
 
 The pipeline can be entered in three ways:
