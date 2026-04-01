@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## Version 0.4.3 (2026-04-01)
+
+### Research tab: convert button improvements
+
+- "Convert to audio" button is now **lime** (matching the Convert tab), shows a spinner and "Converting…" label while jobs are running, and is disabled during conversion
+- A **Cancel** button appears beside it (not inside each job panel) while any jobs are running; clicking it cancels all active jobs at once
+- Button row stays visible throughout conversion so progress and cancel are always accessible
+
 ## Version 0.4.2 (2026-04-01)
 
 ### Bug fixes & UI improvements
@@ -19,9 +27,6 @@
 - `audio_files` card/heading: violet → **lime**
 - `user_settings` card/heading: amber → **purple**
 - Amber removed from the colour palette entirely; lime and purple added
-
-#### Abstract cell scrollable
-- Display div for multiline cells (`abstract`, `query`) now carries `max-h-24 overflow-y-auto`, capping height at 6 rem and making the cell scrollable when content overflows
 
 ## Version 0.4.1 (2026-04-01)
 
