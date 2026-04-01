@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Version 0.4.1 (2026-04-01)
+
+- Set the display div for multiline cells to max-h-24 overflow-y-auto, so abstract (and query) cells will be capped at 6rem tall and scroll vertically when the content overflows
+
 ## Version 0.4.0 (2026-04-01)
 
 ### Bug fixes
