@@ -44,6 +44,7 @@ class EnqueueRequest(BaseModel):
     llm_provider: str | None = None
     llm_model: str | None = None
     tts_backend: str | None = None
+    tts_voice: str | None = None
 
 
 def _make_job(pdf_title: str | None = None) -> dict:
@@ -192,6 +193,7 @@ async def enqueue_research(body: EnqueueRequest) -> JSONResponse:
             llm_provider=body.llm_provider,
             llm_model=body.llm_model,
             tts_backend=body.tts_backend,
+            tts_voice=body.tts_voice,
         ))
         jobs_out.append({"arxiv_id": arxiv_id, "job_id": job_id})
 
@@ -204,6 +206,7 @@ async def _run_research_job(
     llm_provider: str | None = None,
     llm_model: str | None = None,
     tts_backend: str | None = None,
+    tts_voice: str | None = None,
 ) -> None:
     job = JOBS[job_id]
     cfg = get_settings()
@@ -268,6 +271,8 @@ async def _run_research_job(
             cfg2.__dict__["llm_model"] = llm_model
         if tts_backend:
             cfg2.__dict__["tts_backend"] = tts_backend
+        if tts_voice:
+            cfg2.__dict__["tts_voice"] = tts_voice
 
         def _cb_llm(msg: str) -> None:
             _log(job, f"  {msg}")

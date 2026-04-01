@@ -7,10 +7,13 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import shutil
 import uuid
 from pathlib import Path
 from typing import Any, Dict, Optional
+
+_logger = logging.getLogger(__name__)
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
@@ -228,14 +231,18 @@ async def enqueue_conversion(
                 ts = datetime.now(_tz.utc).strftime("%Y%m%d_%H%M%S")
                 pdf_stem = upload_path.stem[:50]
                 run_id = f"{pdf_stem}_{ts}"
-                run_dir = cfg2.debug_dir / run_id
+                debug_dir = get_settings().debug_dir
+                debug_dir.mkdir(parents=True, exist_ok=True)
+                run_dir = debug_dir / run_id
                 run_dir.mkdir(parents=True, exist_ok=True)
-                (run_dir / "1_raw.txt").write_text(pdf_result.text, encoding="utf-8")
-                (run_dir / "2_preprocessed.txt").write_text(precleaned, encoding="utf-8")
-                (run_dir / "3_curated.txt").write_text(curated, encoding="utf-8")
+                (run_dir / "1_raw.txt").write_text(pdf_result.text or "", encoding="utf-8")
+                (run_dir / "2_preprocessed.txt").write_text(precleaned or "", encoding="utf-8")
+                (run_dir / "3_curated.txt").write_text(curated or "", encoding="utf-8")
                 _log(job, f"  Debug texts saved → {run_dir}")
+                _logger.info("Debug texts saved → %s", run_dir)
             except Exception as _dbg_exc:
                 _log(job, f"  [warn] Could not save debug texts: {_dbg_exc}")
+                _logger.warning("Could not save debug texts: %s", _dbg_exc, exc_info=True)
 
             job.update(
                 status="done",

@@ -23,6 +23,7 @@ _DEFAULTS: dict[str, str] = {
     "llm2_provider": "Anthropic",
     "llm2_model": "claude-opus-4-6",
     "tts_backend": "edge-tts",
+    "tts_voice": "en-US-AriaNeural",
 }
 
 
@@ -33,6 +34,7 @@ class SettingsBody(BaseModel):
     llm2_provider: str | None = None
     llm2_model: str | None = None
     tts_backend: str | None = None
+    tts_voice: str | None = None
 
 
 @router.get("", summary="Get saved UI pipeline settings")

@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## Version 0.4.0 (2026-04-01)
+
+### Bug fixes
+
+#### Abstract column not editable in Database tab
+- Root cause: PDF-converted papers have `abstract=""` (empty string), which rendered as a zero-height invisible `<span>` with only 2 px of padding — effectively unclickable
+- Empty editable cells now display a dimmed italic `(empty)` placeholder so they are always visible and clickable
+- `EditableCell` wrapper gained `min-h-[1.25rem]` so the click target is never zero-height
+- `CellValue` now receives `isEditable` and `isDark` props to render the placeholder with correct theme colouring
+
+#### TTS voice not persisted to user settings
+- Root cause: `tts_voice` was missing from both `_DEFAULTS` and `SettingsBody` in `settings.py`, so the voice selection was silently dropped on every save and never loaded on startup
+- `tts_voice` added to `_DEFAULTS` (default: `en-US-AriaNeural`) and `SettingsBody` in the settings router
+- `tts_voice` is now forwarded end-to-end: `MainConvert` and `MainResearch` each gained a `ttsVoice` prop; `Main.tsx` passes the loaded voice to both; the convert form sends it as `voice`, and the research enqueue JSON sends it as `tts_voice`; `EnqueueRequest` and `_run_research_job` in `research.py` likewise accept and apply the new field
+
+#### Debug text files not written in UI mode
+- The debug save block in `convert.py` now resolves `debug_dir` via a fresh `get_settings()` call (not via the mutated `cfg2` alias) and explicitly creates the parent directory before the run subdirectory
+- Text values are guarded with `or ""` to prevent `write_text(None)` errors
+- Errors are now logged to the server console via `logging.warning(..., exc_info=True)` in addition to the job log, so failures are visible even without expanding the progress log in the UI
+
 ## Version 0.3.9 (2026-03-31)
 
 ### Bug fixes & UX improvements
