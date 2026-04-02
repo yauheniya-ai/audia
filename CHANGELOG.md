@@ -2,12 +2,23 @@
 
 ## Version 0.4.4 (2026-04-02)
 
-### Style frontend dropdown menu
-- Fix the ordering issue in the configuration diagram
-- Add backdrop filter to custom dropdown menue
+### Style: docs & frontend
 
-### Extend test coverage
+- Docs tables: darker cell borders so text is readable in both light and dark themes
+- Docs sidebar: expanded section background changed from RTD default light-gray to the theme dark background
+- Docs buttons (prev/next): purple background with white text; no outline on focus/click
+- Docs code blocks: border removed; left accent changed from purple to lime
+- Docs links: underline removed on hover and active states
+- Configuration diagram: fixed node ordering in the pipeline flow
+- Configuration diagram dropdown: added backdrop blur so the list is legible over the SVG
 
+### Tests: coverage 68% → 96%
+
+- New `test_stt.py`: covers `_ensure_stt_deps`, `transcribe_file`, `_transcribe_array`, `record_and_transcribe` (including `KeyboardInterrupt` path), and `distill_search_query`
+- New `test_async_jobs.py`: directly `await`s `_run_research_job` (success, not-found, cancellation, exception, no-query) and exercises the `enqueue_conversion` background task via `httpx.AsyncClient`
+- Extended `test_text_cleaner.py`: Google LLM provider (import error, missing key, happy path, custom `api_base`); OpenAI/Anthropic happy paths with `api_base`; `progress_cb` path in `llm_curate`; `clean_text` alias
+- Extended `test_research.py`: HTML fallback search (parsing, `max_results`, empty page, API-error trigger, 429 trigger); `paper.published = None` edge case; HTTP error on download
+- Extended `test_cli.py`: "all" paper selection, out-of-range selection, download failure with manual path fallback, `--open` flag, no-subcommand invocation
 
 ## Version 0.4.3 (2026-04-01)
 
