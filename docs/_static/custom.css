@@ -33,6 +33,7 @@
 
   --border:           #1e1e32;
   --border-accent:    #a855f7;
+  --table-border:     #3d3d66;
 
   --link:             #06b6d4;
   --link-hover:       #a855f7;
@@ -71,6 +72,7 @@ body.light-mode {
 
   --border:           #e0daf5;
   --border-accent:    #9333ea;
+  --table-border:     #8b6bb5;
 
   --link:             #0891b2;
   --link-hover:       #9333ea;
@@ -147,6 +149,13 @@ html, body {
 .wy-menu-vertical li.toctree-l1.current > a {
   border-top: 1px solid var(--border) !important;
   border-bottom: 1px solid var(--border) !important;
+}
+
+/* Expanded section background — kill RTD's default light gray */
+.wy-menu-vertical li.current,
+.wy-menu-vertical li.toctree-l1.current > ul,
+.wy-menu-vertical li.toctree-l2.current > ul {
+  background: var(--bg-sidebar) !important;
 }
 
 .wy-menu-vertical li.toctree-l2 > a {
@@ -269,6 +278,31 @@ button.copybtn:hover {
   color: #fff !important;
 }
 
+/* ── General buttons ─────────────────────────────────────────── */
+.btn,
+.btn-neutral,
+a.btn,
+input[type="submit"],
+input[type="button"],
+button:not(#audia-theme-toggle):not(.copybtn) {
+  background-color: var(--accent-purple) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--accent-purple) !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  transition: background 0.2s, border-color 0.2s !important;
+}
+
+.btn:hover,
+.btn-neutral:hover,
+a.btn:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
+  background-color: #7c3aed !important;
+  border-color: #7c3aed !important;
+  color: #ffffff !important;
+}
+
 /* ── Tables ──────────────────────────────────────────────────── */
 table.docutils {
   background: var(--bg-base) !important;
@@ -281,14 +315,14 @@ table.docutils th {
   background: var(--bg-table-head) !important;
   color: var(--accent-cyan) !important;
   border-bottom: 2px solid var(--border-accent) !important;
-  border-right: 1px solid var(--border) !important;
+  border-right: 1px solid var(--table-border) !important;
   font-weight: 700 !important;
   padding: 0.6em 0.9em !important;
 }
 
 table.docutils td {
   color: var(--text-primary) !important;
-  border: 1px solid var(--border) !important;
+  border: 1px solid var(--table-border) !important;
   padding: 0.5em 0.9em !important;
 }
 

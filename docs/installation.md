@@ -37,8 +37,13 @@ pip install "audia[dev]"
 
 ```bash
 git clone https://github.com/yauheniya-ai/audia
-cd audia/pypi
+cd audia
 pip install -e ".[dev]"
+```
+
+or with [uv](https://docs.astral.sh/uv/getting-started/installation/):
+```bash
+uv sync --extra dev
 ```
 
 ## Verify
