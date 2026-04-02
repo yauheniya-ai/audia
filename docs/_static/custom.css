@@ -218,23 +218,27 @@ a, a:link {
 
 a:visited {
   color: var(--link-visited) !important;
+  text-decoration: none !important;
 }
 
-a:hover {
+a:hover,
+a:active,
+a:focus {
   color: var(--link-hover) !important;
-  text-decoration: underline !important;
+  text-decoration: none !important;
 }
 
 /* ── Code blocks ─────────────────────────────────────────────── */
 pre, code, kbd, samp, tt {
   background: var(--bg-code) !important;
   color: var(--accent-lime) !important;
-  border: 1px solid var(--border) !important;
+  border: none !important;
   border-radius: 4px !important;
 }
 
 pre {
-  border-left: 3px solid var(--accent-purple) !important;
+  border-left: 3px solid var(--accent-lime) !important;
+  border-radius: 0 4px 4px 0 !important;
   padding: 1em 1.2em !important;
 }
 
@@ -278,19 +282,21 @@ button.copybtn:hover {
   color: #fff !important;
 }
 
-/* ── General buttons ─────────────────────────────────────────── */
+/* ── Navigation prev/next & general buttons ─────────────────── */
 .btn,
 .btn-neutral,
 a.btn,
 input[type="submit"],
-input[type="button"],
-button:not(#audia-theme-toggle):not(.copybtn) {
+input[type="button"] {
   background-color: var(--accent-purple) !important;
   color: #ffffff !important;
   border: 1px solid var(--accent-purple) !important;
   border-radius: 6px !important;
   font-weight: 600 !important;
+  text-decoration: none !important;
   transition: background 0.2s, border-color 0.2s !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .btn:hover,
@@ -301,6 +307,32 @@ input[type="button"]:hover {
   background-color: #7c3aed !important;
   border-color: #7c3aed !important;
   color: #ffffff !important;
+  text-decoration: none !important;
+}
+
+.btn:focus,
+.btn-neutral:focus,
+a.btn:focus,
+.btn:active,
+.btn-neutral:active,
+a.btn:active {
+  outline: none !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  text-decoration: none !important;
+}
+
+/* Restore sidebar expand/collapse toggles */
+.wy-menu-vertical button,
+.wy-menu-vertical span.toctree-expand {
+  background: transparent !important;
+  color: var(--text-nav) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  font-weight: normal !important;
+  padding: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* ── Tables ──────────────────────────────────────────────────── */
@@ -326,8 +358,14 @@ table.docutils td {
   padding: 0.5em 0.9em !important;
 }
 
+table.docutils tr:nth-child(odd) td {
+  background: var(--bg-base) !important;
+  color: var(--text-primary) !important;
+}
+
 table.docutils tr:nth-child(even) td {
   background: var(--bg-table-row-alt) !important;
+  color: var(--text-primary) !important;
 }
 
 /* ── Admonitions ──────────────────────────────────────────────── */

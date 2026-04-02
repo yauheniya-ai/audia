@@ -105,7 +105,7 @@ html_copy_source = False
 
 html_theme_options = {
     "logo_only": False,
-    "display_version": True,
+    "version_selector": False,
     "prev_next_buttons_location": "bottom",
     "style_external_links": False,
     "collapse_navigation": False,
