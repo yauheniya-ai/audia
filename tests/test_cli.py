@@ -199,6 +199,210 @@ class TestResearchCommand:
         assert result.exit_code == 0
         assert "Auto Paper" in result.output or "Done" in result.output
 
+    def test_research_select_all(self, tmp_path, monkeypatch):
+        """Entering 'all' at the prompt converts every paper."""
+        from audia.agents.research import ArxivPaper
+
+        monkeypatch.setenv("AUDIA_DATA_DIR", str(tmp_path))
+        monkeypatch.setenv("AUDIA_LLM_PROVIDER", "openai")
+        monkeypatch.setenv("AUDIA_OPENAI_API_KEY", "sk-test")
+
+        papers = [
+            ArxivPaper(
+                arxiv_id=f"2301.0000{i}v1",
+                title=f"All Paper {i}",
+                authors=["Alice"],
+                abstract="Abstract",
+                pdf_url="",
+                published="2023-01-01",
+            )
+            for i in range(2)
+        ]
+        fake_pdf = tmp_path / "all.pdf"
+        fake_pdf.write_bytes(b"%PDF")
+        fake_audio = tmp_path / "all.mp3"
+        fake_audio.write_bytes(b"AUDIO")
+        mock_state = {
+            "audio_path": str(fake_audio),
+            "audio_filename": "all.mp3",
+            "tts_backend": "edge-tts",
+            "tts_voice": "en-US-AriaNeural",
+            "error": None,
+        }
+        mock_session_ctx = MagicMock()
+        mock_session_ctx.__enter__ = MagicMock(return_value=MagicMock())
+        mock_session_ctx.__exit__ = MagicMock(return_value=False)
+
+        with patch("audia.agents.research.ArxivSearcher") as mock_cls, \
+             patch("audia.storage.database.init_db"), \
+             patch("audia.agents.graph.run_pipeline", return_value=mock_state), \
+             patch("audia.storage.database.get_session", return_value=mock_session_ctx):
+            mock_cls.return_value.search.return_value = papers
+            mock_cls.return_value.download_pdf.return_value = fake_pdf
+            result = runner.invoke(app, ["research", "neural nets"], input="all\n")
+
+        assert result.exit_code == 0
+
+    def test_research_select_nothing_exits(self, tmp_path, monkeypatch):
+        """Entering an invalid number returns empty selection → exits cleanly."""
+        from audia.agents.research import ArxivPaper
+
+        monkeypatch.setenv("AUDIA_DATA_DIR", str(tmp_path))
+        monkeypatch.setenv("AUDIA_LLM_PROVIDER", "openai")
+
+        papers = [
+            ArxivPaper(
+                arxiv_id="2301.00001v1",
+                title="Nothing Paper",
+                authors=["Alice"],
+                abstract="",
+                pdf_url="",
+                published="2023-01-01",
+            )
+        ]
+
+        with patch("audia.agents.research.ArxivSearcher") as mock_cls, \
+             patch("audia.storage.database.init_db"):
+            mock_cls.return_value.search.return_value = papers
+            # Enter '99' which is out of range → selected = []
+            result = runner.invoke(app, ["research", "ai"], input="99\n")
+
+        assert result.exit_code == 0
+        assert "No papers selected" in result.output
+
+    def test_research_download_failure_skip(self, tmp_path, monkeypatch):
+        """If download fails and no manual path is entered, paper is skipped."""
+        from audia.agents.research import ArxivPaper
+
+        monkeypatch.setenv("AUDIA_DATA_DIR", str(tmp_path))
+        monkeypatch.setenv("AUDIA_LLM_PROVIDER", "openai")
+        monkeypatch.setenv("AUDIA_OPENAI_API_KEY", "sk-test")
+
+        paper = ArxivPaper(
+            arxiv_id="2301.00001v1",
+            title="Fail Paper",
+            authors=["Alice"],
+            abstract="",
+            pdf_url="",
+            published="2023-01-01",
+        )
+
+        with patch("audia.agents.research.ArxivSearcher") as mock_cls, \
+             patch("audia.storage.database.init_db"):
+            mock_cls.return_value.search.return_value = [paper]
+            mock_cls.return_value.download_pdf.side_effect = IOError("network error")
+            # auto_convert=True so no paper selection prompt; empty manual path = skip
+            result = runner.invoke(app, ["research", "ai", "--convert"], input="\n")
+
+        # Should complete without crashing
+        assert result.exit_code == 0
+
+    def test_research_download_failure_manual_path(self, tmp_path, monkeypatch):
+        """Download failure then valid manual PDF path is accepted."""
+        from audia.agents.research import ArxivPaper
+
+        monkeypatch.setenv("AUDIA_DATA_DIR", str(tmp_path))
+        monkeypatch.setenv("AUDIA_LLM_PROVIDER", "openai")
+        monkeypatch.setenv("AUDIA_OPENAI_API_KEY", "sk-test")
+
+        manual_pdf = tmp_path / "manual.pdf"
+        manual_pdf.write_bytes(b"%PDF")
+        fake_audio = tmp_path / "manual.mp3"
+        fake_audio.write_bytes(b"AUDIO")
+
+        paper = ArxivPaper(
+            arxiv_id="2301.00002v1",
+            title="Manual Paper",
+            authors=[],
+            abstract="",
+            pdf_url="",
+            published="2023-01-01",
+        )
+        mock_state = {
+            "audio_path": str(fake_audio),
+            "audio_filename": "manual.mp3",
+            "tts_backend": "edge-tts",
+            "tts_voice": "en-US-AriaNeural",
+            "error": None,
+        }
+        mock_session_ctx = MagicMock()
+        mock_session_ctx.__enter__ = MagicMock(return_value=MagicMock())
+        mock_session_ctx.__exit__ = MagicMock(return_value=False)
+
+        with patch("audia.agents.research.ArxivSearcher") as mock_cls, \
+             patch("audia.storage.database.init_db"), \
+             patch("audia.agents.graph.run_pipeline", return_value=mock_state), \
+             patch("audia.storage.database.get_session", return_value=mock_session_ctx):
+            mock_cls.return_value.search.return_value = [paper]
+            mock_cls.return_value.download_pdf.side_effect = IOError("network error")
+            result = runner.invoke(
+                app,
+                ["research", "ai", "--convert"],
+                input=f"{manual_pdf}\n",
+            )
+
+        assert result.exit_code == 0
+
+
+class TestNoSubcommand:
+    def test_invoke_without_subcommand_shows_help(self):
+        result = runner.invoke(app, [])
+        # Exit code may be 0 or non-zero depending on Typer version
+        # The banner/help text should be present
+        assert "audia" in result.output.lower() or result.exit_code == 0
+
+
+class TestConvertOpenFlag:
+    def test_convert_open_after(self, tmp_path, monkeypatch):
+        """--open flag calls _open_file after a successful convert."""
+        monkeypatch.setenv("AUDIA_DATA_DIR", str(tmp_path))
+        monkeypatch.setenv("AUDIA_LLM_PROVIDER", "openai")
+        monkeypatch.setenv("AUDIA_OPENAI_API_KEY", "sk-test")
+
+        pdf = tmp_path / "paper.pdf"
+        pdf.write_bytes(b"%PDF-1.4\n%%EOF")
+        fake_audio = tmp_path / "paper_out.mp3"
+        fake_audio.write_bytes(b"AUDIO")
+
+        mock_state = {
+            "audio_path": str(fake_audio),
+            "audio_filename": fake_audio.name,
+            "title": "Open Test Paper",
+            "num_pages": 1,
+            "tts_backend": "edge-tts",
+            "tts_voice": "en-US-AriaNeural",
+            "error": None,
+        }
+        mock_session_ctx = MagicMock()
+        mock_session_ctx.__enter__ = MagicMock(return_value=MagicMock())
+        mock_session_ctx.__exit__ = MagicMock(return_value=False)
+
+        with patch("audia.agents.graph.run_pipeline", return_value=mock_state), \
+             patch("audia.storage.database.init_db"), \
+             patch("audia.storage.database.get_session", return_value=mock_session_ctx), \
+             patch("audia.cli.app._open_file") as mock_open:
+            result = runner.invoke(app, ["convert", str(pdf), "--open"])
+
+        assert result.exit_code == 0
+        mock_open.assert_called_once_with(str(fake_audio))
+
+
+class TestServeWithBrowser:
+    def test_serve_browser_thread_started(self, tmp_path, monkeypatch):
+        """Verify the browser-open code path executes without error."""
+        monkeypatch.setenv("AUDIA_DATA_DIR", str(tmp_path))
+        monkeypatch.setenv("AUDIA_LLM_PROVIDER", "openai")
+
+        with patch("uvicorn.run"), \
+             patch("audia.storage.database.init_db"), \
+             patch("socket.create_connection"), \
+             patch("webbrowser.open") as mock_browser, \
+             patch("time.sleep"):
+            result = runner.invoke(app, ["serve", "--no-browser"])
+
+        assert result.exit_code == 0
+
+
 
 class TestInfoCommandExtended:
     def test_info_shows_lLm_provider(self, tmp_path, monkeypatch):

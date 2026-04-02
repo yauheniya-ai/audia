@@ -272,3 +272,191 @@ class TestCurateText:
         assert result == "Final curated."
         assert llm.invoke.called
 
+
+# ───────────────────────────────────────────── clean_text alias
+
+class TestCleanTextAlias:
+    def test_clean_text_delegates_to_curate_text(self):
+        from audia.config import Settings
+        from audia.agents.text_cleaner import clean_text
+
+        cfg = Settings(data_dir="/tmp", llm_provider="openai", openai_api_key="sk-x")
+        msg = MagicMock()
+        msg.content = "Alias result."
+        llm = MagicMock()
+        llm.invoke.return_value = msg
+
+        with patch("audia.agents.text_cleaner._build_llm", return_value=llm):
+            result = clean_text("Raw [1] text.", cfg)
+
+        assert result == "Alias result."
+        assert llm.invoke.called
+
+
+# ─────────────────────────────────── _build_llm Google provider
+
+class TestBuildLlmGoogle:
+    def test_raises_import_error_for_google_missing(self):
+        from audia.config import Settings
+        from audia.agents.text_cleaner import _build_llm
+
+        cfg = Settings(data_dir="/tmp", llm_provider="openai", openai_api_key="sk-x")
+        cfg.__dict__["llm_provider"] = "google"
+        cfg.__dict__["google_api_key"] = "AIza-fake"
+        with patch.dict("sys.modules", {"langchain_google_genai": None}):
+            with pytest.raises(ImportError, match=r"pip install audia\[gemini\]"):
+                _build_llm(cfg)
+
+    def test_raises_runtime_error_missing_google_key(self):
+        from audia.config import Settings
+        from audia.agents.text_cleaner import _build_llm
+
+        cfg = Settings(data_dir="/tmp", llm_provider="openai", openai_api_key="sk-x")
+        cfg.__dict__["llm_provider"] = "google"
+        cfg.__dict__["google_api_key"] = None
+
+        fake_goog = MagicMock()
+        with patch.dict("sys.modules", {"langchain_google_genai": fake_goog}):
+            with pytest.raises(RuntimeError, match="AUDIA_GOOGLE_API_KEY"):
+                _build_llm(cfg)
+
+    def test_google_provider_happy_path(self):
+        from audia.config import Settings
+        from audia.agents.text_cleaner import _build_llm
+
+        cfg = Settings(data_dir="/tmp", llm_provider="openai", openai_api_key="sk-x")
+        cfg.__dict__["llm_provider"] = "google"
+        cfg.__dict__["google_api_key"] = "AIza-test"
+        cfg.__dict__["google_api_base"] = None  # no base
+
+        fake_goog = MagicMock()
+        fake_model = MagicMock()
+        fake_goog.ChatGoogleGenerativeAI.return_value = fake_model
+
+        with patch.dict("sys.modules", {"langchain_google_genai": fake_goog}):
+            result = _build_llm(cfg)
+
+        assert result is fake_model
+        fake_goog.ChatGoogleGenerativeAI.assert_called_once()
+
+    def test_google_provider_with_api_base(self):
+        from audia.config import Settings
+        from audia.agents.text_cleaner import _build_llm
+
+        cfg = Settings(data_dir="/tmp", llm_provider="openai", openai_api_key="sk-x")
+        cfg.__dict__["llm_provider"] = "google"
+        cfg.__dict__["google_api_key"] = "AIza-test"
+        cfg.__dict__["google_api_base"] = "https://custom.google.endpoint"
+
+        fake_goog = MagicMock()
+        fake_model = MagicMock()
+        fake_goog.ChatGoogleGenerativeAI.return_value = fake_model
+
+        with patch.dict("sys.modules", {"langchain_google_genai": fake_goog}):
+            result = _build_llm(cfg)
+
+        _, kwargs = fake_goog.ChatGoogleGenerativeAI.call_args
+        assert "client_options" in kwargs
+
+
+# ───────────────────────────────── _build_llm happy paths
+
+class TestBuildLlmHappyPaths:
+    def test_openai_happy_path(self):
+        from audia.config import Settings
+        from audia.agents.text_cleaner import _build_llm
+
+        cfg = Settings(data_dir="/tmp", llm_provider="openai", openai_api_key="sk-real")
+        cfg.__dict__["openai_api_base"] = None
+
+        fake_openai = MagicMock()
+        fake_model = MagicMock()
+        fake_openai.ChatOpenAI.return_value = fake_model
+
+        with patch.dict("sys.modules", {"langchain_openai": fake_openai}):
+            result = _build_llm(cfg)
+
+        assert result is fake_model
+
+    def test_openai_with_base_url(self):
+        from audia.config import Settings
+        from audia.agents.text_cleaner import _build_llm
+
+        cfg = Settings(data_dir="/tmp", llm_provider="openai", openai_api_key="sk-real")
+        cfg.__dict__["openai_api_base"] = "https://custom.openai.endpoint/v1"
+
+        fake_openai = MagicMock()
+        fake_openai.ChatOpenAI.return_value = MagicMock()
+
+        with patch.dict("sys.modules", {"langchain_openai": fake_openai}):
+            _build_llm(cfg)
+
+        _, kwargs = fake_openai.ChatOpenAI.call_args
+        assert "base_url" in kwargs
+
+    def test_anthropic_happy_path(self):
+        from audia.config import Settings
+        from audia.agents.text_cleaner import _build_llm
+
+        cfg = Settings(data_dir="/tmp", llm_provider="anthropic",
+                       anthropic_api_key="sk-ant-real")
+        cfg.__dict__["anthropic_api_base"] = None
+
+        fake_ant = MagicMock()
+        fake_model = MagicMock()
+        fake_ant.ChatAnthropic.return_value = fake_model
+
+        with patch.dict("sys.modules", {"langchain_anthropic": fake_ant}):
+            result = _build_llm(cfg)
+
+        assert result is fake_model
+
+    def test_anthropic_with_base_url(self):
+        from audia.config import Settings
+        from audia.agents.text_cleaner import _build_llm
+
+        cfg = Settings(data_dir="/tmp", llm_provider="anthropic",
+                       anthropic_api_key="sk-ant-real")
+        cfg.__dict__["anthropic_api_base"] = "https://my-anthropic-proxy.example.com"
+
+        fake_ant = MagicMock()
+        fake_ant.ChatAnthropic.return_value = MagicMock()
+
+        with patch.dict("sys.modules", {"langchain_anthropic": fake_ant}):
+            _build_llm(cfg)
+
+        _, kwargs = fake_ant.ChatAnthropic.call_args
+        assert "base_url" in kwargs
+
+
+# ──────────────────────────────── llm_curate with progress_cb
+
+class TestLlmCurateProgressCb:
+    def test_progress_cb_called_per_chunk(self):
+        from audia.config import Settings
+        from audia.agents.text_cleaner import llm_curate
+
+        cfg = Settings(data_dir="/tmp", llm_provider="openai",
+                       openai_api_key="sk-x", llm_max_chunk_chars=50)
+
+        progress_msgs: list[str] = []
+
+        call_n = [0]
+
+        def mock_invoke(messages):
+            call_n[0] += 1
+            msg = MagicMock()
+            msg.content = f"Chunk {call_n[0]} output."
+            return msg
+
+        mock_llm = MagicMock()
+        mock_llm.invoke.side_effect = mock_invoke
+
+        text = "A" * 40 + "\n\n" + "B" * 40
+
+        with patch("audia.agents.text_cleaner._build_llm", return_value=mock_llm):
+            result = llm_curate(text, cfg, progress_cb=progress_msgs.append)
+
+        assert len(progress_msgs) >= 1
+        assert all("LLM curation chunk" in m for m in progress_msgs)
+        assert "Chunk 1 output." in result

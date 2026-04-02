@@ -199,3 +199,128 @@ class TestArxivSearcherDownload:
             searcher = ArxivSearcher()
             with pytest.raises(urllib.error.HTTPError):
                 searcher.download_pdf(paper, dest_dir=tmp_path)
+
+
+# ─────────────────────────────────── HTML fallback search
+
+_FAKE_HTML = '''
+<li class="arxiv-result">
+    <a href="https://arxiv.org/abs/2301.12345">arxiv.org/abs/2301.12345</a>
+    <p class="title is-5">Attention Is All You Need</p>
+    <p class="authors">Alice Smith, Bob Jones</p>
+    <span class="abstract-short">A brief abstract about transformers.</span>
+</li>
+<li class="arxiv-result">
+    <a href="https://arxiv.org/abs/2305.99999">arxiv.org/abs/2305.99999</a>
+    <p class="title is-5">Second Paper</p>
+    <p class="authors">Carol</p>
+    <span class="abstract-short">Second abstract.</span>
+</li>
+'''
+
+
+class TestHtmlSearch:
+    def _make_fake_response(self, html: str):
+        resp = MagicMock()
+        resp.read.return_value = html.encode("utf-8")
+        resp.__enter__ = lambda s: s
+        resp.__exit__ = MagicMock(return_value=False)
+        return resp
+
+    def test_html_search_parses_papers(self, tmp_settings):
+        from audia.agents.research import ArxivSearcher
+
+        fake_resp = self._make_fake_response(_FAKE_HTML)
+
+        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
+             patch("audia.agents.research.urllib.request.urlopen", return_value=fake_resp):
+            searcher = ArxivSearcher(max_results=5)
+            results = searcher._html_search("transformers")
+
+        assert len(results) >= 1
+        assert results[0].title == "Attention Is All You Need"
+        assert "Alice Smith" in results[0].authors
+        assert results[0].arxiv_id == "2301.12345"
+
+    def test_html_search_respects_max_results(self, tmp_settings):
+        from audia.agents.research import ArxivSearcher
+
+        fake_resp = self._make_fake_response(_FAKE_HTML)
+
+        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
+             patch("audia.agents.research.urllib.request.urlopen", return_value=fake_resp):
+            searcher = ArxivSearcher(max_results=1)
+            results = searcher._html_search("transformers")
+
+        assert len(results) == 1
+
+    def test_html_search_empty_page(self, tmp_settings):
+        from audia.agents.research import ArxivSearcher
+
+        empty_resp = self._make_fake_response("<html><body>No results</body></html>")
+
+        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
+             patch("audia.agents.research.urllib.request.urlopen", return_value=empty_resp):
+            searcher = ArxivSearcher(max_results=5)
+            results = searcher._html_search("zzz_nothing")
+
+        assert results == []
+
+    def test_search_falls_back_to_html_on_api_error(self, tmp_settings):
+        """When the arxiv API raises a non-429 error, _html_search is called."""
+        from audia.agents.research import ArxivSearcher
+
+        fake_resp = self._make_fake_response(_FAKE_HTML)
+
+        mock_arxiv = MagicMock()
+        mock_arxiv.Client.return_value.results.side_effect = RuntimeError("API unavailable")
+        mock_arxiv.Search = MagicMock(return_value=MagicMock())
+        mock_arxiv.SortCriterion = MagicMock()
+        mock_arxiv.SortCriterion.Relevance = "relevance"
+
+        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
+             patch.dict("sys.modules", {"arxiv": mock_arxiv}), \
+             patch("audia.agents.research.urllib.request.urlopen", return_value=fake_resp):
+            searcher = ArxivSearcher(max_results=5)
+            results = searcher.search("transformers")
+
+        assert len(results) >= 1
+
+    def test_search_falls_back_to_html_on_429(self, tmp_settings):
+        """When the arxiv API returns HTTP 429, _html_search is called."""
+        from audia.agents.research import ArxivSearcher
+
+        fake_resp = self._make_fake_response(_FAKE_HTML)
+
+        mock_arxiv = MagicMock()
+        mock_arxiv.Client.return_value.results.side_effect = Exception("HTTP 429 Too Many Requests")
+        mock_arxiv.Search = MagicMock(return_value=MagicMock())
+        mock_arxiv.SortCriterion = MagicMock()
+        mock_arxiv.SortCriterion.Relevance = "relevance"
+
+        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
+             patch.dict("sys.modules", {"arxiv": mock_arxiv}), \
+             patch("audia.agents.research.urllib.request.urlopen", return_value=fake_resp):
+            searcher = ArxivSearcher(max_results=5)
+            results = searcher.search("transformers")
+
+        assert len(results) >= 1
+
+
+class TestArxivPaperPublishedNone:
+    """Edge case: paper.published is None from the SDK."""
+
+    def test_published_none_gives_empty_string(self, tmp_settings):
+        from audia.agents.research import ArxivSearcher
+
+        fake = _make_arxiv_result()
+        fake.published = None  # SDK sometimes returns None
+
+        mock_arxiv = _build_arxiv_mock([fake])
+
+        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
+             patch.dict("sys.modules", {"arxiv": mock_arxiv}):
+            searcher = ArxivSearcher(max_results=5)
+            results = searcher.search("transformers")
+
+        assert results[0].published == ""

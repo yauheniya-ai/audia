@@ -3,7 +3,7 @@
 ## Requirements
 
 - Python **3.10** or later
-- A configured LLM provider (OpenAI or Anthropic) — required for the curation step
+- A configured LLM provider (Anthropic, Gemini, or OpenAI) — required for the curation step
 
 ## Standard install
 

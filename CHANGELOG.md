@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## Version 0.4.4 (2026-04-02)
+
+### Style frontend dropdown menu
+- Fix the ordering issue in the configuration diagram
+- Add backdrop filter to custom dropdown menue
+
+### Extend test coverage
+
+
 ## Version 0.4.3 (2026-04-01)
 
 ### Research tab: convert button improvements
