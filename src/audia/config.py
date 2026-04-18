@@ -4,12 +4,57 @@ Global settings, loaded from environment variables or a .env file.
 
 from __future__ import annotations
 
+import re
+from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from typing import Literal, Optional
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# ── Project helpers ──────────────────────────────────────────────────────────
+
+DEFAULT_PROJECT = "default"
+_PROJECT_NAME_RE = re.compile(r'^[a-z0-9][a-z0-9_-]{0,63}$')
+
+
+def validate_project_name(name: str) -> str | None:
+    """Return an error message if *name* is invalid, else None."""
+    if not name.strip():
+        return "Project name cannot be empty."
+    if not _PROJECT_NAME_RE.match(name):
+        return (
+            "Lowercase letters, digits, hyphens and underscores only. "
+            "Must start with a letter or digit."
+        )
+    return None
+
+
+@dataclass
+class ProjectDirs:
+    """File-system paths for a single project under *base_dir*."""
+    root: Path
+
+    @property
+    def db_path(self) -> Path:
+        return self.root / "audia.db"
+
+    @property
+    def audio_dir(self) -> Path:
+        return self.root / "audio"
+
+    @property
+    def upload_dir(self) -> Path:
+        return self.root / "uploads"
+
+    @property
+    def debug_dir(self) -> Path:
+        return self.root / "debug"
+
+    def ensure_dirs(self) -> None:
+        for d in (self.root, self.audio_dir, self.upload_dir, self.debug_dir):
+            d.mkdir(parents=True, exist_ok=True)
 
 
 class Settings(BaseSettings):
@@ -32,25 +77,33 @@ class Settings(BaseSettings):
         description="Root data directory for DB, audio output, and PDF uploads",
     )
 
+    def get_project_dirs(self, project: str | None = None) -> ProjectDirs:
+        """Return filesystem paths for *project* (defaults to 'default')."""
+        name = (project or DEFAULT_PROJECT).strip() or DEFAULT_PROJECT
+        return ProjectDirs(root=self.data_dir / name)
+
+    # ── Convenience shorthands for the default project (backward-compat) ────
+
     @property
     def db_path(self) -> Path:
-        return self.data_dir / "audia.db"
+        return self.get_project_dirs().db_path
 
     @property
     def audio_dir(self) -> Path:
-        return self.data_dir / "audio"
+        return self.get_project_dirs().audio_dir
 
     @property
     def upload_dir(self) -> Path:
-        return self.data_dir / "uploads"
+        return self.get_project_dirs().upload_dir
 
     @property
     def debug_dir(self) -> Path:
-        return self.data_dir / "debug"
+        return self.get_project_dirs().debug_dir
 
     def ensure_dirs(self) -> None:
         """Create all required directories if they don't exist."""
-        for d in (self.data_dir, self.audio_dir, self.upload_dir, self.debug_dir):
+        dirs = self.get_project_dirs()
+        for d in (self.data_dir, dirs.root, dirs.audio_dir, dirs.upload_dir, dirs.debug_dir):
             d.mkdir(parents=True, exist_ok=True)
 
     # ------------------------------------------------------------------ LLM

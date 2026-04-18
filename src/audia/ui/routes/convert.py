@@ -1,6 +1,7 @@
 """
 /api/convert – Upload PDF → run pipeline → return audio file path.
 Includes background-job endpoints for granular progress tracking.
+All endpoints accept an optional ?project= query parameter (defaults to "default").
 """
 
 from __future__ import annotations
@@ -8,17 +9,16 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import shutil
 import uuid
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Optional
 
 _logger = logging.getLogger(__name__)
 
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, File, Form, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 
-from audia.config import get_settings
+from audia.config import DEFAULT_PROJECT, get_settings
 from audia.agents.graph import run_pipeline
 from audia.agents.pdf_processor import extract_text
 from audia.agents.text_cleaner import heuristic_clean, llm_curate
@@ -27,6 +27,10 @@ from audia.storage import get_session, AudioFile, Paper
 from audia.ui.jobs import JOBS
 
 router = APIRouter()
+
+
+def _proj(project: str | None) -> str:
+    return (project or DEFAULT_PROJECT).strip() or DEFAULT_PROJECT
 
 
 def _make_job(pdf_path: str | None = None, pdf_title: str | None = None) -> dict:
@@ -50,6 +54,12 @@ def _log(job: dict, line: str) -> None:
     job["log"].append(line)
 
 
+def _dl_url(audio_id: int, project: str) -> str:
+    if project == DEFAULT_PROJECT:
+        return f"/api/convert/download/{audio_id}"
+    return f"/api/convert/download/{audio_id}?project={project}"
+
+
 # ─────────────────────────────────────────────────── upload (synchronous)
 
 @router.post("/upload", summary="Upload a PDF and convert synchronously")
@@ -59,17 +69,19 @@ async def upload_and_convert(
     llm_provider: Optional[str] = Form(None),
     llm_model: Optional[str] = Form(None),
     tts_backend: Optional[str] = Form(None),
+    project: Optional[str] = Form(None),
 ) -> JSONResponse:
     """Synchronous upload + convert. Returns the download URL when done."""
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted.")
 
+    proj = _proj(project)
     cfg = get_settings()
-    cfg.upload_dir.mkdir(parents=True, exist_ok=True)
-    cfg.audio_dir.mkdir(parents=True, exist_ok=True)
+    dirs = cfg.get_project_dirs(proj)
+    dirs.ensure_dirs()
 
     upload_id = uuid.uuid4().hex[:8]
-    upload_path = cfg.upload_dir / f"{upload_id}_{file.filename}"
+    upload_path = dirs.upload_dir / f"{upload_id}_{file.filename}"
     contents = await file.read()
     upload_path.write_bytes(contents)
 
@@ -79,7 +91,7 @@ async def upload_and_convert(
         raise HTTPException(status_code=500, detail=state.get("error", "Pipeline failed"))
 
     audio_path = Path(state["audio_path"])
-    with get_session() as session:
+    with get_session(proj) as session:
         paper = Paper(
             title=state.get("title", upload_path.stem),
             authors=json.dumps([]),
@@ -100,7 +112,7 @@ async def upload_and_convert(
 
     return JSONResponse({
         "status": "ok",
-        "download_url": f"/api/convert/download/{audio_id}",
+        "download_url": _dl_url(audio_id, proj),
         "title": state.get("title"),
         "num_pages": state.get("num_pages"),
     })
@@ -115,18 +127,20 @@ async def enqueue_conversion(
     llm_provider: Optional[str] = Form(None, description="LLM provider override"),
     llm_model: Optional[str] = Form(None, description="LLM model override"),
     tts_backend: Optional[str] = Form(None, description="TTS backend override"),
+    project: Optional[str] = Form(None, description="Project name"),
 ) -> JSONResponse:
     """Upload a PDF and return a job_id immediately; poll /status/{job_id} for progress."""
+    proj = _proj(project)
     cfg = get_settings()
 
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted.")
 
-    cfg.upload_dir.mkdir(parents=True, exist_ok=True)
-    cfg.audio_dir.mkdir(parents=True, exist_ok=True)
+    dirs = cfg.get_project_dirs(proj)
+    dirs.ensure_dirs()
 
     upload_id = uuid.uuid4().hex[:8]
-    upload_path = cfg.upload_dir / f"{upload_id}_{file.filename}"
+    upload_path = dirs.upload_dir / f"{upload_id}_{file.filename}"
     contents = await file.read()
     upload_path.write_bytes(contents)
 
@@ -184,12 +198,11 @@ async def enqueue_conversion(
             _log(job, f"  Backend: {cfg2.tts_backend} \u00b7 Voice: {cfg2.tts_voice} \u00b7 {len(curated):,} chars")
             def _cb_tts(msg: str):
                 _log(job, f"  {msg}")
-                # bump progress slightly per TTS chunk
                 job["progress"] = min(92, job["progress"] + 1)
             audio_path = await asyncio.to_thread(
                 synthesize,
                 text=curated,
-                output_dir=str(cfg2.audio_dir),
+                output_dir=str(dirs.audio_dir),
                 filename=upload_id,
                 settings=cfg2,
                 progress_cb=_cb_tts,
@@ -202,7 +215,7 @@ async def enqueue_conversion(
             # Save to DB
             job.update(stage="saving", stage_label="Saving to library", progress=95)
             _log(job, "Saving to library\u2026")
-            with get_session() as session:
+            with get_session(proj) as session:
                 paper = Paper(
                     title=pdf_result.title or upload_path.stem,
                     authors=json.dumps([]),
@@ -231,15 +244,15 @@ async def enqueue_conversion(
                 ts = datetime.now(_tz.utc).strftime("%Y%m%d_%H%M%S")
                 pdf_stem = upload_path.stem[:50]
                 run_id = f"{pdf_stem}_{ts}"
-                debug_dir = get_settings().debug_dir
+                debug_dir = dirs.debug_dir
                 debug_dir.mkdir(parents=True, exist_ok=True)
                 run_dir = debug_dir / run_id
                 run_dir.mkdir(parents=True, exist_ok=True)
                 (run_dir / "1_raw.txt").write_text(pdf_result.text or "", encoding="utf-8")
                 (run_dir / "2_preprocessed.txt").write_text(precleaned or "", encoding="utf-8")
                 (run_dir / "3_curated.txt").write_text(curated or "", encoding="utf-8")
-                _log(job, f"  Debug texts saved → {run_dir}")
-                _logger.info("Debug texts saved → %s", run_dir)
+                _log(job, f"  Debug texts saved \u2192 {run_dir}")
+                _logger.info("Debug texts saved \u2192 %s", run_dir)
             except Exception as _dbg_exc:
                 _log(job, f"  [warn] Could not save debug texts: {_dbg_exc}")
                 _logger.warning("Could not save debug texts: %s", _dbg_exc, exc_info=True)
@@ -253,7 +266,7 @@ async def enqueue_conversion(
                     "audio_id": audio_id,
                     "paper_id": paper_id,
                     "audio_filename": audio_path.name,
-                    "download_url": f"/api/convert/download/{audio_id}",
+                    "download_url": _dl_url(audio_id, proj),
                     "title": pdf_result.title or upload_path.stem,
                     "num_pages": pdf_result.num_pages,
                 },
@@ -309,9 +322,12 @@ async def serve_job_pdf(job_id: str) -> FileResponse:
 # ─────────────────────────────────────────────────── download
 
 @router.get("/download/{audio_id}", summary="Download generated audio file")
-async def download_audio(audio_id: int) -> FileResponse:
+async def download_audio(
+    audio_id: int,
+    project: str | None = Query(None),
+) -> FileResponse:
     """Stream the generated audio file."""
-    with get_session() as session:
+    with get_session(_proj(project)) as session:
         af = session.get(AudioFile, audio_id)
         if af is None:
             raise HTTPException(status_code=404, detail="Audio file not found.")
@@ -323,4 +339,3 @@ async def download_audio(audio_id: int) -> FileResponse:
 
     media_type = "audio/mpeg" if filename.endswith(".mp3") else "audio/wav"
     return FileResponse(path=str(file_path), filename=filename, media_type=media_type)
-

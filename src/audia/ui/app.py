@@ -17,6 +17,7 @@ from audia.ui.routes.convert import router as convert_router
 from audia.ui.routes.research import router as research_router
 from audia.ui.routes.library import router as library_router
 from audia.ui.routes.settings import router as settings_router
+from audia.ui.routes.projects import router as projects_router
 
 _STATIC_DIR = Path(__file__).parent / "static"
 
@@ -38,10 +39,10 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # Initialise DB on startup
+    # Initialise DB on startup (default project)
     @application.on_event("startup")
     async def startup() -> None:
-        init_db()
+        init_db()  # default project
 
     # Package info endpoint
     @application.get("/api/info", include_in_schema=True, tags=["info"])
@@ -49,6 +50,7 @@ def create_app() -> FastAPI:
         return JSONResponse({"version": __version__, "name": "audia"})
 
     # API routes
+    application.include_router(projects_router, prefix="/api/projects", tags=["projects"])
     application.include_router(convert_router,  prefix="/api/convert",  tags=["convert"])
     application.include_router(research_router, prefix="/api/research", tags=["research"])
     application.include_router(library_router,  prefix="/api/library",  tags=["library"])

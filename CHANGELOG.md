@@ -1,5 +1,43 @@
 # CHANGELOG
 
+## Version 0.5.0 (2026-04-18)
+
+> **Breaking change** — existing data stored under `~/.audia/` must be migrated manually.
+> Move `~/.audia/audia.db`, `~/.audia/audio/`, `~/.audia/uploads/`, and `~/.audia/debug/` into `~/.audia/default/` to preserve your current library under the default project.
+
+### Project-based storage
+
+All files are now namespaced by project under `~/.audia/<project>/`
+
+Previously everything was written flat to `~/.audia/`. The new layout keeps projects fully isolated — each has its own SQLite database and audio/upload/debug directories.
+
+#### Backend
+
+- `config.py`: new `DEFAULT_PROJECT = "default"` constant; `ProjectDirs` dataclass bundles `db_path`, `audio_dir`, `upload_dir`, `debug_dir` for a given project root; `validate_project_name()` enforces lowercase-alphanumeric names; `Settings.get_project_dirs(project)` returns the correct `ProjectDirs` for any project; the legacy flat properties (`db_path`, `audio_dir`, etc.) now delegate to `get_project_dirs("default")`
+- `storage/database.py`: per-project engine/session-factory registry (`_engines`, `_factories` dicts keyed by project name); `init_db(project)` and `get_session(project)` both accept an optional project argument; engines are lazily created and cached
+- New `GET /api/projects` — list all projects with metadata (document count, audio count, disk size, creation date)
+- New `POST /api/projects` — create a named project
+- New `DELETE /api/projects/{name}` — delete a project and all its files (protected: default project cannot be deleted)
+- All existing routes (`/api/library/*`, `/api/convert/*`, `/api/research/*`, `/api/settings`) accept an optional `?project=<name>` query parameter (or `project` form/body field for POST endpoints); omitting it selects the default project
+
+#### CLI
+
+- `audia convert` gains `--project` / `-p` — output audio and database entries go to `~/.audia/<project>/`; defaults to `~/.audia/default/`
+- `--output` still works as an explicit override on top of the active project directory
+
+#### Frontend
+
+- New `DatabaseSelector` component in the header — dropdown to list, create, and delete projects; active project is highlighted; destructive delete requires a confirmation step
+- `activeProject` state threaded from `App` through `Header`, `Sidebar`, `Main`, `MainConvert`, `MainResearch`, and `MainDatabase`; all API calls append `?project=<name>` when a non-default project is active
+- Switching projects refreshes the sidebar library immediately
+
+#### Tests
+
+- `conftest.py`: `clear_settings_cache` fixture (autouse) now sets `AUDIA_DATA_DIR` to pytest's `tmp_path` and clears the engine/factory registry around every test — no test writes to `~/.audia/` any more
+- `isolated_db` fixture rewritten to inject into the new `_engines`/`_factories` dicts instead of the removed module-level `_engine`/`_SessionLocal` attributes
+- `test_config.py`: path assertions updated to reflect the new `data_dir/default/` layout
+
+
 ## Version 0.4.4 (2026-04-02)
 
 ### Style: docs & frontend

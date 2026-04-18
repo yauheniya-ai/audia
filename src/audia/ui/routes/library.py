@@ -1,5 +1,6 @@
 """
 /api/library – Query the local SQLite library of papers and audio files.
+All endpoints accept an optional ?project= query parameter (defaults to "default").
 """
 
 from __future__ import annotations
@@ -7,10 +8,11 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
+from audia.config import DEFAULT_PROJECT
 from audia.storage import get_session, AudioFile, Paper
 from audia.storage.models import ResearchSession, UserSetting
 from sqlalchemy import select, desc
@@ -18,10 +20,19 @@ from sqlalchemy import select, desc
 router = APIRouter()
 
 
+def _proj(project: str | None) -> str:
+    return (project or DEFAULT_PROJECT).strip() or DEFAULT_PROJECT
+
+
+def _dl_url(audio_id: int, project: str) -> str:
+    if project == DEFAULT_PROJECT:
+        return f"/api/convert/download/{audio_id}"
+    return f"/api/convert/download/{audio_id}?project={project}"
+
+
 @router.get("/papers", summary="List all saved papers")
-async def list_papers() -> JSONResponse:
-    """Return all papers stored in the local database."""
-    with get_session() as session:
+async def list_papers(project: str | None = Query(None)) -> JSONResponse:
+    with get_session(_proj(project)) as session:
         rows = session.execute(
             select(Paper).order_by(desc(Paper.created_at))
         ).scalars().all()
@@ -43,9 +54,9 @@ async def list_papers() -> JSONResponse:
 
 
 @router.get("/audio", summary="List all generated audio files")
-async def list_audio() -> JSONResponse:
-    """Return all audio files stored in the local database."""
-    with get_session() as session:
+async def list_audio(project: str | None = Query(None)) -> JSONResponse:
+    proj = _proj(project)
+    with get_session(proj) as session:
         rows = session.execute(
             select(AudioFile).order_by(desc(AudioFile.created_at))
         ).scalars().all()
@@ -56,7 +67,7 @@ async def list_audio() -> JSONResponse:
                     "paper_id": af.paper_id,
                     "filename": af.filename,
                     "file_path": af.file_path,
-                    "download_url": f"/api/convert/download/{af.id}",
+                    "download_url": _dl_url(af.id, proj),
                     "duration_seconds": af.duration_seconds,
                     "tts_backend": af.tts_backend,
                     "tts_voice": af.tts_voice,
@@ -68,9 +79,8 @@ async def list_audio() -> JSONResponse:
 
 
 @router.get("/research_sessions", summary="List all research sessions")
-async def list_research_sessions() -> JSONResponse:
-    """Return all research sessions stored in the local database."""
-    with get_session() as session:
+async def list_research_sessions(project: str | None = Query(None)) -> JSONResponse:
+    with get_session(_proj(project)) as session:
         rows = session.execute(
             select(ResearchSession).order_by(desc(ResearchSession.created_at))
         ).scalars().all()
@@ -88,9 +98,8 @@ async def list_research_sessions() -> JSONResponse:
 
 
 @router.get("/user_settings", summary="List all user settings key-value pairs")
-async def list_user_settings() -> JSONResponse:
-    """Return all user settings stored in the local database."""
-    with get_session() as session:
+async def list_user_settings(project: str | None = Query(None)) -> JSONResponse:
+    with get_session(_proj(project)) as session:
         rows = session.execute(
             select(UserSetting).order_by(UserSetting.key)
         ).scalars().all()
@@ -98,8 +107,6 @@ async def list_user_settings() -> JSONResponse:
             "user_settings": [{"key": r.key, "value": r.value} for r in rows]
         })
 
-
-# ─────────────────────────────────────────────── PATCH models
 
 class PaperPatch(BaseModel):
     title: str | None = None
@@ -126,13 +133,12 @@ class UserSettingPatch(BaseModel):
     value: str
 
 
-# ─────────────────────────────────────────────── PATCH endpoints
-
 @router.patch("/papers/{paper_id}", summary="Update paper fields")
-async def patch_paper(paper_id: int, body: PaperPatch) -> JSONResponse:
-    """Partially update a paper's editable fields."""
+async def patch_paper(
+    paper_id: int, body: PaperPatch, project: str | None = Query(None)
+) -> JSONResponse:
     updates = body.model_dump(exclude_unset=True)
-    with get_session() as session:
+    with get_session(_proj(project)) as session:
         paper = session.get(Paper, paper_id)
         if paper is None:
             raise HTTPException(status_code=404, detail="Paper not found.")
@@ -146,10 +152,11 @@ async def patch_paper(paper_id: int, body: PaperPatch) -> JSONResponse:
 
 
 @router.patch("/audio/{audio_id}", summary="Update audio file fields")
-async def patch_audio(audio_id: int, body: AudioPatch) -> JSONResponse:
-    """Partially update an audio file's editable fields."""
+async def patch_audio(
+    audio_id: int, body: AudioPatch, project: str | None = Query(None)
+) -> JSONResponse:
     updates = body.model_dump(exclude_unset=True)
-    with get_session() as session:
+    with get_session(_proj(project)) as session:
         af = session.get(AudioFile, audio_id)
         if af is None:
             raise HTTPException(status_code=404, detail="Audio file not found.")
@@ -160,10 +167,11 @@ async def patch_audio(audio_id: int, body: AudioPatch) -> JSONResponse:
 
 
 @router.patch("/research_sessions/{session_id}", summary="Update research session")
-async def patch_research_session(session_id: int, body: ResearchSessionPatch) -> JSONResponse:
-    """Partially update a research session's editable fields."""
+async def patch_research_session(
+    session_id: int, body: ResearchSessionPatch, project: str | None = Query(None)
+) -> JSONResponse:
     updates = body.model_dump(exclude_unset=True)
-    with get_session() as session:
+    with get_session(_proj(project)) as session:
         rs = session.get(ResearchSession, session_id)
         if rs is None:
             raise HTTPException(status_code=404, detail="Research session not found.")
@@ -174,9 +182,10 @@ async def patch_research_session(session_id: int, body: ResearchSessionPatch) ->
 
 
 @router.patch("/user_settings/{key}", summary="Update a user setting value")
-async def patch_user_setting(key: str, body: UserSettingPatch) -> JSONResponse:
-    """Update the value for an existing user setting key."""
-    with get_session() as session:
+async def patch_user_setting(
+    key: str, body: UserSettingPatch, project: str | None = Query(None)
+) -> JSONResponse:
+    with get_session(_proj(project)) as session:
         row = session.get(UserSetting, key)
         if row is None:
             raise HTTPException(status_code=404, detail="Setting not found.")
@@ -185,28 +194,27 @@ async def patch_user_setting(key: str, body: UserSettingPatch) -> JSONResponse:
     return JSONResponse({"status": "updated", "key": key})
 
 
-# ─────────────────────────────────────────────── DELETE
-
 @router.delete("/audio/{audio_id}", summary="Delete an audio file record")
-async def delete_audio(audio_id: int) -> JSONResponse:
-    """Remove an audio file record (and optionally the file on disk)."""
-    with get_session() as session:
+async def delete_audio(
+    audio_id: int, project: str | None = Query(None)
+) -> JSONResponse:
+    with get_session(_proj(project)) as session:
         af = session.get(AudioFile, audio_id)
         if af is None:
             raise HTTPException(status_code=404, detail="Audio file not found.")
         path = Path(af.file_path)
         session.delete(af)
-
     if path.exists():
         path.unlink()
-
     return JSONResponse({"status": "deleted", "id": audio_id})
 
 
 @router.get("/papers/{paper_id}", summary="Get a single paper with its audio files")
-async def get_paper(paper_id: int) -> JSONResponse:
-    """Return a single paper record including linked audio files."""
-    with get_session() as session:
+async def get_paper(
+    paper_id: int, project: str | None = Query(None)
+) -> JSONResponse:
+    proj = _proj(project)
+    with get_session(proj) as session:
         paper = session.get(Paper, paper_id)
         if paper is None:
             raise HTTPException(status_code=404, detail="Paper not found.")
@@ -221,7 +229,7 @@ async def get_paper(paper_id: int) -> JSONResponse:
                 {
                     "id": af.id,
                     "filename": af.filename,
-                    "download_url": f"/api/convert/download/{af.id}",
+                    "download_url": _dl_url(af.id, proj),
                     "tts_backend": af.tts_backend,
                     "tts_voice": af.tts_voice,
                     "created_at": af.created_at.isoformat(),
@@ -232,41 +240,35 @@ async def get_paper(paper_id: int) -> JSONResponse:
 
 
 @router.delete("/papers/{paper_id}", summary="Delete a paper and all its audio files")
-async def delete_paper(paper_id: int) -> JSONResponse:
-    """Remove a paper record, its audio file records, and the files from disk."""
-    with get_session() as session:
+async def delete_paper(
+    paper_id: int, project: str | None = Query(None)
+) -> JSONResponse:
+    with get_session(_proj(project)) as session:
         paper = session.get(Paper, paper_id)
         if paper is None:
             raise HTTPException(status_code=404, detail="Paper not found.")
-
-        # Collect paths before deletion
         audio_paths = [Path(af.file_path) for af in paper.audio_files]
         pdf_path = Path(paper.pdf_path) if paper.pdf_path else None
-
         session.delete(paper)
-
-    # Remove files from disk
     for p in audio_paths:
         if p.exists():
             p.unlink()
     if pdf_path and pdf_path.exists():
         pdf_path.unlink()
-
     return JSONResponse({"status": "deleted", "id": paper_id})
 
 
 @router.get("/pdf/{paper_id}", summary="Serve the original PDF for a paper")
-async def serve_pdf(paper_id: int) -> FileResponse:
-    """Stream the original PDF file for in-browser preview."""
-    with get_session() as session:
+async def serve_pdf(
+    paper_id: int, project: str | None = Query(None)
+) -> FileResponse:
+    with get_session(_proj(project)) as session:
         paper = session.get(Paper, paper_id)
         if paper is None:
             raise HTTPException(status_code=404, detail="Paper not found.")
         pdf_path = Path(paper.pdf_path) if paper.pdf_path else None
-
     if pdf_path is None or not pdf_path.exists():
         raise HTTPException(status_code=404, detail="PDF file not found on disk.")
-
     return FileResponse(
         path=str(pdf_path),
         media_type="application/pdf",

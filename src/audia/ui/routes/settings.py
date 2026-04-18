@@ -2,20 +2,21 @@
 /api/settings – Persist and retrieve user-configured pipeline settings.
 Settings are stored in the SQLite DB as key-value pairs so they survive
 server restarts and are pre-loaded by the frontend on every page open.
+All endpoints accept an optional ?project= query parameter (defaults to "default").
 """
 
 from __future__ import annotations
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
+from audia.config import DEFAULT_PROJECT
 from audia.storage import get_session
 from audia.storage.models import UserSetting
 
 router = APIRouter()
 
-# Keys returned by GET and accepted by PUT
 _DEFAULTS: dict[str, str] = {
     "stt_model": "whisper-large-v3",
     "llm1_provider": "Anthropic",
@@ -25,6 +26,10 @@ _DEFAULTS: dict[str, str] = {
     "tts_backend": "edge-tts",
     "tts_voice": "en-US-AriaNeural",
 }
+
+
+def _proj(project: str | None) -> str:
+    return (project or DEFAULT_PROJECT).strip() or DEFAULT_PROJECT
 
 
 class SettingsBody(BaseModel):
@@ -38,19 +43,21 @@ class SettingsBody(BaseModel):
 
 
 @router.get("", summary="Get saved UI pipeline settings")
-async def get_ui_settings() -> JSONResponse:
+async def get_ui_settings(project: str | None = Query(None)) -> JSONResponse:
     """Return the user-saved pipeline settings merged with defaults."""
-    with get_session() as session:
+    with get_session(_proj(project)) as session:
         rows = session.query(UserSetting).all()
         stored = {r.key: r.value for r in rows}
     return JSONResponse({**_DEFAULTS, **stored})
 
 
 @router.put("", summary="Save UI pipeline settings")
-async def save_ui_settings(body: SettingsBody) -> JSONResponse:
+async def save_ui_settings(
+    body: SettingsBody, project: str | None = Query(None)
+) -> JSONResponse:
     """Persist the provided settings; omitted fields are left unchanged."""
     updates = body.model_dump(exclude_none=True)
-    with get_session() as session:
+    with get_session(_proj(project)) as session:
         for key, value in updates.items():
             row = session.get(UserSetting, key)
             if row:

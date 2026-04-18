@@ -1,5 +1,6 @@
 """
 /api/research – Search ArXiv and convert selected papers to audio.
+All endpoints accept an optional ?project= query parameter (defaults to "default").
 """
 
 from __future__ import annotations
@@ -9,7 +10,7 @@ import json
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, File, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
@@ -18,11 +19,21 @@ from audia.agents.research import ArxivSearcher
 from audia.agents.pdf_processor import extract_text
 from audia.agents.text_cleaner import heuristic_clean, llm_curate
 from audia.agents.tts import synthesize
-from audia.config import get_settings
+from audia.config import DEFAULT_PROJECT, get_settings
 from audia.storage import get_session, AudioFile, Paper, ResearchSession
 from audia.ui.jobs import JOBS
 
 router = APIRouter()
+
+
+def _proj(project: str | None) -> str:
+    return (project or DEFAULT_PROJECT).strip() or DEFAULT_PROJECT
+
+
+def _dl_url(audio_id: int, project: str) -> str:
+    if project == DEFAULT_PROJECT:
+        return f"/api/convert/download/{audio_id}"
+    return f"/api/convert/download/{audio_id}?project={project}"
 
 
 class SearchRequest(BaseModel):
@@ -38,6 +49,7 @@ class NormalizeRequest(BaseModel):
 
 class ConvertResearchRequest(BaseModel):
     arxiv_ids: list[str]
+    project: str | None = None
 
 
 class EnqueueRequest(BaseModel):
@@ -47,6 +59,7 @@ class EnqueueRequest(BaseModel):
     llm_model: str | None = None
     tts_backend: str | None = None
     tts_voice: str | None = None
+    project: str | None = None
 
 
 def _make_job(pdf_title: str | None = None) -> dict:
@@ -74,12 +87,10 @@ def _log(job: dict, line: str) -> None:
 
 @router.post("/normalize", summary="Distil a natural-language query into a short ArXiv search string via LLM")
 async def normalize(body: NormalizeRequest) -> JSONResponse:
-    """Uses the same distill_search_query function as the CLI speech pipeline."""
     from audia.agents.text_cleaner import _build_llm
     from langchain_core.messages import HumanMessage, SystemMessage  # type: ignore
 
     cfg = get_settings()
-    # Apply user-selected provider/model overrides (sent from the UI settings)
     if body.llm_provider:
         cfg.__dict__["llm_provider"] = body.llm_provider.lower()
     if body.llm_model:
@@ -109,7 +120,6 @@ async def normalize(body: NormalizeRequest) -> JSONResponse:
 
 @router.post("/search", summary="Search ArXiv for papers")
 async def search(body: SearchRequest) -> JSONResponse:
-    """Search ArXiv and return paper metadata."""
     searcher = ArxivSearcher(max_results=body.max_results)
     try:
         papers = searcher.search(body.query)
@@ -136,10 +146,10 @@ async def search(body: SearchRequest) -> JSONResponse:
 
 @router.post("/convert", summary="Synchronously convert ArXiv papers to audio")
 async def convert_papers(body: ConvertResearchRequest) -> JSONResponse:
-    """Search, download, run pipeline, and save for each arxiv_id. Returns results synchronously."""
+    proj = _proj(body.project)
     cfg = get_settings()
-    cfg.upload_dir.mkdir(parents=True, exist_ok=True)
-    cfg.audio_dir.mkdir(parents=True, exist_ok=True)
+    dirs = cfg.get_project_dirs(proj)
+    dirs.ensure_dirs()
 
     results = []
     for arxiv_id in body.arxiv_ids:
@@ -152,7 +162,7 @@ async def convert_papers(body: ConvertResearchRequest) -> JSONResponse:
         paper = papers[0]
         try:
             pdf_path: Path = await asyncio.to_thread(
-                searcher.download_pdf, paper, cfg.upload_dir
+                searcher.download_pdf, paper, dirs.upload_dir
             )
         except Exception as exc:
             results.append({"arxiv_id": arxiv_id, "error": f"Download failed: {exc}"})
@@ -164,7 +174,7 @@ async def convert_papers(body: ConvertResearchRequest) -> JSONResponse:
             continue
 
         audio_path = Path(state["audio_path"])
-        with get_session() as session:
+        with get_session(proj) as session:
             db_paper = Paper(
                 title=paper.title,
                 authors=json.dumps(paper.authors),
@@ -189,7 +199,7 @@ async def convert_papers(body: ConvertResearchRequest) -> JSONResponse:
         results.append({
             "arxiv_id": arxiv_id,
             "title": paper.title,
-            "download_url": f"/api/convert/download/{audio_id}",
+            "download_url": _dl_url(audio_id, proj),
         })
 
     return JSONResponse({"results": results})
@@ -199,14 +209,10 @@ async def convert_papers(body: ConvertResearchRequest) -> JSONResponse:
 
 @router.post("/enqueue", summary="Enqueue ArXiv paper(s) for async conversion")
 async def enqueue_research(body: EnqueueRequest) -> JSONResponse:
-    """
-    For each arxiv_id, create an async job that downloads, processes, and
-    saves to the library.  Returns job_ids immediately; poll
-    /api/research/status/{job_id} for progress.
-    """
+    proj = _proj(body.project)
     cfg = get_settings()
-    cfg.upload_dir.mkdir(parents=True, exist_ok=True)
-    cfg.audio_dir.mkdir(parents=True, exist_ok=True)
+    dirs = cfg.get_project_dirs(proj)
+    dirs.ensure_dirs()
 
     jobs_out = []
     for arxiv_id in body.arxiv_ids:
@@ -215,6 +221,7 @@ async def enqueue_research(body: EnqueueRequest) -> JSONResponse:
         JOBS[job_id] = job
         asyncio.create_task(_run_research_job(
             job_id, arxiv_id,
+            project=proj,
             query=body.query,
             llm_provider=body.llm_provider,
             llm_model=body.llm_model,
@@ -229,6 +236,7 @@ async def enqueue_research(body: EnqueueRequest) -> JSONResponse:
 async def _run_research_job(
     job_id: str,
     arxiv_id: str,
+    project: str = DEFAULT_PROJECT,
     query: str | None = None,
     llm_provider: str | None = None,
     llm_model: str | None = None,
@@ -237,6 +245,7 @@ async def _run_research_job(
 ) -> None:
     job = JOBS[job_id]
     cfg = get_settings()
+    dirs = cfg.get_project_dirs(project)
     upload_id = uuid.uuid4().hex[:8]
 
     try:
@@ -260,11 +269,11 @@ async def _run_research_job(
         job.update(stage="downloading", stage_label="Step 2/6 \u2500 Downloading PDF", progress=15)
         _log(job, "Step 2/6 \u2500 Downloading PDF")
         pdf_path: Path = await asyncio.to_thread(
-            searcher.download_pdf, paper, cfg.upload_dir
+            searcher.download_pdf, paper, dirs.upload_dir
         )
         if job["cancelled"]:
             job.update(status="cancelled", stage="cancelled", stage_label="Cancelled"); return
-        job["pdf_path"] = str(pdf_path)  # available now for preview
+        job["pdf_path"] = str(pdf_path)
         _log(job, f"  \u2713 Saved to {pdf_path.name}")
 
         # Stage 3 – PDF extraction
@@ -322,7 +331,7 @@ async def _run_research_job(
         audio_path = await asyncio.to_thread(
             synthesize,
             text=curated,
-            output_dir=str(cfg2.audio_dir),
+            output_dir=str(dirs.audio_dir),
             filename=upload_id,
             settings=cfg2,
             progress_cb=_cb_tts,
@@ -335,7 +344,7 @@ async def _run_research_job(
         # Save to DB
         job.update(stage="saving", stage_label="Saving to library", progress=95)
         _log(job, "Saving to library\u2026")
-        with get_session() as session:
+        with get_session(project) as session:
             db_paper = Paper(
                 title=job["pdf_title"] or paper.title,
                 authors=json.dumps(paper.authors),
@@ -357,7 +366,6 @@ async def _run_research_job(
             session.flush()
             audio_id = af.id
             paper_id = db_paper.id
-            # Save research session so the Database tab shows the query history
             if query:
                 session.add(ResearchSession(
                     query=query,
@@ -375,7 +383,7 @@ async def _run_research_job(
                 "audio_id": audio_id,
                 "paper_id": paper_id,
                 "audio_filename": audio_path.name,
-                "download_url": f"/api/convert/download/{audio_id}",
+                "download_url": _dl_url(audio_id, project),
                 "title": job["pdf_title"] or paper.title,
                 "num_pages": pdf_result.num_pages,
             },
@@ -412,7 +420,6 @@ async def transcribe_audio(file: UploadFile = File(...)) -> JSONResponse:
 
 @router.get("/status/{job_id}", summary="Poll research job status")
 async def get_job_status(job_id: str) -> JSONResponse:
-    """Return current status, stage, progress, log, result when done."""
     job = JOBS.get(job_id)
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found.")
@@ -433,7 +440,6 @@ async def cancel_job(job_id: str) -> JSONResponse:
 
 @router.get("/jobs/{job_id}/pdf", summary="Serve the PDF for an in-progress or completed research job")
 async def serve_job_pdf(job_id: str) -> FileResponse:
-    """Stream the PDF associated with a research job (once downloaded)."""
     job = JOBS.get(job_id)
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found.")

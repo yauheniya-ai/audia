@@ -85,10 +85,15 @@ def convert(
         dir_okay=False,
         readable=True,
     ),
+    project: Optional[str] = typer.Option(
+        None,
+        "--project", "-p",
+        help="Project name. Files are stored under ~/.audia/<project>/. Defaults to 'default'.",
+    ),
     output_dir: Optional[Path] = typer.Option(
         None,
         "--output", "-o",
-        help="Directory for audio output. Defaults to ~/.audia/audio/",
+        help="Directory for audio output. Defaults to ~/.audia/<project>/audio/",
     ),
     voice: Optional[str] = typer.Option(
         None, "--voice", "-v",
@@ -105,22 +110,36 @@ def convert(
     Extracts text, applies agentic cleaning, and synthesises speech.
     Example:
       audia convert paper.pdf
+      audia convert paper.pdf --project icons
       audia convert paper1.pdf paper2.pdf --output ~/my_audio
     """
-    from audia.config import get_settings
+    from audia.config import get_settings, validate_project_name
     from audia.agents.graph import run_pipeline
     from audia.storage import init_db, get_session, AudioFile, Paper
 
     cfg = get_settings()
+
+    # Validate and resolve project
+    if project is not None:
+        err = validate_project_name(project)
+        if err:
+            rprint(f"[red]Invalid project name:[/red] {err}")
+            raise typer.Exit(code=1)
+    dirs = cfg.get_project_dirs(project)
+    dirs.ensure_dirs()
+
     if voice:
         cfg.__dict__["tts_voice"] = voice
 
-    init_db()
+    # Resolve output directory: explicit flag > project audio dir
+    resolved_output = output_dir or dirs.audio_dir
+
+    init_db(project)
     errors: list[str] = []
 
     for pdf_path in pdf_paths:
         console.print(Rule(f"[bold]{pdf_path.name}[/bold]"))
-        state = run_pipeline(pdf_path, output_dir=output_dir)
+        state = run_pipeline(pdf_path, output_dir=resolved_output)
 
         if state.get("error"):
             rprint(f"[red]Error:[/red] {state['error']}")
@@ -131,7 +150,7 @@ def convert(
         rprint(f"[green]✓ Audio saved:[/green] {audio_path}")
 
         # Persist to database
-        with get_session() as session:
+        with get_session(project) as session:
             paper = Paper(
                 title=state.get("title", pdf_path.stem),
                 authors=json.dumps([]),

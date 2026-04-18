@@ -26,16 +26,16 @@ class TestSettingsDefaults:
 
 class TestSettingsProperties:
     def test_db_path(self, tmp_settings):
-        assert tmp_settings.db_path == tmp_settings.data_dir / "audia.db"
+        assert tmp_settings.db_path == tmp_settings.data_dir / "default" / "audia.db"
 
     def test_audio_dir(self, tmp_settings):
-        assert tmp_settings.audio_dir == tmp_settings.data_dir / "audio"
+        assert tmp_settings.audio_dir == tmp_settings.data_dir / "default" / "audio"
 
     def test_upload_dir(self, tmp_settings):
-        assert tmp_settings.upload_dir == tmp_settings.data_dir / "uploads"
+        assert tmp_settings.upload_dir == tmp_settings.data_dir / "default" / "uploads"
 
     def test_debug_dir(self, tmp_settings):
-        assert tmp_settings.debug_dir == tmp_settings.data_dir / "debug"
+        assert tmp_settings.debug_dir == tmp_settings.data_dir / "default" / "debug"
 
     def test_ensure_dirs_creates_all(self, tmp_settings):
         tmp_settings.ensure_dirs()
