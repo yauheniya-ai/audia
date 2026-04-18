@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## Version 0.5.1 (2026-04-19)
+
+### Bug fixes
+
+#### PDF preview broken for saved papers after project-layer introduction
+- Sidebar-selected papers built their preview URL as `/api/library/pdf/{id}` without the `?project=` query param, while the endpoint requires it to locate the file in the correct project subfolder
+- `App.tsx` now appends `?project=<name>` to the sidebar preview URL (matching the existing behaviour in `Main.tsx`)
+
+#### Renaming an audio file in the database editor only updated the display name
+- `PATCH /api/library/audio/{id}` updated `filename` in the DB but left the MP3 on disk untouched and `file_path` stale
+- The endpoint now renames the file on disk, preserving the original extension if omitted, and updates `file_path` in the same transaction
+- After a successful cell save, the database table re-fetches its rows so `file_path` reflects the rename immediately, and the sidebar refreshes via the existing `onConverted` / `refreshKey` mechanism
+
 ## Version 0.5.0 (2026-04-18)
 
 > **Breaking change** — existing data stored under `~/.audia/` must be migrated manually.

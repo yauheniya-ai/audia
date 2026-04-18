@@ -160,6 +160,20 @@ async def patch_audio(
         af = session.get(AudioFile, audio_id)
         if af is None:
             raise HTTPException(status_code=404, detail="Audio file not found.")
+
+        # If filename is being renamed, also rename the file on disk and update file_path.
+        if "filename" in updates and af.file_path:
+            old_path = Path(af.file_path)
+            new_name = updates["filename"]
+            # Preserve the original extension if the new name has none.
+            if not Path(new_name).suffix and old_path.suffix:
+                new_name = new_name + old_path.suffix
+            new_path = old_path.parent / new_name
+            if old_path.exists() and old_path != new_path:
+                old_path.rename(new_path)
+            af.file_path = str(new_path)
+            updates["filename"] = new_name  # normalised name with extension
+
         for field, val in updates.items():
             setattr(af, field, val)
         session.commit()
