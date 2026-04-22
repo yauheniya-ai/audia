@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## Version 0.6.1 (2026-04-22)
+
+### UI enhancements
+
+#### Animated music visualizer in footer
+- Added a new `MusicVisualizer` component that renders an animated SVG bar-grid driven by sine-wave calculations and a `requestAnimationFrame` loop, with colors adapting to dark/light mode
+- Restructured the `Footer` layout into three regions: left (audia label + visualizer), center (navigation links), and right (version display)
+
 ## Version 0.5.1 (2026-04-19)
 
 ### Bug fixes
