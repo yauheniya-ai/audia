@@ -1,5 +1,52 @@
 # CHANGELOG
 
+## Version 0.7.0 (2026-04-29)
+
+### Move studies between projects
+
+#### Backend
+
+- New `POST /api/library/papers/{paper_id}/move?project=<src>` endpoint in `library.py`
+  - Accepts `{ "target_project": "<name>" }` body
+  - Validates target project name via `validate_project_name()`; rejects same-source-and-target moves
+  - Copies the PDF to `~/.audia/<target>/uploads/` and each linked audio file to `~/.audia/<target>/audio/`, avoiding filename collisions with a `{paper_id}_` prefix
+  - Inserts new `Paper` + `AudioFile` rows in the target project's SQLite database with the updated absolute file paths
+  - Deletes source database records (cascade-deletes audio rows) and removes the original files from disk
+  - Returns `{ status, source_project, target_project, new_paper_id }`
+
+#### Path repair utility (`scripts/repair_paths.py`)
+
+- New `repair` mode: scans a project's DB for `pdf_path` / `file_path` values that no longer exist on disk and re-matches them by filename (with and without hash prefix) against files currently in the project's `uploads/` and `audio/` directories
+- New `recover-from` mode (`--recover-from <source>`): migrates DB records from a source project whose file paths are broken into a target project by matching filenames against the target's on-disk files — useful for recovering from manual file moves
+- Usage: `.venv/bin/python scripts/repair_paths.py --project <name> [--recover-from <source>] [--dry-run]`
+
+### Sidebar UI overhaul
+
+#### Project selector moved to sidebar
+
+- `DatabaseSelector` removed from `Header` and placed inline in the sidebar's "LIBRARY" header row (right-aligned, `max-w-[130px]`, project name truncated with native tooltip)
+- `Header` props simplified — `activeProject` and `onSelectProject` removed; header now only manages theme toggle and install-command copy
+- `onSelectProject` prop added to `Sidebar` and threaded through `App`
+
+#### Project selector styling: purple → cyan
+
+- All purple accent colours in `DatabaseSelector` replaced with cyan: header bar, active-row highlight, border-left indicator, "default"/"active" badges, input focus ring, "Create" button
+- Trigger button icon and label updated to `text-cyan-400` / `text-cyan-300`
+
+#### Move button in paper rows
+
+- Each paper row now shows a `mdi:folder-move-outline` (cyan) button and a `mdi:delete-outline` (rose) button, always visible at 70 % opacity, `opacity-100` on hover
+- Button order: move first, delete second
+- Clicking **move** fetches `/api/projects`, filters out the current project, and expands an inline two-row picker (label + ✕ on row 1; `<select>` + "move" button on row 2)
+- "move" confirmation text is cyan; "yes" on delete confirmation is rose; ✕ cancel is visible on its own row so it is never clipped in the narrow sidebar
+
+#### Custom tooltips (`Tooltip.tsx`)
+
+- New `Tooltip` component renders via `createPortal` into `document.body` — never clipped by sidebar overflow
+- Three variants: `delete` (rose border/text), `move` (cyan border/text), `cancel` (white border/text)
+- Implemented with `cloneElement` to inject `onMouseEnter`/`onMouseLeave` directly onto the child element — avoids `display:contents` hit-testing bug
+- Includes a small CSS-triangle caret pointing at the trigger; appears instantly (no delay)
+
 ## Version 0.6.1 (2026-04-22)
 
 ### UI enhancements
