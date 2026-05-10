@@ -23,6 +23,7 @@ router = APIRouter()
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 
+
 def _project_info(
     project_dir: Path,
     active_project: str,
@@ -40,10 +41,13 @@ def _project_info(
         try:
             size_kb = round(db_path.stat().st_size / 1024, 1)
             from audia.storage.database import get_session
+
             with get_session(name) as sess:
-                from audia.storage.models import AudioFile, Paper
                 from sqlalchemy import func, select
-                doc_count  = sess.execute(select(func.count()).select_from(Paper)).scalar_one()
+
+                from audia.storage.models import AudioFile, Paper
+
+                doc_count = sess.execute(select(func.count()).select_from(Paper)).scalar_one()
                 audio_count = sess.execute(select(func.count()).select_from(AudioFile)).scalar_one()
         except Exception:
             pass
@@ -52,22 +56,23 @@ def _project_info(
     try:
         created_at = project_dir.stat().st_ctime
         from datetime import datetime, timezone
+
         created_at = datetime.fromtimestamp(created_at, tz=timezone.utc).isoformat()
     except Exception:
         pass
 
     return {
-        "name":        name,
-        "path":        str(project_dir),
-        "root":        str(get_settings().data_dir),
+        "name": name,
+        "path": str(project_dir),
+        "root": str(get_settings().data_dir),
         "description": "",
-        "size_kb":     size_kb,
-        "documents":   doc_count,
-        "quizzes":     audio_count,
-        "is_default":  name == DEFAULT_PROJECT,
-        "is_active":   name == active_project,
-        "exists":      exists,
-        "created_at":  created_at,
+        "size_kb": size_kb,
+        "documents": doc_count,
+        "quizzes": audio_count,
+        "is_default": name == DEFAULT_PROJECT,
+        "is_active": name == active_project,
+        "exists": exists,
+        "created_at": created_at,
     }
 
 
@@ -94,6 +99,7 @@ def _list_projects(active_project: str) -> list[dict]:
 
 
 # ── endpoints ────────────────────────────────────────────────────────────────
+
 
 @router.get("", summary="List all projects")
 async def list_projects(
@@ -144,6 +150,7 @@ async def delete_project(
         shutil.rmtree(dirs.root, ignore_errors=True)
     # Also remove from engine cache
     from audia.storage.database import _engines, _factories
+
     _engines.pop(name, None)
     _factories.pop(name, None)
 

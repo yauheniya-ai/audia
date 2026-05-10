@@ -20,8 +20,8 @@ from typing import Any
 from langgraph.graph import END, StateGraph
 from rich.console import Console
 
-from audia.agents.state import PipelineState
 from audia.agents.pdf_processor import extract_text
+from audia.agents.state import PipelineState
 from audia.agents.text_cleaner import heuristic_clean, llm_curate
 from audia.agents.tts import synthesize
 from audia.config import get_settings
@@ -31,14 +31,14 @@ console = Console(stderr=True)
 
 # ──────────────────────────────────────────────────────────── nodes
 
+
 def node_extract_text(state: PipelineState) -> dict[str, Any]:
     """Extract text and basic metadata from the PDF."""
     console.print("[bold cyan]\u25b6 Step 1/4 ─ PDF extraction[/bold cyan]")
     try:
         result = extract_text(state["pdf_path"])
         console.print(
-            f"  [green]✓[/green] {result.num_pages} pages extracted, "
-            f"{len(result.text):,} chars"
+            f"  [green]✓[/green] {result.num_pages} pages extracted, {len(result.text):,} chars"
         )
         return {
             "raw_text": result.text,
@@ -58,9 +58,7 @@ def node_preprocess(state: PipelineState) -> dict[str, Any]:
     console.print("[bold cyan]\u25b6 Step 2/4 ─ Heuristic pre-pass[/bold cyan]")
     text = state.get("raw_text", "")
     cleaned = heuristic_clean(text)
-    console.print(
-        f"  [green]✓[/green] {len(text):,} → {len(cleaned):,} chars after pre-pass"
-    )
+    console.print(f"  [green]✓[/green] {len(text):,} → {len(cleaned):,} chars after pre-pass")
     return {"preprocessed_text": cleaned}
 
 
@@ -73,9 +71,7 @@ def node_curate(state: PipelineState) -> dict[str, Any]:
     text = state.get("preprocessed_text") or state.get("raw_text", "")
     try:
         curated = llm_curate(text, cfg)
-        console.print(
-            f"  [green]✓[/green] Curation complete – {len(curated):,} chars"
-        )
+        console.print(f"  [green]✓[/green] Curation complete – {len(curated):,} chars")
         return {"cleaned_text": curated}
     except Exception as exc:
         console.print(f"  [red]✗ LLM curation failed:[/red] {exc}")
@@ -89,11 +85,7 @@ def node_synthesize_audio(state: PipelineState) -> dict[str, Any]:
 
     console.print("[bold cyan]\u25b6 Step 4/4 ─ TTS synthesis[/bold cyan]")
     cfg = get_settings()
-    text = (
-        state.get("cleaned_text")
-        or state.get("preprocessed_text")
-        or state.get("raw_text", "")
-    )
+    text = state.get("cleaned_text") or state.get("preprocessed_text") or state.get("raw_text", "")
 
     out_dir = state.get("output_dir") or str(cfg.audio_dir)
     stem = state.get("run_id") or _safe_stem(state.get("title", "audio"))
@@ -123,20 +115,21 @@ def node_synthesize_audio(state: PipelineState) -> dict[str, Any]:
 
 # ──────────────────────────────────────────────────────────── graph
 
+
 def build_pipeline() -> Any:
     """Compile and return the LangGraph CompiledGraph."""
     g = StateGraph(PipelineState)
 
     g.add_node("extract_text", node_extract_text)
-    g.add_node("preprocess",   node_preprocess)
-    g.add_node("curate",       node_curate)
-    g.add_node("synthesize",   node_synthesize_audio)
+    g.add_node("preprocess", node_preprocess)
+    g.add_node("curate", node_curate)
+    g.add_node("synthesize", node_synthesize_audio)
 
     g.set_entry_point("extract_text")
     g.add_edge("extract_text", "preprocess")
-    g.add_edge("preprocess",   "curate")       # LLM curation always runs
-    g.add_edge("curate",       "synthesize")
-    g.add_edge("synthesize",   END)
+    g.add_edge("preprocess", "curate")  # LLM curation always runs
+    g.add_edge("curate", "synthesize")
+    g.add_edge("synthesize", END)
 
     return g.compile()
 
@@ -156,6 +149,7 @@ def run_pipeline(
     out = str(output_dir or cfg.audio_dir)
 
     from datetime import datetime, timezone
+
     pdf_stem = Path(pdf_path).stem[:50]
     ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     run_id = f"{pdf_stem}_{ts}"
@@ -173,6 +167,7 @@ def run_pipeline(
 
 # ──────────────────────────────────────────────────────────── helpers
 
+
 def _save_debug_texts(run_id: str, state: PipelineState, cfg) -> None:
     """
     Save each text stage of a pipeline run to its own .txt file inside
@@ -187,9 +182,9 @@ def _save_debug_texts(run_id: str, state: PipelineState, cfg) -> None:
     run_dir.mkdir(parents=True, exist_ok=True)
 
     stages = [
-        ("1_raw.txt",          state.get("raw_text")),
+        ("1_raw.txt", state.get("raw_text")),
         ("2_preprocessed.txt", state.get("preprocessed_text")),
-        ("3_curated.txt",      state.get("cleaned_text")),
+        ("3_curated.txt", state.get("cleaned_text")),
     ]
     for filename, text in stages:
         if text:
@@ -201,6 +196,7 @@ def _save_debug_texts(run_id: str, state: PipelineState, cfg) -> None:
 def _safe_stem(title: str, max_len: int = 60) -> str:
     """Convert a title to a safe filename stem."""
     import re
+
     slug = re.sub(r"[^a-zA-Z0-9\s\-]", "", title)
     slug = re.sub(r"\s+", "_", slug.strip())
     return slug[:max_len] or "audia_output"

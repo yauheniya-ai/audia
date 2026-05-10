@@ -7,7 +7,7 @@ The status endpoint and the cancel endpoint read/write here.
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
 # job_id (hex str) → job state dict
 # Keys present in every job:
@@ -24,4 +24,4 @@ from typing import Any, Dict
 #   pdf_title:   str | None – display title for the PDF
 #   paper_id:    int | None – DB row id once the paper is persisted
 
-JOBS: Dict[str, Dict[str, Any]] = {}
+JOBS: dict[str, dict[str, Any]] = {}

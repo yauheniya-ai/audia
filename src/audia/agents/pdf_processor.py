@@ -90,6 +90,7 @@ def extract_text(pdf_path: str | Path) -> ExtractionResult:
 
 # ──────────────────────────────────────────────────────── helpers
 
+
 def _detect_header_footer_lines(page_texts: list[str]) -> set[str]:
     """
     Identify lines that appear verbatim in ≥50% of pages AND are short.

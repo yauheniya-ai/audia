@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "audia"
-version = "0.7.0"
+version = "0.7.1"
 description = "An agentic Python package that converts ideas and documents into audio – PDF papers, reports, and regulations turned into podcast-style audio files."
 readme = "README.md"
 authors = [
@@ -87,7 +87,6 @@ dev = [
     "pytest-asyncio>=0.23",
     "pytest-cov>=4.0",
     "pytest-mock",
-    "black>=22.0",
     "ruff>=0.4",
     "mypy>=1.0",
     "pre-commit>=3.0",

@@ -11,20 +11,19 @@ import json
 import logging
 import uuid
 from pathlib import Path
-from typing import Optional
-
-_logger = logging.getLogger(__name__)
 
 from fastapi import APIRouter, File, Form, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 
-from audia.config import DEFAULT_PROJECT, get_settings
 from audia.agents.graph import run_pipeline
 from audia.agents.pdf_processor import extract_text
 from audia.agents.text_cleaner import heuristic_clean, llm_curate
 from audia.agents.tts import synthesize
-from audia.storage import get_session, AudioFile, Paper
+from audia.config import DEFAULT_PROJECT, get_settings
+from audia.storage import AudioFile, Paper, get_session
 from audia.ui.jobs import JOBS
+
+_logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -62,14 +61,15 @@ def _dl_url(audio_id: int, project: str) -> str:
 
 # ─────────────────────────────────────────────────── upload (synchronous)
 
+
 @router.post("/upload", summary="Upload a PDF and convert synchronously")
 async def upload_and_convert(
     file: UploadFile = File(..., description="PDF file to convert"),
-    voice: Optional[str] = Form(None),
-    llm_provider: Optional[str] = Form(None),
-    llm_model: Optional[str] = Form(None),
-    tts_backend: Optional[str] = Form(None),
-    project: Optional[str] = Form(None),
+    voice: str | None = Form(None),
+    llm_provider: str | None = Form(None),
+    llm_model: str | None = Form(None),
+    tts_backend: str | None = Form(None),
+    project: str | None = Form(None),
 ) -> JSONResponse:
     """Synchronous upload + convert. Returns the download URL when done."""
     if not file.filename or not file.filename.lower().endswith(".pdf"):
@@ -110,24 +110,27 @@ async def upload_and_convert(
         session.flush()
         audio_id = af.id
 
-    return JSONResponse({
-        "status": "ok",
-        "download_url": _dl_url(audio_id, proj),
-        "title": state.get("title"),
-        "num_pages": state.get("num_pages"),
-    })
+    return JSONResponse(
+        {
+            "status": "ok",
+            "download_url": _dl_url(audio_id, proj),
+            "title": state.get("title"),
+            "num_pages": state.get("num_pages"),
+        }
+    )
 
 
 # ─────────────────────────────────────────────────── enqueue (upload)
 
+
 @router.post("/enqueue", summary="Enqueue a PDF conversion job (with progress tracking)")
 async def enqueue_conversion(
     file: UploadFile = File(..., description="PDF file to convert"),
-    voice: Optional[str] = Form(None, description="TTS voice override"),
-    llm_provider: Optional[str] = Form(None, description="LLM provider override"),
-    llm_model: Optional[str] = Form(None, description="LLM model override"),
-    tts_backend: Optional[str] = Form(None, description="TTS backend override"),
-    project: Optional[str] = Form(None, description="Project name"),
+    voice: str | None = Form(None, description="TTS voice override"),
+    llm_provider: str | None = Form(None, description="LLM provider override"),
+    llm_model: str | None = Form(None, description="LLM model override"),
+    tts_backend: str | None = Form(None, description="TTS backend override"),
+    project: str | None = Form(None, description="Project name"),
 ) -> JSONResponse:
     """Upload a PDF and return a job_id immediately; poll /status/{job_id} for progress."""
     proj = _proj(project)
@@ -152,23 +155,34 @@ async def enqueue_conversion(
         effective_voice = voice
         try:
             # Stage 1 – PDF extraction
-            job.update(stage="extracting", stage_label="Step 1/4 \u2500 PDF extraction", progress=10)
+            job.update(
+                stage="extracting", stage_label="Step 1/4 \u2500 PDF extraction", progress=10
+            )
             _log(job, "Step 1/4 \u2500 PDF extraction")
             pdf_result = await asyncio.to_thread(extract_text, str(upload_path))
             if job["cancelled"]:
-                job.update(status="cancelled", stage="cancelled", stage_label="Cancelled"); return
+                job.update(status="cancelled", stage="cancelled", stage_label="Cancelled")
+                return
             raw_chars = len(pdf_result.text)
-            job["stats"].update(raw_chars=raw_chars, num_pages=pdf_result.num_pages,
-                                title=pdf_result.title or upload_path.stem)
+            job["stats"].update(
+                raw_chars=raw_chars,
+                num_pages=pdf_result.num_pages,
+                title=pdf_result.title or upload_path.stem,
+            )
             job["pdf_title"] = pdf_result.title or upload_path.stem
             _log(job, f"  \u2713 {pdf_result.num_pages} pages extracted, {raw_chars:,} chars")
 
             # Stage 2 – Heuristic pre-pass
-            job.update(stage="preprocessing", stage_label="Step 2/4 \u2500 Heuristic pre-cleaning", progress=28)
+            job.update(
+                stage="preprocessing",
+                stage_label="Step 2/4 \u2500 Heuristic pre-cleaning",
+                progress=28,
+            )
             _log(job, "Step 2/4 \u2500 Heuristic pre-cleaning")
             precleaned = await asyncio.to_thread(heuristic_clean, pdf_result.text)
             if job["cancelled"]:
-                job.update(status="cancelled", stage="cancelled", stage_label="Cancelled"); return
+                job.update(status="cancelled", stage="cancelled", stage_label="Cancelled")
+                return
             job["stats"]["precleaned_chars"] = len(precleaned)
             _log(job, f"  \u2713 {raw_chars:,} \u2192 {len(precleaned):,} chars after pre-pass")
 
@@ -184,21 +198,32 @@ async def enqueue_conversion(
                 cfg2.__dict__["tts_backend"] = tts_backend
             if effective_voice:
                 cfg2.__dict__["tts_voice"] = effective_voice
+
             def _cb_llm(msg: str):
                 _log(job, f"  {msg}")
+
             curated = await asyncio.to_thread(llm_curate, precleaned, cfg2, _cb_llm)
             if job["cancelled"]:
-                job.update(status="cancelled", stage="cancelled", stage_label="Cancelled"); return
+                job.update(status="cancelled", stage="cancelled", stage_label="Cancelled")
+                return
             job["stats"]["curated_chars"] = len(curated)
             _log(job, f"  \u2713 Curation complete \u2013 {len(curated):,} chars")
 
             # Stage 4 – TTS synthesis
-            job.update(stage="synthesizing", stage_label="Step 4/4 \u2500 TTS synthesis", progress=72)
+            job.update(
+                stage="synthesizing", stage_label="Step 4/4 \u2500 TTS synthesis", progress=72
+            )
             _log(job, "Step 4/4 \u2500 TTS synthesis")
-            _log(job, f"  Backend: {cfg2.tts_backend} \u00b7 Voice: {cfg2.tts_voice} \u00b7 {len(curated):,} chars")
+            _log(
+                job,
+                f"  Backend: {cfg2.tts_backend} \u00b7 Voice: {cfg2.tts_voice}"
+                f" \u00b7 {len(curated):,} chars",
+            )
+
             def _cb_tts(msg: str):
                 _log(job, f"  {msg}")
                 job["progress"] = min(92, job["progress"] + 1)
+
             audio_path = await asyncio.to_thread(
                 synthesize,
                 text=curated,
@@ -208,7 +233,8 @@ async def enqueue_conversion(
                 progress_cb=_cb_tts,
             )
             if job["cancelled"]:
-                job.update(status="cancelled", stage="cancelled", stage_label="Cancelled"); return
+                job.update(status="cancelled", stage="cancelled", stage_label="Cancelled")
+                return
             job["stats"]["audio_filename"] = audio_path.name
             _log(job, f"  \u2713 Audio saved: {audio_path}")
 
@@ -240,7 +266,9 @@ async def enqueue_conversion(
 
             # Save debug texts
             try:
-                from datetime import datetime, timezone as _tz
+                from datetime import datetime
+                from datetime import timezone as _tz
+
                 ts = datetime.now(_tz.utc).strftime("%Y%m%d_%H%M%S")
                 pdf_stem = upload_path.stem[:50]
                 run_id = f"{pdf_stem}_{ts}"
@@ -281,6 +309,7 @@ async def enqueue_conversion(
 
 # ─────────────────────────────────────────────────── status / cancel / pdf
 
+
 @router.get("/status/{job_id}", summary="Poll conversion job status")
 async def get_job_status(job_id: str) -> JSONResponse:
     """Return current status, stage, progress, log, result when done."""
@@ -305,7 +334,8 @@ async def cancel_job(job_id: str) -> JSONResponse:
 
 @router.get("/jobs/{job_id}/pdf", summary="Serve the PDF for an in-progress or completed job")
 async def serve_job_pdf(job_id: str) -> FileResponse:
-    """Stream the PDF associated with a conversion job (available as soon as uploaded/downloaded)."""
+    """Stream the PDF associated with a conversion job (available as soon as
+    uploaded/downloaded)."""
     job = JOBS.get(job_id)
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found.")
@@ -320,6 +350,7 @@ async def serve_job_pdf(job_id: str) -> FileResponse:
 
 
 # ─────────────────────────────────────────────────── download
+
 
 @router.get("/download/{audio_id}", summary="Download generated audio file")
 async def download_audio(

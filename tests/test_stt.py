@@ -2,23 +2,24 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-
 # ─────────────────────────────────────────────── _ensure_stt_deps
+
 
 class TestEnsureSttDeps:
     def test_raises_when_both_missing(self):
         from audia.agents.stt import _ensure_stt_deps
+
         with patch.dict("sys.modules", {"sounddevice": None, "faster_whisper": None}):
             with pytest.raises(ImportError, match=r"pip install audia\[stt\]"):
                 _ensure_stt_deps()
 
     def test_raises_when_sounddevice_missing(self):
         from audia.agents.stt import _ensure_stt_deps
+
         fake_fw = MagicMock()
         with patch.dict("sys.modules", {"sounddevice": None, "faster_whisper": fake_fw}):
             with pytest.raises(ImportError, match="sounddevice"):
@@ -26,6 +27,7 @@ class TestEnsureSttDeps:
 
     def test_raises_when_faster_whisper_missing(self):
         from audia.agents.stt import _ensure_stt_deps
+
         fake_sd = MagicMock()
         with patch.dict("sys.modules", {"sounddevice": fake_sd, "faster_whisper": None}):
             with pytest.raises(ImportError, match="faster-whisper"):
@@ -33,6 +35,7 @@ class TestEnsureSttDeps:
 
     def test_passes_when_both_present(self):
         from audia.agents.stt import _ensure_stt_deps
+
         fake_sd = MagicMock()
         fake_fw = MagicMock()
         with patch.dict("sys.modules", {"sounddevice": fake_sd, "faster_whisper": fake_fw}):
@@ -41,6 +44,7 @@ class TestEnsureSttDeps:
 
 
 # ─────────────────────────────────────────────── transcribe_file
+
 
 class TestTranscribeFile:
     def test_transcribes_audio_file(self, tmp_path):
@@ -58,6 +62,7 @@ class TestTranscribeFile:
 
         with patch.dict("sys.modules", {"sounddevice": fake_sd, "faster_whisper": fake_fw}):
             from audia.agents.stt import transcribe_file
+
             result = transcribe_file(str(wav), model_size="base", device="cpu")
 
         assert result == "Hello world"
@@ -77,12 +82,14 @@ class TestTranscribeFile:
 
         with patch.dict("sys.modules", {"sounddevice": MagicMock(), "faster_whisper": fake_fw}):
             from audia.agents.stt import transcribe_file
+
             result = transcribe_file(str(wav))
 
         assert result == "First Second"
 
 
 # ─────────────────────────────────────────────── _transcribe_array
+
 
 class TestTranscribeArray:
     def test_transcribes_numpy_array(self):
@@ -99,12 +106,16 @@ class TestTranscribeArray:
         fake_fw.WhisperModel.return_value = fake_model
         fake_sf = MagicMock()
 
-        with patch.dict("sys.modules", {
-            "sounddevice": MagicMock(),
-            "faster_whisper": fake_fw,
-            "soundfile": fake_sf,
-        }):
+        with patch.dict(
+            "sys.modules",
+            {
+                "sounddevice": MagicMock(),
+                "faster_whisper": fake_fw,
+                "soundfile": fake_sf,
+            },
+        ):
             from audia.agents.stt import _transcribe_array
+
             result = _transcribe_array(audio, 16000, "base", "cpu")
 
         assert result == "Spoken words"
@@ -121,12 +132,16 @@ class TestTranscribeArray:
         fake_fw.WhisperModel.return_value = fake_model
         fake_sf = MagicMock()
 
-        with patch.dict("sys.modules", {
-            "sounddevice": MagicMock(),
-            "faster_whisper": fake_fw,
-            "soundfile": fake_sf,
-        }):
+        with patch.dict(
+            "sys.modules",
+            {
+                "sounddevice": MagicMock(),
+                "faster_whisper": fake_fw,
+                "soundfile": fake_sf,
+            },
+        ):
             from audia.agents.stt import _transcribe_array
+
             _transcribe_array(audio, 16000, "base", "cpu")
 
         # sf.write called with a tmp path argument
@@ -134,6 +149,7 @@ class TestTranscribeArray:
 
 
 # ─────────────────────────────────────────────── record_and_transcribe
+
 
 class TestRecordAndTranscribe:
     def _make_mocks(self, seg_text=" Recording result "):
@@ -155,12 +171,16 @@ class TestRecordAndTranscribe:
 
     def test_records_and_transcribes(self):
         fake_sd, fake_fw, fake_sf = self._make_mocks()
-        with patch.dict("sys.modules", {
-            "sounddevice": fake_sd,
-            "faster_whisper": fake_fw,
-            "soundfile": fake_sf,
-        }):
+        with patch.dict(
+            "sys.modules",
+            {
+                "sounddevice": fake_sd,
+                "faster_whisper": fake_fw,
+                "soundfile": fake_sf,
+            },
+        ):
             from audia.agents.stt import record_and_transcribe
+
             result = record_and_transcribe(seconds=1)
 
         assert isinstance(result, str)
@@ -171,12 +191,16 @@ class TestRecordAndTranscribe:
         fake_sd, fake_fw, fake_sf = self._make_mocks(" Interrupted ")
         fake_sd.wait.side_effect = KeyboardInterrupt()
 
-        with patch.dict("sys.modules", {
-            "sounddevice": fake_sd,
-            "faster_whisper": fake_fw,
-            "soundfile": fake_sf,
-        }):
+        with patch.dict(
+            "sys.modules",
+            {
+                "sounddevice": fake_sd,
+                "faster_whisper": fake_fw,
+                "soundfile": fake_sf,
+            },
+        ):
             from audia.agents.stt import record_and_transcribe
+
             result = record_and_transcribe(seconds=1)
 
         fake_sd.stop.assert_called_once()
@@ -184,6 +208,7 @@ class TestRecordAndTranscribe:
 
 
 # ─────────────────────────────────────────────── distill_search_query
+
 
 class TestDistillSearchQuery:
     def test_distills_and_strips_period(self, tmp_path):
@@ -196,9 +221,12 @@ class TestDistillSearchQuery:
         mock_llm = MagicMock()
         mock_llm.invoke.return_value = mock_result
 
-        with patch("audia.agents.text_cleaner._build_llm", return_value=mock_llm), \
-             patch("audia.config.get_settings", return_value=cfg):
+        with (
+            patch("audia.agents.text_cleaner._build_llm", return_value=mock_llm),
+            patch("audia.config.get_settings", return_value=cfg),
+        ):
             from audia.agents.stt import distill_search_query
+
             result = distill_search_query("I would like to research about agentic AI.")
 
         # trailing period must be stripped
@@ -206,8 +234,9 @@ class TestDistillSearchQuery:
         assert mock_llm.invoke.call_count == 1
 
     def test_passes_speech_as_human_message(self, tmp_path):
-        from audia.config import Settings
         from langchain_core.messages import HumanMessage
+
+        from audia.config import Settings
 
         cfg = Settings(data_dir=tmp_path, llm_provider="openai", openai_api_key="sk-x")
 
@@ -222,9 +251,12 @@ class TestDistillSearchQuery:
         mock_llm = MagicMock()
         mock_llm.invoke.side_effect = fake_invoke
 
-        with patch("audia.agents.text_cleaner._build_llm", return_value=mock_llm), \
-             patch("audia.config.get_settings", return_value=cfg):
+        with (
+            patch("audia.agents.text_cleaner._build_llm", return_value=mock_llm),
+            patch("audia.config.get_settings", return_value=cfg),
+        ):
             from audia.agents.stt import distill_search_query
+
             result = distill_search_query("Tell me about neural networks")
 
         assert result == "neural networks"

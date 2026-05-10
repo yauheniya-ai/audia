@@ -8,7 +8,7 @@ import re
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -16,7 +16,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # ── Project helpers ──────────────────────────────────────────────────────────
 
 DEFAULT_PROJECT = "default"
-_PROJECT_NAME_RE = re.compile(r'^[a-z0-9][a-z0-9_-]{0,63}$')
+_PROJECT_NAME_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,63}$")
 
 
 def validate_project_name(name: str) -> str | None:
@@ -34,6 +34,7 @@ def validate_project_name(name: str) -> str | None:
 @dataclass
 class ProjectDirs:
     """File-system paths for a single project under *base_dir*."""
+
     root: Path
 
     @property
@@ -118,8 +119,10 @@ class Settings(BaseSettings):
             "Required – set AUDIA_LLM_PROVIDER=openai|anthropic|google."
         ),
     )
-    openai_api_key: Optional[str] = Field(None, description="OpenAI API key (env: AUDIA_OPENAI_API_KEY)")
-    openai_api_base: Optional[str] = Field(
+    openai_api_key: str | None = Field(
+        None, description="OpenAI API key (env: AUDIA_OPENAI_API_KEY)"
+    )
+    openai_api_base: str | None = Field(
         None,
         description=(
             "Custom OpenAI-compatible base URL, e.g. an Azure OpenAI endpoint or "
@@ -128,8 +131,10 @@ class Settings(BaseSettings):
             "(env: AUDIA_OPENAI_API_BASE)"
         ),
     )
-    anthropic_api_key: Optional[str] = Field(None, description="Anthropic API key (env: AUDIA_ANTHROPIC_API_KEY)")
-    anthropic_api_base: Optional[str] = Field(
+    anthropic_api_key: str | None = Field(
+        None, description="Anthropic API key (env: AUDIA_ANTHROPIC_API_KEY)"
+    )
+    anthropic_api_base: str | None = Field(
         None,
         description=(
             "Custom Anthropic-compatible base URL, e.g. a corporate proxy. "
@@ -137,8 +142,10 @@ class Settings(BaseSettings):
             "(env: AUDIA_ANTHROPIC_API_BASE)"
         ),
     )
-    google_api_key: Optional[str] = Field(None, description="Google AI API key (env: AUDIA_GOOGLE_API_KEY)")
-    google_api_base: Optional[str] = Field(
+    google_api_key: str | None = Field(
+        None, description="Google AI API key (env: AUDIA_GOOGLE_API_KEY)"
+    )
+    google_api_base: str | None = Field(
         None,
         description=(
             "Custom Google AI-compatible base URL, e.g. a Vertex AI endpoint or "
@@ -148,7 +155,8 @@ class Settings(BaseSettings):
     )
     llm_model: str = Field(
         "gpt-4o-mini",
-        description="Model name, e.g. 'gpt-4o-mini', 'gpt-4o', 'claude-3-5-haiku-20241022', 'gemini-2.0-flash'",
+        description="Model name, e.g. 'gpt-4o-mini', 'gpt-4o', 'claude-3-5-haiku-20241022',"
+        " 'gemini-2.0-flash'",
     )
     llm_temperature: float = Field(0.1, ge=0.0, le=1.0)
     llm_max_chunk_chars: int = Field(
@@ -173,9 +181,7 @@ class Settings(BaseSettings):
             "For OpenAI use 'alloy' | 'echo' | 'nova' | 'shimmer'."
         ),
     )
-    tts_rate: str = Field(
-        "+0%", description="edge-tts speaking rate offset, e.g. '+10%' or '-5%'"
-    )
+    tts_rate: str = Field("+0%", description="edge-tts speaking rate offset, e.g. '+10%' or '-5%'")
     tts_chunk_chars: int = Field(
         3800,
         description="Max characters per TTS chunk (long texts are split and concatenated)",
@@ -184,9 +190,7 @@ class Settings(BaseSettings):
     # ------------------------------------------------------------------ STT
     stt_model: str = Field(
         "base",
-        description=(
-            "faster-whisper model size: tiny | base | small | medium | large-v3"
-        ),
+        description=("faster-whisper model size: tiny | base | small | medium | large-v3"),
     )
     stt_device: str = Field("cpu", description="Device for faster-whisper: cpu | cuda")
     stt_record_seconds: int = Field(
@@ -194,9 +198,7 @@ class Settings(BaseSettings):
     )
 
     # ------------------------------------------------------------------ Research
-    arxiv_max_results: int = Field(
-        10, description="Max papers returned per ArXiv query"
-    )
+    arxiv_max_results: int = Field(10, description="Max papers returned per ArXiv query")
 
     @field_validator("llm_provider", mode="before")
     @classmethod

@@ -2,16 +2,13 @@
 
 from __future__ import annotations
 
-import io
-import os
 import tempfile
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-
 # ── helpers ──────────────────────────────────────────────────────────────────
+
 
 def _make_fake_pdf(texts: list[str]) -> str:
     """Return the path to a minimal fake PDF (just bytes, not real PDF rendering)."""
@@ -39,6 +36,7 @@ def _mock_fitz(page_texts: list[str]):
 
 # ── tests ─────────────────────────────────────────────────────────────────────
 
+
 class TestExtractText:
     def test_basic_extraction(self, tmp_path):
         pdf_path = tmp_path / "test.pdf"
@@ -47,6 +45,7 @@ class TestExtractText:
         pages = ["Page one content.", "Page two content."]
         with _mock_fitz(pages):
             from audia.agents.pdf_processor import extract_text
+
             result = extract_text(str(pdf_path))
 
         assert "Page one content" in result.text
@@ -72,6 +71,7 @@ class TestExtractText:
         ]
         with _mock_fitz(pages):
             from audia.agents.pdf_processor import extract_text
+
             result = extract_text(str(pdf_path))
 
         # Header should be stripped from the body text
@@ -88,6 +88,7 @@ class TestExtractText:
         ]
         with _mock_fitz(pages):
             from audia.agents.pdf_processor import extract_text
+
             result = extract_text(str(pdf_path))
 
         assert "[1] Some author" not in result.text
@@ -99,6 +100,7 @@ class TestExtractText:
         pages = ["Attention Is All You Need\nAuthors: Vaswani et al.\nAbstract:"]
         with _mock_fitz(pages):
             from audia.agents.pdf_processor import extract_text
+
             result = extract_text(str(pdf_path))
 
         assert "Attention Is All You Need" in result.title

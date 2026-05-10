@@ -14,8 +14,8 @@ def clear_settings_cache(tmp_path, monkeypatch):
       - clear the per-project engine/factory registry
     Restore everything on teardown.
     """
-    from audia.config import get_settings
     import audia.storage.database as db_mod
+    from audia.config import get_settings
 
     monkeypatch.setenv("AUDIA_DATA_DIR", str(tmp_path))
     get_settings.cache_clear()
@@ -33,6 +33,7 @@ def clear_settings_cache(tmp_path, monkeypatch):
 def tmp_settings(tmp_path):
     """Real Settings instance pointing at a temp directory."""
     from audia.config import Settings
+
     return Settings(
         data_dir=tmp_path,
         llm_provider="openai",
@@ -46,10 +47,11 @@ def isolated_db(tmp_path):
     Inject a fresh SQLite test DB into the per-project registry under the
     'default' key, yield the engine, then remove it.
     """
-    import audia.storage.database as db_mod
-    from audia.config import DEFAULT_PROJECT
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
+
+    import audia.storage.database as db_mod
+    from audia.config import DEFAULT_PROJECT
     from audia.storage.models import Base
 
     test_engine = create_engine(

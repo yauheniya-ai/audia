@@ -52,9 +52,7 @@ async def get_ui_settings(project: str | None = Query(None)) -> JSONResponse:
 
 
 @router.put("", summary="Save UI pipeline settings")
-async def save_ui_settings(
-    body: SettingsBody, project: str | None = Query(None)
-) -> JSONResponse:
+async def save_ui_settings(body: SettingsBody, project: str | None = Query(None)) -> JSONResponse:
     """Persist the provided settings; omitted fields are left unchanged."""
     updates = body.model_dump(exclude_none=True)
     with get_session(_proj(project)) as session:

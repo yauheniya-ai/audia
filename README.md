@@ -191,10 +191,11 @@ Output files for a run on `2025_Xu+.pdf`:
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/my-change`)
-3. Make your changes
-4. Run the test suite: `pytest --cov=src --cov-report=term-missing`
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/my-change`) and make your changes
+3. Run the test suite: `pytest --cov=src --cov-report=term-missing`
+4. Format and lint: `ruff format src/ tests/ && ruff check src/ tests/`
+5. Update the documentation
+6. Submit a pull request
 
 ## License
 

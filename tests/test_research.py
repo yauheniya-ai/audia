@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from datetime import date
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -52,8 +51,10 @@ class TestArxivSearcherSearch:
         fake = _make_arxiv_result()
         mock_arxiv = _build_arxiv_mock([fake])
 
-        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
-             patch.dict("sys.modules", {"arxiv": mock_arxiv}):
+        with (
+            patch("audia.agents.research.get_settings", return_value=tmp_settings),
+            patch.dict("sys.modules", {"arxiv": mock_arxiv}),
+        ):
             searcher = ArxivSearcher(max_results=5)
             results = searcher.search("transformers")
 
@@ -70,8 +71,10 @@ class TestArxivSearcherSearch:
         from audia.agents.research import ArxivSearcher
 
         mock_arxiv = _build_arxiv_mock([])
-        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
-             patch.dict("sys.modules", {"arxiv": mock_arxiv}):
+        with (
+            patch("audia.agents.research.get_settings", return_value=tmp_settings),
+            patch.dict("sys.modules", {"arxiv": mock_arxiv}),
+        ):
             searcher = ArxivSearcher(max_results=5)
             results = searcher.search("zzz_nonexistent_zzz")
 
@@ -81,12 +84,13 @@ class TestArxivSearcherSearch:
         from audia.agents.research import ArxivSearcher
 
         fakes = [
-            _make_arxiv_result(short_id=f"2301.0000{i}v1", title=f"Paper {i}")
-            for i in range(3)
+            _make_arxiv_result(short_id=f"2301.0000{i}v1", title=f"Paper {i}") for i in range(3)
         ]
         mock_arxiv = _build_arxiv_mock(fakes)
-        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
-             patch.dict("sys.modules", {"arxiv": mock_arxiv}):
+        with (
+            patch("audia.agents.research.get_settings", return_value=tmp_settings),
+            patch.dict("sys.modules", {"arxiv": mock_arxiv}),
+        ):
             searcher = ArxivSearcher(max_results=3)
             results = searcher.search("neural networks")
 
@@ -97,8 +101,10 @@ class TestArxivSearcherSearch:
         from audia.agents.research import ArxivSearcher
 
         mock_arxiv = _build_arxiv_mock([])
-        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
-             patch.dict("sys.modules", {"arxiv": mock_arxiv}):
+        with (
+            patch("audia.agents.research.get_settings", return_value=tmp_settings),
+            patch.dict("sys.modules", {"arxiv": mock_arxiv}),
+        ):
             searcher = ArxivSearcher()  # no explicit max_results
             searcher.search("test")
 
@@ -106,9 +112,10 @@ class TestArxivSearcherSearch:
 
     def test_search_raises_import_error(self, tmp_settings):
         """ImportError from missing arxiv package is re-raised with message."""
+        import builtins
+
         from audia.agents.research import ArxivSearcher
 
-        import builtins
         real_import = builtins.__import__
 
         def mock_import(name, *args, **kwargs):
@@ -142,8 +149,10 @@ class TestArxivSearcherDownload:
         existing.write_bytes(b"%PDF-fake")
 
         mock_arxiv = MagicMock()
-        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
-             patch.dict("sys.modules", {"arxiv": mock_arxiv}):
+        with (
+            patch("audia.agents.research.get_settings", return_value=tmp_settings),
+            patch.dict("sys.modules", {"arxiv": mock_arxiv}),
+        ):
             searcher = ArxivSearcher()
             result = searcher.download_pdf(paper, dest_dir=tmp_path)
 
@@ -168,8 +177,12 @@ class TestArxivSearcherDownload:
         fake_response.__enter__ = lambda s: s
         fake_response.__exit__ = MagicMock(return_value=False)
 
-        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
-             patch("audia.agents.research.urllib.request.urlopen", return_value=fake_response) as mock_open:
+        with (
+            patch("audia.agents.research.get_settings", return_value=tmp_settings),
+            patch(
+                "audia.agents.research.urllib.request.urlopen", return_value=fake_response
+            ) as mock_open,
+        ):
             searcher = ArxivSearcher()
             result = searcher.download_pdf(paper, dest_dir=tmp_path)
 
@@ -179,8 +192,9 @@ class TestArxivSearcherDownload:
         mock_open.assert_called_once()
 
     def test_download_raises_on_http_error(self, tmp_path, tmp_settings):
-        from audia.agents.research import ArxivPaper, ArxivSearcher
         import urllib.error
+
+        from audia.agents.research import ArxivPaper, ArxivSearcher
 
         paper = ArxivPaper(
             arxiv_id="2301.00002v1",
@@ -191,11 +205,15 @@ class TestArxivSearcherDownload:
             published="2023-01-01",
         )
 
-        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
-             patch("audia.agents.research.urllib.request.urlopen",
-                   side_effect=urllib.error.HTTPError(
-                       url="", code=429, msg="Too Many Requests", hdrs={}, fp=None
-                   )):
+        with (
+            patch("audia.agents.research.get_settings", return_value=tmp_settings),
+            patch(
+                "audia.agents.research.urllib.request.urlopen",
+                side_effect=urllib.error.HTTPError(
+                    url="", code=429, msg="Too Many Requests", hdrs={}, fp=None
+                ),
+            ),
+        ):
             searcher = ArxivSearcher()
             with pytest.raises(urllib.error.HTTPError):
                 searcher.download_pdf(paper, dest_dir=tmp_path)
@@ -203,7 +221,7 @@ class TestArxivSearcherDownload:
 
 # ─────────────────────────────────── HTML fallback search
 
-_FAKE_HTML = '''
+_FAKE_HTML = """
 <li class="arxiv-result">
     <a href="https://arxiv.org/abs/2301.12345">arxiv.org/abs/2301.12345</a>
     <p class="title is-5">Attention Is All You Need</p>
@@ -216,7 +234,7 @@ _FAKE_HTML = '''
     <p class="authors">Carol</p>
     <span class="abstract-short">Second abstract.</span>
 </li>
-'''
+"""
 
 
 class TestHtmlSearch:
@@ -232,8 +250,10 @@ class TestHtmlSearch:
 
         fake_resp = self._make_fake_response(_FAKE_HTML)
 
-        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
-             patch("audia.agents.research.urllib.request.urlopen", return_value=fake_resp):
+        with (
+            patch("audia.agents.research.get_settings", return_value=tmp_settings),
+            patch("audia.agents.research.urllib.request.urlopen", return_value=fake_resp),
+        ):
             searcher = ArxivSearcher(max_results=5)
             results = searcher._html_search("transformers")
 
@@ -247,8 +267,10 @@ class TestHtmlSearch:
 
         fake_resp = self._make_fake_response(_FAKE_HTML)
 
-        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
-             patch("audia.agents.research.urllib.request.urlopen", return_value=fake_resp):
+        with (
+            patch("audia.agents.research.get_settings", return_value=tmp_settings),
+            patch("audia.agents.research.urllib.request.urlopen", return_value=fake_resp),
+        ):
             searcher = ArxivSearcher(max_results=1)
             results = searcher._html_search("transformers")
 
@@ -259,8 +281,10 @@ class TestHtmlSearch:
 
         empty_resp = self._make_fake_response("<html><body>No results</body></html>")
 
-        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
-             patch("audia.agents.research.urllib.request.urlopen", return_value=empty_resp):
+        with (
+            patch("audia.agents.research.get_settings", return_value=tmp_settings),
+            patch("audia.agents.research.urllib.request.urlopen", return_value=empty_resp),
+        ):
             searcher = ArxivSearcher(max_results=5)
             results = searcher._html_search("zzz_nothing")
 
@@ -278,9 +302,11 @@ class TestHtmlSearch:
         mock_arxiv.SortCriterion = MagicMock()
         mock_arxiv.SortCriterion.Relevance = "relevance"
 
-        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
-             patch.dict("sys.modules", {"arxiv": mock_arxiv}), \
-             patch("audia.agents.research.urllib.request.urlopen", return_value=fake_resp):
+        with (
+            patch("audia.agents.research.get_settings", return_value=tmp_settings),
+            patch.dict("sys.modules", {"arxiv": mock_arxiv}),
+            patch("audia.agents.research.urllib.request.urlopen", return_value=fake_resp),
+        ):
             searcher = ArxivSearcher(max_results=5)
             results = searcher.search("transformers")
 
@@ -298,9 +324,11 @@ class TestHtmlSearch:
         mock_arxiv.SortCriterion = MagicMock()
         mock_arxiv.SortCriterion.Relevance = "relevance"
 
-        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
-             patch.dict("sys.modules", {"arxiv": mock_arxiv}), \
-             patch("audia.agents.research.urllib.request.urlopen", return_value=fake_resp):
+        with (
+            patch("audia.agents.research.get_settings", return_value=tmp_settings),
+            patch.dict("sys.modules", {"arxiv": mock_arxiv}),
+            patch("audia.agents.research.urllib.request.urlopen", return_value=fake_resp),
+        ):
             searcher = ArxivSearcher(max_results=5)
             results = searcher.search("transformers")
 
@@ -318,8 +346,10 @@ class TestArxivPaperPublishedNone:
 
         mock_arxiv = _build_arxiv_mock([fake])
 
-        with patch("audia.agents.research.get_settings", return_value=tmp_settings), \
-             patch.dict("sys.modules", {"arxiv": mock_arxiv}):
+        with (
+            patch("audia.agents.research.get_settings", return_value=tmp_settings),
+            patch.dict("sys.modules", {"arxiv": mock_arxiv}),
+        ):
             searcher = ArxivSearcher(max_results=5)
             results = searcher.search("transformers")
 

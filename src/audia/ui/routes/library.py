@@ -12,11 +12,11 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
+from sqlalchemy import desc, select
 
 from audia.config import DEFAULT_PROJECT, get_settings, validate_project_name
-from audia.storage import get_session, AudioFile, Paper
+from audia.storage import AudioFile, Paper, get_session
 from audia.storage.models import ResearchSession, UserSetting
-from sqlalchemy import select, desc
 
 router = APIRouter()
 
@@ -34,79 +34,81 @@ def _dl_url(audio_id: int, project: str) -> str:
 @router.get("/papers", summary="List all saved papers")
 async def list_papers(project: str | None = Query(None)) -> JSONResponse:
     with get_session(_proj(project)) as session:
-        rows = session.execute(
-            select(Paper).order_by(desc(Paper.created_at))
-        ).scalars().all()
-        return JSONResponse({
-            "papers": [
-                {
-                    "id": p.id,
-                    "title": p.title,
-                    "authors": p.authors_list,
-                    "abstract": p.abstract,
-                    "arxiv_id": p.arxiv_id,
-                    "pdf_path": p.pdf_path,
-                    "pdf_url": p.pdf_url,
-                    "created_at": p.created_at.isoformat(),
-                }
-                for p in rows
-            ]
-        })
+        rows = session.execute(select(Paper).order_by(desc(Paper.created_at))).scalars().all()
+        return JSONResponse(
+            {
+                "papers": [
+                    {
+                        "id": p.id,
+                        "title": p.title,
+                        "authors": p.authors_list,
+                        "abstract": p.abstract,
+                        "arxiv_id": p.arxiv_id,
+                        "pdf_path": p.pdf_path,
+                        "pdf_url": p.pdf_url,
+                        "created_at": p.created_at.isoformat(),
+                    }
+                    for p in rows
+                ]
+            }
+        )
 
 
 @router.get("/audio", summary="List all generated audio files")
 async def list_audio(project: str | None = Query(None)) -> JSONResponse:
     proj = _proj(project)
     with get_session(proj) as session:
-        rows = session.execute(
-            select(AudioFile).order_by(desc(AudioFile.created_at))
-        ).scalars().all()
-        return JSONResponse({
-            "audio_files": [
-                {
-                    "id": af.id,
-                    "paper_id": af.paper_id,
-                    "filename": af.filename,
-                    "file_path": af.file_path,
-                    "download_url": _dl_url(af.id, proj),
-                    "duration_seconds": af.duration_seconds,
-                    "tts_backend": af.tts_backend,
-                    "tts_voice": af.tts_voice,
-                    "created_at": af.created_at.isoformat(),
-                }
-                for af in rows
-            ]
-        })
+        rows = (
+            session.execute(select(AudioFile).order_by(desc(AudioFile.created_at))).scalars().all()
+        )
+        return JSONResponse(
+            {
+                "audio_files": [
+                    {
+                        "id": af.id,
+                        "paper_id": af.paper_id,
+                        "filename": af.filename,
+                        "file_path": af.file_path,
+                        "download_url": _dl_url(af.id, proj),
+                        "duration_seconds": af.duration_seconds,
+                        "tts_backend": af.tts_backend,
+                        "tts_voice": af.tts_voice,
+                        "created_at": af.created_at.isoformat(),
+                    }
+                    for af in rows
+                ]
+            }
+        )
 
 
 @router.get("/research_sessions", summary="List all research sessions")
 async def list_research_sessions(project: str | None = Query(None)) -> JSONResponse:
     with get_session(_proj(project)) as session:
-        rows = session.execute(
-            select(ResearchSession).order_by(desc(ResearchSession.created_at))
-        ).scalars().all()
-        return JSONResponse({
-            "research_sessions": [
-                {
-                    "id": rs.id,
-                    "query": rs.query,
-                    "paper_ids": rs.paper_ids_list,
-                    "created_at": rs.created_at.isoformat(),
-                }
-                for rs in rows
-            ]
-        })
+        rows = (
+            session.execute(select(ResearchSession).order_by(desc(ResearchSession.created_at)))
+            .scalars()
+            .all()
+        )
+        return JSONResponse(
+            {
+                "research_sessions": [
+                    {
+                        "id": rs.id,
+                        "query": rs.query,
+                        "paper_ids": rs.paper_ids_list,
+                        "created_at": rs.created_at.isoformat(),
+                    }
+                    for rs in rows
+                ]
+            }
+        )
 
 
 @router.get("/user_settings", summary="List all user settings key-value pairs")
 async def list_user_settings(project: str | None = Query(None)) -> JSONResponse:
     with get_session(_proj(project)) as session:
-        rows = session.execute(
-            select(UserSetting).order_by(UserSetting.key)
-        ).scalars().all()
-        return JSONResponse({
-            "user_settings": [{"key": r.key, "value": r.value} for r in rows]
-        })
+        rows = session.execute(select(UserSetting).order_by(UserSetting.key)).scalars().all()
+        return JSONResponse({"user_settings": [{"key": r.key, "value": r.value} for r in rows]})
 
 
 class PaperPatch(BaseModel):
@@ -210,9 +212,7 @@ async def patch_user_setting(
 
 
 @router.delete("/audio/{audio_id}", summary="Delete an audio file record")
-async def delete_audio(
-    audio_id: int, project: str | None = Query(None)
-) -> JSONResponse:
+async def delete_audio(audio_id: int, project: str | None = Query(None)) -> JSONResponse:
     with get_session(_proj(project)) as session:
         af = session.get(AudioFile, audio_id)
         if af is None:
@@ -225,39 +225,37 @@ async def delete_audio(
 
 
 @router.get("/papers/{paper_id}", summary="Get a single paper with its audio files")
-async def get_paper(
-    paper_id: int, project: str | None = Query(None)
-) -> JSONResponse:
+async def get_paper(paper_id: int, project: str | None = Query(None)) -> JSONResponse:
     proj = _proj(project)
     with get_session(proj) as session:
         paper = session.get(Paper, paper_id)
         if paper is None:
             raise HTTPException(status_code=404, detail="Paper not found.")
-        return JSONResponse({
-            "id": paper.id,
-            "title": paper.title,
-            "authors": paper.authors_list,
-            "arxiv_id": paper.arxiv_id,
-            "pdf_path": paper.pdf_path,
-            "created_at": paper.created_at.isoformat(),
-            "audio_files": [
-                {
-                    "id": af.id,
-                    "filename": af.filename,
-                    "download_url": _dl_url(af.id, proj),
-                    "tts_backend": af.tts_backend,
-                    "tts_voice": af.tts_voice,
-                    "created_at": af.created_at.isoformat(),
-                }
-                for af in paper.audio_files
-            ],
-        })
+        return JSONResponse(
+            {
+                "id": paper.id,
+                "title": paper.title,
+                "authors": paper.authors_list,
+                "arxiv_id": paper.arxiv_id,
+                "pdf_path": paper.pdf_path,
+                "created_at": paper.created_at.isoformat(),
+                "audio_files": [
+                    {
+                        "id": af.id,
+                        "filename": af.filename,
+                        "download_url": _dl_url(af.id, proj),
+                        "tts_backend": af.tts_backend,
+                        "tts_voice": af.tts_voice,
+                        "created_at": af.created_at.isoformat(),
+                    }
+                    for af in paper.audio_files
+                ],
+            }
+        )
 
 
 @router.delete("/papers/{paper_id}", summary="Delete a paper and all its audio files")
-async def delete_paper(
-    paper_id: int, project: str | None = Query(None)
-) -> JSONResponse:
+async def delete_paper(paper_id: int, project: str | None = Query(None)) -> JSONResponse:
     with get_session(_proj(project)) as session:
         paper = session.get(Paper, paper_id)
         if paper is None:
@@ -274,9 +272,7 @@ async def delete_paper(
 
 
 @router.get("/pdf/{paper_id}", summary="Serve the original PDF for a paper")
-async def serve_pdf(
-    paper_id: int, project: str | None = Query(None)
-) -> FileResponse:
+async def serve_pdf(paper_id: int, project: str | None = Query(None)) -> FileResponse:
     with get_session(_proj(project)) as session:
         paper = session.get(Paper, paper_id)
         if paper is None:
@@ -295,7 +291,9 @@ class MovePaperBody(BaseModel):
     target_project: str
 
 
-@router.post("/papers/{paper_id}/move", summary="Move a paper and its audio files to another project")
+@router.post(
+    "/papers/{paper_id}/move", summary="Move a paper and its audio files to another project"
+)
 async def move_paper(
     paper_id: int,
     body: MovePaperBody,
@@ -313,7 +311,6 @@ async def move_paper(
         raise HTTPException(status_code=400, detail="Source and target project are the same.")
 
     cfg = get_settings()
-    src_dirs = cfg.get_project_dirs(src)
     dst_dirs = cfg.get_project_dirs(dst)
     dst_dirs.ensure_dirs()
 
@@ -384,15 +381,17 @@ async def move_paper(
         dst_sess.flush()  # assigns new_paper.id
 
         for i, af in enumerate(audio_data):
-            dst_sess.add(AudioFile(
-                paper_id=new_paper.id,
-                filename=af["filename"],
-                file_path=new_audio_paths[i],
-                duration_seconds=af["duration_seconds"],
-                tts_backend=af["tts_backend"],
-                tts_voice=af["tts_voice"],
-                created_at=af["created_at"],
-            ))
+            dst_sess.add(
+                AudioFile(
+                    paper_id=new_paper.id,
+                    filename=af["filename"],
+                    file_path=new_audio_paths[i],
+                    duration_seconds=af["duration_seconds"],
+                    tts_backend=af["tts_backend"],
+                    tts_voice=af["tts_voice"],
+                    created_at=af["created_at"],
+                )
+            )
         dst_sess.commit()
         new_id = new_paper.id
 
@@ -412,9 +411,11 @@ async def move_paper(
     if old_pdf and old_pdf.exists():
         old_pdf.unlink(missing_ok=True)
 
-    return JSONResponse({
-        "status": "moved",
-        "source_project": src,
-        "target_project": dst,
-        "new_paper_id": new_id,
-    })
+    return JSONResponse(
+        {
+            "status": "moved",
+            "source_project": src,
+            "target_project": dst,
+            "new_paper_id": new_id,
+        }
+    )

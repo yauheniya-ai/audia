@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## Version 0.7.1 (2026-05-10)
+
+### Code quality fixes
+
+- Fixed E402 lint errors in `ui/routes/convert.py` by moving `_logger` assignment to after all imports
+- Removed unused local variables (`result`, `src_dirs`, `mock_browser`) in `ui/routes/library.py`, `tests/test_cli.py`, and `tests/test_text_cleaner.py` (F841)
+- Wrapped long lines exceeding 100 chars in `agents/research.py`, `agents/text_cleaner.py`, `config.py`, `ui/routes/convert.py`, and `tests/test_cli.py` (E501)
+
 ## Version 0.7.0 (2026-04-29)
 
 ### Move studies between projects

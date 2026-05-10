@@ -15,7 +15,6 @@ import re
 import time
 import uuid
 from pathlib import Path
-from typing import Optional
 
 from rich.console import Console
 
@@ -28,6 +27,7 @@ _EDGE_TTS_CHUNK_TIMEOUT = 90
 
 
 # ──────────────────────────────────────────────────────────── public API
+
 
 def synthesize(
     text: str,
@@ -65,6 +65,7 @@ def synthesize(
 
 # ──────────────────────────────────────────────────────────── edge-tts
 
+
 def _edge_tts(text: str, out_dir: Path, stem: str, cfg: Settings, progress_cb=None) -> Path:
     """Use Microsoft Edge TTS (free, no API key). Generates mp3 via network."""
     try:
@@ -86,9 +87,7 @@ def _edge_tts(text: str, out_dir: Path, stem: str, cfg: Settings, progress_cb=No
         console.print(f"  [dim]  {msg_start}[/dim]")
         if progress_cb:
             progress_cb(msg_start)
-        _run_async(
-            _edge_speak(chunk, str(chunk_path), cfg.tts_voice, cfg.tts_rate, edge_tts)
-        )
+        _run_async(_edge_speak(chunk, str(chunk_path), cfg.tts_voice, cfg.tts_rate, edge_tts))
         chunk_paths.append(chunk_path)
         msg_done = f"Chunk {i}/{total} done \u2192 {chunk_path.name}"
         console.print(f"  [dim]  {msg_done}[/dim]")
@@ -121,6 +120,7 @@ def _run_async(coro) -> None:
         # We're inside a running event loop (FastAPI worker thread).
         # asyncio.run() would fail here; use a new event loop in this thread.
         import concurrent.futures
+
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
             future = pool.submit(asyncio.run, coro)
             future.result(timeout=_EDGE_TTS_CHUNK_TIMEOUT + 5)
@@ -149,12 +149,13 @@ def _concat_mp3(parts: list[Path], dest: Path) -> Path:
 
 # ──────────────────────────────────────────────────────────── kokoro
 
+
 def _kokoro_tts(text: str, out_dir: Path, stem: str, cfg: Settings) -> Path:
     """Use Kokoro local TTS model (pip install audia[kokoro])."""
     try:
-        from kokoro import KPipeline  # type: ignore
-        import soundfile as sf  # type: ignore
         import numpy as np
+        import soundfile as sf  # type: ignore
+        from kokoro import KPipeline  # type: ignore
     except ImportError as e:
         raise ImportError(
             "Kokoro TTS requires extra dependencies: pip install audia[kokoro]"
@@ -176,14 +177,13 @@ def _kokoro_tts(text: str, out_dir: Path, stem: str, cfg: Settings) -> Path:
 
 # ──────────────────────────────────────────────────────────── openai
 
+
 def _openai_tts(text: str, out_dir: Path, stem: str, cfg: Settings) -> Path:
     """Use OpenAI TTS API."""
     try:
         from openai import OpenAI  # type: ignore
     except ImportError as e:
-        raise ImportError(
-            "OpenAI TTS requires: pip install audia[openai]"
-        ) from e
+        raise ImportError("OpenAI TTS requires: pip install audia[openai]") from e
 
     client_kwargs: dict = dict(api_key=cfg.openai_api_key)
     if cfg.openai_api_base:
@@ -214,6 +214,7 @@ def _openai_tts(text: str, out_dir: Path, stem: str, cfg: Settings) -> Path:
 
 
 # ──────────────────────────────────────────────────────────── helpers
+
 
 def _split(text: str, max_chars: int) -> list[str]:
     """

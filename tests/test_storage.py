@@ -10,16 +10,19 @@ import pytest
 class TestPaperModel:
     def test_repr(self, isolated_db):
         from audia.storage.models import Paper
+
         p = Paper(title="Test Paper", authors="[]")
         assert "Test Paper" in repr(p)
 
     def test_authors_list_valid_json(self, isolated_db):
         from audia.storage.models import Paper
+
         p = Paper(title="T", authors=json.dumps(["Alice", "Bob"]))
         assert p.authors_list == ["Alice", "Bob"]
 
     def test_authors_list_fallback(self, isolated_db):
         from audia.storage.models import Paper
+
         p = Paper(title="T", authors="plain string")
         assert p.authors_list == ["plain string"]
 
@@ -43,6 +46,7 @@ class TestPaperModel:
 class TestAudioFileModel:
     def test_repr(self):
         from audia.storage.models import AudioFile
+
         af = AudioFile(filename="out.mp3", file_path="/tmp/out.mp3")
         assert "out.mp3" in repr(af)
 
@@ -74,16 +78,19 @@ class TestAudioFileModel:
 class TestResearchSessionModel:
     def test_paper_ids_list(self):
         from audia.storage.models import ResearchSession
+
         rs = ResearchSession(query="transformers", paper_ids=json.dumps([1, 2, 3]))
         assert rs.paper_ids_list == [1, 2, 3]
 
     def test_paper_ids_fallback(self):
         from audia.storage.models import ResearchSession
+
         rs = ResearchSession(query="q", paper_ids="broken json{")
         assert rs.paper_ids_list == []
 
     def test_repr(self):
         from audia.storage.models import ResearchSession
+
         rs = ResearchSession(query="attention", paper_ids="[]")
         assert "attention" in repr(rs)
 
@@ -91,6 +98,7 @@ class TestResearchSessionModel:
 class TestDatabase:
     def test_init_db_creates_tables(self, isolated_db):
         from sqlalchemy import inspect
+
         inspector = inspect(isolated_db)
         assert "papers" in inspector.get_table_names()
         assert "audio_files" in inspector.get_table_names()

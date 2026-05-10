@@ -69,7 +69,8 @@ def heuristic_clean(text: str) -> str:
 
 # ──────────────────────────────────────────────────────────── LLM curation
 
-_SYSTEM_PROMPT = """You are an expert academic editor preparing a research paper for text-to-speech conversion.
+_SYSTEM_PROMPT = """
+You are an expert academic editor preparing a research paper for text-to-speech conversion.
 Transform the text so it reads naturally and clearly when spoken aloud.
 
 Apply ALL rules without exception:
@@ -81,7 +82,8 @@ Apply ALL rules without exception:
    If the surrounding text already summarises the table, remove the table entirely.
 3. **Remove entirely**: equation labels like (1) or (2), author affiliations,
    email addresses, DOI/URL lines, running headers, page numbers.
-4. **Acknowledgements**: Condense to one sentence: "The authors acknowledge support from [institutions]."
+4. **Acknowledgements**: Condense to one sentence:
+   "The authors acknowledge support from [institutions]."
 5. **Residual artefacts**: Remove leftover bullet symbols (•  ‣), hyphenated line-breaks (e.g. algo-
    rithm), and any remaining LaTeX commands.
 6. **Section transitions**: Preserve section headings as natural spoken transitions,
@@ -161,15 +163,14 @@ llm_clean = llm_curate
 
 # ──────────────────────────────────────────────────────────── LLM factory
 
+
 def _build_llm(cfg: Settings):
     """Instantiate a LangChain chat model; raises clearly on bad config."""
     if cfg.llm_provider == "openai":
         try:
             from langchain_openai import ChatOpenAI  # type: ignore
         except ImportError as e:
-            raise ImportError(
-                "OpenAI support requires: pip install audia[openai]"
-            ) from e
+            raise ImportError("OpenAI support requires: pip install audia[openai]") from e
         if not cfg.openai_api_key:
             raise RuntimeError(
                 "AUDIA_OPENAI_API_KEY is not set.\n"
@@ -187,9 +188,7 @@ def _build_llm(cfg: Settings):
         try:
             from langchain_anthropic import ChatAnthropic  # type: ignore
         except ImportError as e:
-            raise ImportError(
-                "Anthropic support requires: pip install audia[anthropic]"
-            ) from e
+            raise ImportError("Anthropic support requires: pip install audia[anthropic]") from e
         if not cfg.anthropic_api_key:
             raise RuntimeError(
                 "AUDIA_ANTHROPIC_API_KEY is not set.\n"
@@ -207,9 +206,7 @@ def _build_llm(cfg: Settings):
         try:
             from langchain_google_genai import ChatGoogleGenerativeAI  # type: ignore
         except ImportError as e:
-            raise ImportError(
-                "Google Gemini support requires: pip install audia[gemini]"
-            ) from e
+            raise ImportError("Google Gemini support requires: pip install audia[gemini]") from e
         if not cfg.google_api_key:
             raise RuntimeError(
                 "AUDIA_GOOGLE_API_KEY is not set.\n"
@@ -240,7 +237,7 @@ def _extract_tail(text: str, max_chars: int) -> str:
     tail = text[-max_chars:]
     # Trim to the first paragraph boundary so we don't start mid-sentence.
     first_break = tail.find("\n\n")
-    return tail[first_break + 2:] if first_break != -1 else tail
+    return tail[first_break + 2 :] if first_break != -1 else tail
 
 
 def _split_text(text: str, max_chars: int = 8000) -> list[str]:
@@ -266,6 +263,7 @@ def _split_text(text: str, max_chars: int = 8000) -> list[str]:
 
 # ──────────────────────────────────────────────────────────── main entry
 
+
 def curate_text(text: str, settings: Settings | None = None) -> str:
     """
     Full curation pipeline: heuristic pre-pass → LLM curation.
@@ -281,9 +279,7 @@ def curate_text(text: str, settings: Settings | None = None) -> str:
     cfg = settings or get_settings()
     console.print("  [dim]Heuristic pre-pass (citations, LaTeX artefacts)…[/dim]")
     preprocessed = heuristic_clean(text)
-    console.print(
-        f"  [dim]Pre-pass: {len(text):,} → {len(preprocessed):,} chars[/dim]"
-    )
+    console.print(f"  [dim]Pre-pass: {len(text):,} → {len(preprocessed):,} chars[/dim]")
     return llm_curate(preprocessed, cfg)
 
 

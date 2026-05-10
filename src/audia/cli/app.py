@@ -13,9 +13,7 @@ Commands
 from __future__ import annotations
 
 import json
-import sys
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich import print as rprint
@@ -50,6 +48,7 @@ _ASCII_BANNER = """
 def _version_callback(value: bool) -> None:
     if value:
         from audia import __version__
+
         rprint(f"audia [bold cyan]{__version__}[/bold cyan]")
         raise typer.Exit()
 
@@ -57,7 +56,7 @@ def _version_callback(value: bool) -> None:
 @app.callback()
 def _main(
     ctx: typer.Context,
-    version: Optional[bool] = typer.Option(
+    version: bool | None = typer.Option(
         None,
         "--version",
         "-V",
@@ -75,6 +74,7 @@ def _main(
 
 # ──────────────────────────────────────────────────────────── convert
 
+
 @app.command()
 def convert(
     pdf_paths: list[Path] = typer.Argument(
@@ -85,22 +85,27 @@ def convert(
         dir_okay=False,
         readable=True,
     ),
-    project: Optional[str] = typer.Option(
+    project: str | None = typer.Option(
         None,
-        "--project", "-p",
+        "--project",
+        "-p",
         help="Project name. Files are stored under ~/.audia/<project>/. Defaults to 'default'.",
     ),
-    output_dir: Optional[Path] = typer.Option(
+    output_dir: Path | None = typer.Option(
         None,
-        "--output", "-o",
+        "--output",
+        "-o",
         help="Directory for audio output. Defaults to ~/.audia/<project>/audio/",
     ),
-    voice: Optional[str] = typer.Option(
-        None, "--voice", "-v",
+    voice: str | None = typer.Option(
+        None,
+        "--voice",
+        "-v",
         help="TTS voice override (e.g. 'en-US-GuyNeural' for edge-tts).",
     ),
     open_after: bool = typer.Option(
-        False, "--open",
+        False,
+        "--open",
         help="Open the generated audio file immediately.",
     ),
 ) -> None:
@@ -113,9 +118,9 @@ def convert(
       audia convert paper.pdf --project icons
       audia convert paper1.pdf paper2.pdf --output ~/my_audio
     """
-    from audia.config import get_settings, validate_project_name
     from audia.agents.graph import run_pipeline
-    from audia.storage import init_db, get_session, AudioFile, Paper
+    from audia.config import get_settings, validate_project_name
+    from audia.storage import AudioFile, Paper, get_session, init_db
 
     cfg = get_settings()
 
@@ -177,18 +182,21 @@ def convert(
 
 # ──────────────────────────────────────────────────────────── research
 
+
 @app.command()
 def research(
     query: str = typer.Argument(..., help="Topic to search on ArXiv."),
-    max_results: int = typer.Option(
-        10, "--max", "-n", help="Maximum number of ArXiv results."
-    ),
-    output_dir: Optional[Path] = typer.Option(
-        None, "--output", "-o",
+    max_results: int = typer.Option(10, "--max", "-n", help="Maximum number of ArXiv results."),
+    output_dir: Path | None = typer.Option(
+        None,
+        "--output",
+        "-o",
         help="Directory for audio output.",
     ),
     auto_convert: bool = typer.Option(
-        False, "--convert", "-c",
+        False,
+        "--convert",
+        "-c",
         help="Automatically convert selected papers to audio.",
     ),
 ) -> None:
@@ -199,9 +207,10 @@ def research(
     Example:
       audia research "diffusion models image generation" --convert
     """
-    from audia.agents.research import ArxivSearcher
-    from audia.storage import init_db, get_session, Paper, ResearchSession
     import json
+
+    from audia.agents.research import ArxivSearcher
+    from audia.storage import Paper, get_session, init_db
 
     searcher = ArxivSearcher(max_results=max_results)
     init_db()
@@ -254,7 +263,7 @@ def research(
     for paper in selected:
         rprint(f"\n[cyan]Downloading[/cyan] {paper.title[:60]}…")
         abs_url = f"https://arxiv.org/abs/{paper.arxiv_id}"
-        pdf_path: Optional[Path] = None
+        pdf_path: Path | None = None
         try:
             pdf_path = searcher.download_pdf(paper)
         except Exception as exc:
@@ -312,12 +321,11 @@ def research(
 
 # ──────────────────────────────────────────────────────────── listen
 
+
 @app.command()
 def listen(
-    seconds: int = typer.Option(
-        30, "--seconds", "-s", help="Max recording duration in seconds."
-    ),
-    output_dir: Optional[Path] = typer.Option(
+    seconds: int = typer.Option(30, "--seconds", "-s", help="Max recording duration in seconds."),
+    output_dir: Path | None = typer.Option(
         None, "--output", "-o", help="Directory for audio output."
     ),
 ) -> None:
@@ -326,7 +334,7 @@ def listen(
 
     Pipeline: record → transcribe → LLM extracts search query → confirm → research
     """
-    from audia.agents.stt import record_and_transcribe, distill_search_query
+    from audia.agents.stt import distill_search_query, record_and_transcribe
 
     while True:
         rprint("[cyan]Listening…[/cyan] Speak your research topic.")
@@ -337,10 +345,14 @@ def listen(
         query = distill_search_query(speech)
         rprint(f"[bold cyan]Search query:[/bold cyan] {query}")
 
-        choice = typer.prompt(
-            "Search ArXiv with this query? [y=yes / r=re-record / q=quit]",
-            default="y",
-        ).strip().lower()
+        choice = (
+            typer.prompt(
+                "Search ArXiv with this query? [y=yes / r=re-record / q=quit]",
+                default="y",
+            )
+            .strip()
+            .lower()
+        )
 
         if choice in ("y", "yes", ""):
             break
@@ -362,6 +374,7 @@ def listen(
 
 # ──────────────────────────────────────────────────────────── serve
 
+
 @app.command()
 def serve(
     host: str = typer.Option(None, "--host", "-h", help="Server host."),
@@ -375,6 +388,7 @@ def serve(
     Launches a FastAPI server.  Open http://localhost:8000 in your browser.
     """
     import uvicorn
+
     from audia.config import get_settings
     from audia.storage import init_db
 
@@ -419,11 +433,12 @@ def serve(
 
 # ──────────────────────────────────────────────────────────── info
 
+
 @app.command()
 def info() -> None:
     """Show current configuration."""
-    from audia.config import get_settings
     from audia import __version__
+    from audia.config import get_settings
 
     cfg = get_settings()
     table = Table(title=f"audia v{__version__} – Configuration", show_header=False)
@@ -449,9 +464,10 @@ def info() -> None:
 
 # ──────────────────────────────────────────────────────────── helpers
 
+
 def _open_file(path: str) -> None:
-    import subprocess
     import platform
+    import subprocess
 
     system = platform.system()
     if system == "Darwin":
@@ -460,6 +476,7 @@ def _open_file(path: str) -> None:
         subprocess.call(["xdg-open", path])
     elif system == "Windows":
         import os
+
         os.startfile(path)
 
 

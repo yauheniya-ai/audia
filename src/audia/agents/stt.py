@@ -5,7 +5,6 @@ Speech-to-Text input – record from microphone and transcribe.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 
 def record_and_transcribe(
@@ -42,7 +41,7 @@ def record_and_transcribe(
         sd.stop()
     print("[audia] Recording finished.")
 
-    audio_1d: "np.ndarray" = audio.flatten()
+    audio_1d: np.ndarray = audio.flatten()
     return _transcribe_array(audio_1d, samplerate, model_size, device)
 
 
@@ -61,13 +60,14 @@ def transcribe_file(
 
 
 def _transcribe_array(
-    audio: "object",
+    audio: object,
     samplerate: int,
     model_size: str,
     device: str,
 ) -> str:
     """Transcribe a NumPy float32 array using faster-whisper."""
     import tempfile
+
     import soundfile as sf  # type: ignore
     from faster_whisper import WhisperModel  # type: ignore
 
@@ -92,9 +92,10 @@ def distill_search_query(speech: str) -> str:
     >>> distill_search_query("I would like to research about agentic AI.")
     'agentic AI research'
     """
-    from audia.config import get_settings
-    from audia.agents.text_cleaner import _build_llm
     from langchain_core.messages import HumanMessage, SystemMessage  # type: ignore
+
+    from audia.agents.text_cleaner import _build_llm
+    from audia.config import get_settings
 
     cfg = get_settings()
     llm = _build_llm(cfg)
@@ -125,6 +126,5 @@ def _ensure_stt_deps() -> None:
     if missing:
         deps = " ".join(missing)
         raise ImportError(
-            f"STT requires extra dependencies: pip install audia[stt]\n"
-            f"Missing: {deps}"
+            f"STT requires extra dependencies: pip install audia[stt]\nMissing: {deps}"
         )

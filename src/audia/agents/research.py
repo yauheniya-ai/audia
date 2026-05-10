@@ -10,12 +10,10 @@ from __future__ import annotations
 import calendar
 import html as _html
 import re
-import shutil
 import urllib.parse
 import urllib.request
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 from rich import print as rprint
 
@@ -31,8 +29,8 @@ class ArxivPaper:
     authors: list[str]
     abstract: str
     pdf_url: str
-    published: str          # ISO date string
-    local_pdf_path: Optional[str] = None
+    published: str  # ISO date string
+    local_pdf_path: str | None = None
 
 
 class ArxivSearcher:
@@ -75,7 +73,10 @@ class ArxivSearcher:
         except Exception as exc:
             msg = str(exc)
             if "429" in msg:
-                rprint("[yellow]Page request resulted in HTTP 429 — starting alternative search…[/yellow]")
+                rprint(
+                    "[yellow]Page request resulted in HTTP 429"
+                    " — starting alternative search…[/yellow]"
+                )
             else:
                 rprint("[yellow]ArXiv API unavailable — starting alternative search…[/yellow]")
 
@@ -84,48 +85,36 @@ class ArxivSearcher:
     def _html_search(self, query: str) -> list[ArxivPaper]:
         """Fallback: scrape arxiv.org/search HTML when the API is unavailable."""
         q = urllib.parse.quote_plus(query)
-        url = (
-            f"https://arxiv.org/search/?query={q}"
-            "&searchtype=all&source=header&start=0"
-        )
-        req = urllib.request.Request(
-            url, headers={"User-Agent": "audia/0.1 (research fallback)"}
-        )
+        url = f"https://arxiv.org/search/?query={q}&searchtype=all&source=header&start=0"
+        req = urllib.request.Request(url, headers={"User-Agent": "audia/0.1 (research fallback)"})
         with urllib.request.urlopen(req, timeout=40) as resp:
             body = resp.read().decode("utf-8", errors="replace")
 
         papers: list[ArxivPaper] = []
-        for block in re.findall(
-            r'<li class="arxiv-result">(.*?)</li>', body, re.DOTALL
-        ):
-            id_m = re.search(r'arxiv\.org/abs/([\.\w]+)', block)
+        for block in re.findall(r'<li class="arxiv-result">(.*?)</li>', body, re.DOTALL):
+            id_m = re.search(r"arxiv\.org/abs/([\.\w]+)", block)
             if not id_m:
                 continue
             arxiv_id = id_m.group(1)
 
             title_m = re.search(r'<p class="title[^"]*">(.*?)</p>', block, re.DOTALL)
-            title = re.sub(r'<[^>]+>', '', title_m.group(1)).strip() if title_m else arxiv_id
+            title = re.sub(r"<[^>]+>", "", title_m.group(1)).strip() if title_m else arxiv_id
 
             authors_m = re.search(r'<p class="authors">(.*?)</p>', block, re.DOTALL)
             authors: list[str] = []
             if authors_m:
-                raw_authors = re.sub(r'<[^>]+>', '', authors_m.group(1))
-                authors = [a.strip() for a in raw_authors.split(',') if a.strip()]
+                raw_authors = re.sub(r"<[^>]+>", "", authors_m.group(1))
+                authors = [a.strip() for a in raw_authors.split(",") if a.strip()]
 
-            date_m = re.match(r'(\d{2})(\d{2})\.', arxiv_id)
+            date_m = re.match(r"(\d{2})(\d{2})\.", arxiv_id)
             if date_m:
                 yy, mm = int(date_m.group(1)), int(date_m.group(2))
                 published = f"{calendar.month_abbr[mm]} {2000 + yy}"
             else:
                 published = ""
 
-            abstract_m = re.search(
-                r'<span class="abstract-[^"]*">(.*?)</span>', block, re.DOTALL
-            )
-            abstract = (
-                re.sub(r'<[^>]+>', '', abstract_m.group(1)).strip()
-                if abstract_m else ""
-            )
+            abstract_m = re.search(r'<span class="abstract-[^"]*">(.*?)</span>', block, re.DOTALL)
+            abstract = re.sub(r"<[^>]+>", "", abstract_m.group(1)).strip() if abstract_m else ""
 
             papers.append(
                 ArxivPaper(

@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import pytest
 from typer.testing import CliRunner
 
 from audia.cli.app import app
@@ -16,6 +14,7 @@ runner = CliRunner()
 class TestVersionFlag:
     def test_version(self):
         from audia import __version__
+
         result = runner.invoke(app, ["--version"])
         assert result.exit_code == 0
         assert "audia" in result.output
@@ -37,14 +36,17 @@ class TestConvertCommand:
         assert result.exit_code != 0
 
     def test_existing_file_accepted_by_typer(self, tmp_path):
-        """Typer `exists=True` only checks the file exists; extension is not validated by the CLI."""
+        """Typer `exists=True` only checks the file exists;
+        extension is not validated by the CLI."""
         txt = tmp_path / "doc.txt"
         txt.write_text("hello")
         # The CLI will accept it and attempt to run the pipeline – we patch that out.
         mock_state = {"error": "not a pdf", "audio_path": None}
-        with patch("audia.agents.graph.run_pipeline", return_value=mock_state), \
-             patch("audia.storage.init_db"), \
-             patch("audia.config.get_settings") as mock_cfg:
+        with (
+            patch("audia.agents.graph.run_pipeline", return_value=mock_state),
+            patch("audia.storage.init_db"),
+            patch("audia.config.get_settings") as mock_cfg,
+        ):
             mock_cfg.return_value = MagicMock(tts_voice="en-US-AriaNeural", tts_backend="edge-tts")
             result = runner.invoke(app, ["convert", str(txt)])
         # Error reported (non-zero) because pipeline returned an error
@@ -75,9 +77,11 @@ class TestConvertCommand:
         mock_session_ctx.__enter__ = MagicMock(return_value=MagicMock())
         mock_session_ctx.__exit__ = MagicMock(return_value=False)
 
-        with patch("audia.agents.graph.run_pipeline", return_value=mock_state), \
-             patch("audia.storage.database.init_db"), \
-             patch("audia.storage.database.get_session", return_value=mock_session_ctx):
+        with (
+            patch("audia.agents.graph.run_pipeline", return_value=mock_state),
+            patch("audia.storage.database.init_db"),
+            patch("audia.storage.database.get_session", return_value=mock_session_ctx),
+        ):
             result = runner.invoke(app, ["convert", str(pdf)])
 
         assert result.exit_code == 0
@@ -92,8 +96,10 @@ class TestConvertCommand:
 
         mock_state = {"error": "PDF extraction failed", "audio_path": None}
 
-        with patch("audia.agents.graph.run_pipeline", return_value=mock_state), \
-             patch("audia.storage.database.init_db"):
+        with (
+            patch("audia.agents.graph.run_pipeline", return_value=mock_state),
+            patch("audia.storage.database.init_db"),
+        ):
             result = runner.invoke(app, ["convert", str(pdf)])
 
         assert result.exit_code != 0
@@ -105,17 +111,15 @@ class TestServeCommand:
         monkeypatch.setenv("AUDIA_DATA_DIR", str(tmp_path))
         monkeypatch.setenv("AUDIA_LLM_PROVIDER", "openai")
         # `uvicorn` is imported inside serve(), so patch at source
-        with patch("uvicorn.run") as mock_run, \
-             patch("audia.storage.database.init_db"):
-            result = runner.invoke(app, ["serve"])
+        with patch("uvicorn.run") as mock_run, patch("audia.storage.database.init_db"):
+            runner.invoke(app, ["serve"])
         mock_run.assert_called_once()
 
     def test_serve_custom_host_port(self, tmp_path, monkeypatch):
         monkeypatch.setenv("AUDIA_DATA_DIR", str(tmp_path))
         monkeypatch.setenv("AUDIA_LLM_PROVIDER", "openai")
-        with patch("uvicorn.run") as mock_run, \
-             patch("audia.storage.database.init_db"):
-            result = runner.invoke(app, ["serve", "--host", "0.0.0.0", "--port", "9000", "--no-browser"])
+        with patch("uvicorn.run") as mock_run, patch("audia.storage.database.init_db"):
+            runner.invoke(app, ["serve", "--host", "0.0.0.0", "--port", "9000", "--no-browser"])
         args, kwargs = mock_run.call_args
         assert kwargs.get("host") == "0.0.0.0" or args[1] == "0.0.0.0"
 
@@ -124,8 +128,10 @@ class TestResearchCommand:
     def test_research_no_results(self, tmp_path, monkeypatch):
         monkeypatch.setenv("AUDIA_DATA_DIR", str(tmp_path))
         monkeypatch.setenv("AUDIA_LLM_PROVIDER", "openai")
-        with patch("audia.agents.research.ArxivSearcher") as mock_cls, \
-             patch("audia.storage.database.init_db"):
+        with (
+            patch("audia.agents.research.ArxivSearcher") as mock_cls,
+            patch("audia.storage.database.init_db"),
+        ):
             mock_cls.return_value.search.return_value = []
             result = runner.invoke(app, ["research", "quantum computing"])
         assert result.exit_code == 0
@@ -148,8 +154,10 @@ class TestResearchCommand:
             )
             for i in range(3)
         ]
-        with patch("audia.agents.research.ArxivSearcher") as mock_cls, \
-             patch("audia.storage.database.init_db"):
+        with (
+            patch("audia.agents.research.ArxivSearcher") as mock_cls,
+            patch("audia.storage.database.init_db"),
+        ):
             mock_cls.return_value.search.return_value = papers
             # 'q' to quit the prompt
             result = runner.invoke(app, ["research", "neural nets"], input="q\n")
@@ -188,10 +196,12 @@ class TestResearchCommand:
         mock_session_ctx.__enter__ = MagicMock(return_value=MagicMock())
         mock_session_ctx.__exit__ = MagicMock(return_value=False)
 
-        with patch("audia.agents.research.ArxivSearcher") as mock_cls, \
-             patch("audia.storage.database.init_db"), \
-             patch("audia.agents.graph.run_pipeline", return_value=mock_state), \
-             patch("audia.storage.database.get_session", return_value=mock_session_ctx):
+        with (
+            patch("audia.agents.research.ArxivSearcher") as mock_cls,
+            patch("audia.storage.database.init_db"),
+            patch("audia.agents.graph.run_pipeline", return_value=mock_state),
+            patch("audia.storage.database.get_session", return_value=mock_session_ctx),
+        ):
             mock_cls.return_value.search.return_value = [paper]
             mock_cls.return_value.download_pdf.return_value = fake_pdf
             result = runner.invoke(app, ["research", "neural nets", "--convert"])
@@ -233,10 +243,12 @@ class TestResearchCommand:
         mock_session_ctx.__enter__ = MagicMock(return_value=MagicMock())
         mock_session_ctx.__exit__ = MagicMock(return_value=False)
 
-        with patch("audia.agents.research.ArxivSearcher") as mock_cls, \
-             patch("audia.storage.database.init_db"), \
-             patch("audia.agents.graph.run_pipeline", return_value=mock_state), \
-             patch("audia.storage.database.get_session", return_value=mock_session_ctx):
+        with (
+            patch("audia.agents.research.ArxivSearcher") as mock_cls,
+            patch("audia.storage.database.init_db"),
+            patch("audia.agents.graph.run_pipeline", return_value=mock_state),
+            patch("audia.storage.database.get_session", return_value=mock_session_ctx),
+        ):
             mock_cls.return_value.search.return_value = papers
             mock_cls.return_value.download_pdf.return_value = fake_pdf
             result = runner.invoke(app, ["research", "neural nets"], input="all\n")
@@ -261,8 +273,10 @@ class TestResearchCommand:
             )
         ]
 
-        with patch("audia.agents.research.ArxivSearcher") as mock_cls, \
-             patch("audia.storage.database.init_db"):
+        with (
+            patch("audia.agents.research.ArxivSearcher") as mock_cls,
+            patch("audia.storage.database.init_db"),
+        ):
             mock_cls.return_value.search.return_value = papers
             # Enter '99' which is out of range → selected = []
             result = runner.invoke(app, ["research", "ai"], input="99\n")
@@ -287,10 +301,12 @@ class TestResearchCommand:
             published="2023-01-01",
         )
 
-        with patch("audia.agents.research.ArxivSearcher") as mock_cls, \
-             patch("audia.storage.database.init_db"):
+        with (
+            patch("audia.agents.research.ArxivSearcher") as mock_cls,
+            patch("audia.storage.database.init_db"),
+        ):
             mock_cls.return_value.search.return_value = [paper]
-            mock_cls.return_value.download_pdf.side_effect = IOError("network error")
+            mock_cls.return_value.download_pdf.side_effect = OSError("network error")
             # auto_convert=True so no paper selection prompt; empty manual path = skip
             result = runner.invoke(app, ["research", "ai", "--convert"], input="\n")
 
@@ -329,12 +345,14 @@ class TestResearchCommand:
         mock_session_ctx.__enter__ = MagicMock(return_value=MagicMock())
         mock_session_ctx.__exit__ = MagicMock(return_value=False)
 
-        with patch("audia.agents.research.ArxivSearcher") as mock_cls, \
-             patch("audia.storage.database.init_db"), \
-             patch("audia.agents.graph.run_pipeline", return_value=mock_state), \
-             patch("audia.storage.database.get_session", return_value=mock_session_ctx):
+        with (
+            patch("audia.agents.research.ArxivSearcher") as mock_cls,
+            patch("audia.storage.database.init_db"),
+            patch("audia.agents.graph.run_pipeline", return_value=mock_state),
+            patch("audia.storage.database.get_session", return_value=mock_session_ctx),
+        ):
             mock_cls.return_value.search.return_value = [paper]
-            mock_cls.return_value.download_pdf.side_effect = IOError("network error")
+            mock_cls.return_value.download_pdf.side_effect = OSError("network error")
             result = runner.invoke(
                 app,
                 ["research", "ai", "--convert"],
@@ -377,10 +395,12 @@ class TestConvertOpenFlag:
         mock_session_ctx.__enter__ = MagicMock(return_value=MagicMock())
         mock_session_ctx.__exit__ = MagicMock(return_value=False)
 
-        with patch("audia.agents.graph.run_pipeline", return_value=mock_state), \
-             patch("audia.storage.database.init_db"), \
-             patch("audia.storage.database.get_session", return_value=mock_session_ctx), \
-             patch("audia.cli.app._open_file") as mock_open:
+        with (
+            patch("audia.agents.graph.run_pipeline", return_value=mock_state),
+            patch("audia.storage.database.init_db"),
+            patch("audia.storage.database.get_session", return_value=mock_session_ctx),
+            patch("audia.cli.app._open_file") as mock_open,
+        ):
             result = runner.invoke(app, ["convert", str(pdf), "--open"])
 
         assert result.exit_code == 0
@@ -393,15 +413,16 @@ class TestServeWithBrowser:
         monkeypatch.setenv("AUDIA_DATA_DIR", str(tmp_path))
         monkeypatch.setenv("AUDIA_LLM_PROVIDER", "openai")
 
-        with patch("uvicorn.run"), \
-             patch("audia.storage.database.init_db"), \
-             patch("socket.create_connection"), \
-             patch("webbrowser.open") as mock_browser, \
-             patch("time.sleep"):
+        with (
+            patch("uvicorn.run"),
+            patch("audia.storage.database.init_db"),
+            patch("socket.create_connection"),
+            patch("webbrowser.open"),
+            patch("time.sleep"),
+        ):
             result = runner.invoke(app, ["serve", "--no-browser"])
 
         assert result.exit_code == 0
-
 
 
 class TestInfoCommandExtended:
@@ -447,9 +468,11 @@ class TestConvertVoiceAndOpen:
         mock_session_ctx.__enter__ = MagicMock(return_value=MagicMock())
         mock_session_ctx.__exit__ = MagicMock(return_value=False)
 
-        with patch("audia.agents.graph.run_pipeline", return_value=mock_state), \
-             patch("audia.storage.database.init_db"), \
-             patch("audia.storage.database.get_session", return_value=mock_session_ctx):
+        with (
+            patch("audia.agents.graph.run_pipeline", return_value=mock_state),
+            patch("audia.storage.database.init_db"),
+            patch("audia.storage.database.get_session", return_value=mock_session_ctx),
+        ):
             result = runner.invoke(app, ["convert", str(pdf), "--voice", "en-US-GuyNeural"])
 
         assert result.exit_code == 0
@@ -478,10 +501,12 @@ class TestConvertVoiceAndOpen:
         mock_session_ctx.__enter__ = MagicMock(return_value=MagicMock())
         mock_session_ctx.__exit__ = MagicMock(return_value=False)
 
-        with patch("audia.agents.graph.run_pipeline", return_value=mock_state), \
-             patch("audia.storage.database.init_db"), \
-             patch("audia.storage.database.get_session", return_value=mock_session_ctx), \
-             patch("audia.cli.app._open_file") as mock_open:
+        with (
+            patch("audia.agents.graph.run_pipeline", return_value=mock_state),
+            patch("audia.storage.database.init_db"),
+            patch("audia.storage.database.get_session", return_value=mock_session_ctx),
+            patch("audia.cli.app._open_file") as mock_open,
+        ):
             result = runner.invoke(app, ["convert", str(pdf), "--open"])
 
         assert result.exit_code == 0
@@ -494,8 +519,7 @@ class TestOpenFileHelper:
     def test_darwin(self, tmp_path):
         from audia.cli.app import _open_file
 
-        with patch("platform.system", return_value="Darwin"), \
-             patch("subprocess.call") as mock_call:
+        with patch("platform.system", return_value="Darwin"), patch("subprocess.call") as mock_call:
             _open_file(str(tmp_path))
 
         mock_call.assert_called_once_with(["open", str(tmp_path)])
@@ -503,8 +527,7 @@ class TestOpenFileHelper:
     def test_linux(self, tmp_path):
         from audia.cli.app import _open_file
 
-        with patch("platform.system", return_value="Linux"), \
-             patch("subprocess.call") as mock_call:
+        with patch("platform.system", return_value="Linux"), patch("subprocess.call") as mock_call:
             _open_file(str(tmp_path))
 
         mock_call.assert_called_once_with(["xdg-open", str(tmp_path)])
@@ -512,8 +535,10 @@ class TestOpenFileHelper:
     def test_windows(self, tmp_path):
         from audia.cli.app import _open_file
 
-        with patch("platform.system", return_value="Windows"), \
-             patch("os.startfile", create=True) as mock_sf:
+        with (
+            patch("platform.system", return_value="Windows"),
+            patch("os.startfile", create=True) as mock_sf,
+        ):
             _open_file(str(tmp_path))
 
         mock_sf.assert_called_once_with(str(tmp_path))
@@ -524,10 +549,12 @@ class TestListenCommand:
         monkeypatch.setenv("AUDIA_DATA_DIR", str(tmp_path))
         monkeypatch.setenv("AUDIA_LLM_PROVIDER", "openai")
 
-        with patch("audia.agents.stt.record_and_transcribe", return_value="neural nets"), \
-             patch("audia.agents.stt.distill_search_query", return_value="neural networks"), \
-             patch("audia.agents.research.ArxivSearcher") as mock_cls, \
-             patch("audia.storage.database.init_db"):
+        with (
+            patch("audia.agents.stt.record_and_transcribe", return_value="neural nets"),
+            patch("audia.agents.stt.distill_search_query", return_value="neural networks"),
+            patch("audia.agents.research.ArxivSearcher") as mock_cls,
+            patch("audia.storage.database.init_db"),
+        ):
             mock_cls.return_value.search.return_value = []
             result = runner.invoke(app, ["listen"], input="y\n")
 
@@ -570,10 +597,12 @@ class TestResearchCommandEdgeCases:
         mock_session_ctx.__enter__ = MagicMock(return_value=MagicMock())
         mock_session_ctx.__exit__ = MagicMock(return_value=False)
 
-        with patch("audia.agents.research.ArxivSearcher") as mock_cls, \
-             patch("audia.storage.database.init_db"), \
-             patch("audia.agents.graph.run_pipeline", return_value=mock_state), \
-             patch("audia.storage.database.get_session", return_value=mock_session_ctx):
+        with (
+            patch("audia.agents.research.ArxivSearcher") as mock_cls,
+            patch("audia.storage.database.init_db"),
+            patch("audia.agents.graph.run_pipeline", return_value=mock_state),
+            patch("audia.storage.database.get_session", return_value=mock_session_ctx),
+        ):
             mock_cls.return_value.search.return_value = [paper]
             mock_cls.return_value.download_pdf.return_value = fake_pdf
             result = runner.invoke(app, ["research", "neural nets"], input="all\n")
@@ -595,12 +624,15 @@ class TestResearchCommandEdgeCases:
             published="2023-01-01",
         )
 
-        with patch("audia.agents.research.ArxivSearcher") as mock_cls, \
-             patch("audia.storage.database.init_db"):
+        with (
+            patch("audia.agents.research.ArxivSearcher") as mock_cls,
+            patch("audia.storage.database.init_db"),
+        ):
             mock_cls.return_value.search.return_value = [paper]
-            mock_cls.return_value.download_pdf.side_effect = IOError("network down")
-            result = runner.invoke(app, ["research", "neural nets", "--convert"],
-                                   input="\n")  # skip manual-path prompt
+            mock_cls.return_value.download_pdf.side_effect = OSError("network down")
+            result = runner.invoke(
+                app, ["research", "neural nets", "--convert"], input="\n"
+            )  # skip manual-path prompt
 
         assert result.exit_code == 0
         assert "Download failed" in result.output
@@ -620,8 +652,10 @@ class TestResearchCommandEdgeCases:
             published="2023-01-01",
         )
 
-        with patch("audia.agents.research.ArxivSearcher") as mock_cls, \
-             patch("audia.storage.database.init_db"):
+        with (
+            patch("audia.agents.research.ArxivSearcher") as mock_cls,
+            patch("audia.storage.database.init_db"),
+        ):
             mock_cls.return_value.search.return_value = [paper]
             # Input empty selection (becomes "0": maps to nothing valid if index 0 is 1-indexed)
             result = runner.invoke(app, ["research", "neural nets"], input="99\n")

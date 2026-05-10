@@ -5,8 +5,8 @@ Supports per-project databases: each project lives under ~/.audia/<project>/.
 
 from __future__ import annotations
 
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Generator
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
@@ -49,9 +49,7 @@ def engine(project: str | None = None):
 def _session_factory(project: str | None = None) -> sessionmaker:
     name = _resolve(project)
     if name not in _factories:
-        _factories[name] = sessionmaker(
-            bind=engine(name), autocommit=False, autoflush=False
-        )
+        _factories[name] = sessionmaker(bind=engine(name), autocommit=False, autoflush=False)
     return _factories[name]
 
 

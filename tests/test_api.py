@@ -3,9 +3,6 @@
 from __future__ import annotations
 
 import io
-import json
-import tempfile
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -18,11 +15,12 @@ def client(tmp_path_factory):
     tmp = tmp_path_factory.mktemp("audia_test")
 
     # Patch Settings so data_dir points at tmp; also wire the DB singletons.
-    import audia.storage.database as db_mod
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
-    from audia.storage.models import Base
+
+    import audia.storage.database as db_mod
     from audia.config import Settings
+    from audia.storage.models import Base
 
     test_engine = create_engine(f"sqlite:///{tmp / 'test.db'}")
     Base.metadata.create_all(bind=test_engine)
@@ -40,6 +38,7 @@ def client(tmp_path_factory):
 
     with patch("audia.config.get_settings", return_value=settings):
         from audia.ui.app import create_app
+
         app = create_app()
         yield TestClient(app)
 
@@ -119,13 +118,13 @@ class TestLibraryEndpoints:
 
     def _seed_audio_file(self, tmp_path):
         """Create an AudioFile row (and a parent Paper) and return the audio id."""
-        import audia.storage.database as db_mod
-        from audia.storage.models import Paper, AudioFile
+        from audia.storage.models import AudioFile, Paper
 
         audio_file = tmp_path / "test_audio.mp3"
         audio_file.write_bytes(b"AUDIO")
 
         from audia.storage.database import get_session
+
         with get_session() as session:
             paper = Paper(title="Seed Paper", authors="[]", pdf_path="/tmp/x.pdf")
             session.add(paper)
@@ -217,7 +216,7 @@ class TestResearchEndpoints:
         )
         with patch("audia.ui.routes.research.ArxivSearcher") as mock_cls:
             mock_cls.return_value.search.return_value = [fake_paper]
-            mock_cls.return_value.download_pdf.side_effect = IOError("disk full")
+            mock_cls.return_value.download_pdf.side_effect = OSError("disk full")
             res = client.post(
                 "/api/research/convert",
                 json={"arxiv_ids": ["2301.00001v1"]},
@@ -239,8 +238,10 @@ class TestResearchEndpoints:
         )
         fake_pdf = tmp_path / "fake.pdf"
         fake_pdf.write_bytes(b"%PDF")
-        with patch("audia.ui.routes.research.ArxivSearcher") as mock_cls, \
-             patch("audia.ui.routes.research.run_pipeline", return_value={"error": "oops"}):
+        with (
+            patch("audia.ui.routes.research.ArxivSearcher") as mock_cls,
+            patch("audia.ui.routes.research.run_pipeline", return_value={"error": "oops"}),
+        ):
             mock_cls.return_value.search.return_value = [fake_paper]
             mock_cls.return_value.download_pdf.return_value = fake_pdf
             res = client.post(
@@ -274,8 +275,10 @@ class TestResearchEndpoints:
             "tts_voice": "en-US-AriaNeural",
             "error": None,
         }
-        with patch("audia.ui.routes.research.ArxivSearcher") as mock_cls, \
-             patch("audia.ui.routes.research.run_pipeline", return_value=mock_state):
+        with (
+            patch("audia.ui.routes.research.ArxivSearcher") as mock_cls,
+            patch("audia.ui.routes.research.run_pipeline", return_value=mock_state),
+        ):
             mock_cls.return_value.search.return_value = [fake_paper]
             mock_cls.return_value.download_pdf.return_value = fake_pdf
             res = client.post(
@@ -289,6 +292,7 @@ class TestResearchEndpoints:
 
 
 # ─────────────────────────────────────────────── Settings routes
+
 
 class TestSettingsRoutes:
     def test_get_settings_returns_defaults(self, client):
@@ -320,9 +324,11 @@ class TestSettingsRoutes:
 
 # ─────────────────────────────────────────────── Convert job endpoints
 
+
 class TestConvertJobEndpoints:
     def test_enqueue_non_pdf_rejected(self, client):
         import io
+
         res = client.post(
             "/api/convert/enqueue",
             files={"file": ("doc.txt", io.BytesIO(b"text"), "text/plain")},
@@ -331,6 +337,7 @@ class TestConvertJobEndpoints:
 
     def test_enqueue_returns_job_id(self, client):
         import io
+
         res = client.post(
             "/api/convert/enqueue",
             files={"file": ("paper.pdf", io.BytesIO(b"%PDF-1.4\n%%EOF"), "application/pdf")},
@@ -344,6 +351,7 @@ class TestConvertJobEndpoints:
 
     def test_job_status_found(self, client):
         from audia.ui.jobs import JOBS
+
         jid = "convert_status_test"
         JOBS[jid] = {"status": "running", "stage": "queued", "log": [], "progress": 2}
         try:
@@ -359,10 +367,14 @@ class TestConvertJobEndpoints:
 
     def test_cancel_running_job(self, client):
         from audia.ui.jobs import JOBS
+
         jid = "convert_cancel_test"
         JOBS[jid] = {
-            "status": "running", "stage": "curating", "log": [],
-            "cancelled": False, "stage_label": "Curating",
+            "status": "running",
+            "stage": "curating",
+            "log": [],
+            "cancelled": False,
+            "stage_label": "Curating",
         }
         try:
             res = client.delete(f"/api/convert/jobs/{jid}")
@@ -374,10 +386,14 @@ class TestConvertJobEndpoints:
 
     def test_cancel_non_running_job_is_noop(self, client):
         from audia.ui.jobs import JOBS
+
         jid = "convert_done_test"
         JOBS[jid] = {
-            "status": "done", "stage": "done", "log": [],
-            "cancelled": False, "stage_label": "Complete",
+            "status": "done",
+            "stage": "done",
+            "log": [],
+            "cancelled": False,
+            "stage_label": "Complete",
         }
         try:
             res = client.delete(f"/api/convert/jobs/{jid}")
@@ -392,6 +408,7 @@ class TestConvertJobEndpoints:
 
     def test_serve_job_pdf_no_path(self, client):
         from audia.ui.jobs import JOBS
+
         jid = "convert_pdf_none"
         JOBS[jid] = {"status": "running", "pdf_path": None, "log": []}
         try:
@@ -402,6 +419,7 @@ class TestConvertJobEndpoints:
 
     def test_serve_job_pdf_file_exists(self, client, tmp_path):
         from audia.ui.jobs import JOBS
+
         fake_pdf = tmp_path / "job.pdf"
         fake_pdf.write_bytes(b"%PDF-1.4")
         jid = "convert_pdf_real"
@@ -419,9 +437,8 @@ class TestConvertJobEndpoints:
 
     def test_download_audio_file_missing_on_disk(self, client):
         """DB record exists but file is gone from disk → 404."""
-        import io
         from audia.storage.database import get_session
-        from audia.storage.models import Paper, AudioFile
+        from audia.storage.models import AudioFile, Paper
 
         with get_session() as session:
             paper = Paper(title="DL Paper", authors="[]", pdf_path="/tmp/dl.pdf")
@@ -442,9 +459,8 @@ class TestConvertJobEndpoints:
         assert res.status_code == 404
 
     def test_download_audio_success(self, client, tmp_path):
-        import io
         from audia.storage.database import get_session
-        from audia.storage.models import Paper, AudioFile
+        from audia.storage.models import AudioFile, Paper
 
         real_audio = tmp_path / "real_out.mp3"
         real_audio.write_bytes(b"ID3\x00FAKE_MP3")
@@ -470,6 +486,7 @@ class TestConvertJobEndpoints:
 
 
 # ─────────────────────────────────────────────── Research job endpoints
+
 
 class TestResearchJobEndpoints:
     def test_normalize_success(self, client):
@@ -504,8 +521,9 @@ class TestResearchJobEndpoints:
         assert res.status_code == 200
 
     def test_normalize_error_returns_500(self, client):
-        with patch("audia.agents.text_cleaner._build_llm",
-                   side_effect=RuntimeError("API key missing")):
+        with patch(
+            "audia.agents.text_cleaner._build_llm", side_effect=RuntimeError("API key missing")
+        ):
             res = client.post(
                 "/api/research/normalize",
                 json={"query": "something"},
@@ -530,6 +548,7 @@ class TestResearchJobEndpoints:
 
     def test_research_status_found(self, client):
         from audia.ui.jobs import JOBS
+
         jid = "research_status_test"
         JOBS[jid] = {"status": "running", "stage": "searching", "log": [], "progress": 5}
         try:
@@ -545,10 +564,14 @@ class TestResearchJobEndpoints:
 
     def test_research_cancel_running(self, client):
         from audia.ui.jobs import JOBS
+
         jid = "research_cancel_test"
         JOBS[jid] = {
-            "status": "running", "stage": "downloading", "log": [],
-            "cancelled": False, "stage_label": "Downloading",
+            "status": "running",
+            "stage": "downloading",
+            "log": [],
+            "cancelled": False,
+            "stage_label": "Downloading",
         }
         try:
             res = client.delete(f"/api/research/jobs/{jid}")
@@ -563,6 +586,7 @@ class TestResearchJobEndpoints:
 
     def test_research_serve_pdf_file_exists(self, client, tmp_path):
         from audia.ui.jobs import JOBS
+
         fake_pdf = tmp_path / "research.pdf"
         fake_pdf.write_bytes(b"%PDF-1.4")
         jid = "research_pdf_real"
@@ -575,6 +599,7 @@ class TestResearchJobEndpoints:
 
     def test_transcribe_audio(self, client):
         import io
+
         with patch("audia.agents.stt.transcribe_file", return_value="hello world"):
             res = client.post(
                 "/api/research/transcribe",
@@ -586,10 +611,11 @@ class TestResearchJobEndpoints:
 
 # ─────────────────────────────────────────────── Library extended CRUD
 
+
 class TestLibraryExtended:
     def _seed_paper_with_audio(self, tmp_path):
         from audia.storage.database import get_session
-        from audia.storage.models import Paper, AudioFile
+        from audia.storage.models import AudioFile, Paper
 
         audio_file = tmp_path / f"lib_ext_{id(self)}.mp3"
         audio_file.write_bytes(b"AUDIO_DATA")
@@ -720,6 +746,7 @@ class TestLibraryExtended:
 
 
 # ─────────────────────────────────────────────── UI app / SPA
+
 
 class TestUIApp:
     def test_api_info_endpoint(self, client):

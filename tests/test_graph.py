@@ -2,13 +2,10 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import pytest
-
-
 # ─────────────────────────────────────────────── helper nodes (unit)
+
 
 class TestNodeExtractText:
     def test_success(self, tmp_path):
@@ -40,11 +37,13 @@ class TestNodeExtractText:
 class TestNodePreprocess:
     def test_skipped_on_error(self):
         from audia.agents.graph import node_preprocess
+
         out = node_preprocess({"error": "something went wrong", "raw_text": "text"})
         assert out == {}
 
     def test_cleans_text(self):
         from audia.agents.graph import node_preprocess
+
         state = {"raw_text": "Neural networks [1] are powerful [2,3]."}
         out = node_preprocess(state)
         assert "[1]" not in out["preprocessed_text"]
@@ -54,6 +53,7 @@ class TestNodePreprocess:
 class TestNodeCurate:
     def test_skipped_on_error(self):
         from audia.agents.graph import node_curate
+
         out = node_curate({"error": "boom"})
         assert out == {}
 
@@ -63,8 +63,10 @@ class TestNodeCurate:
 
         cfg = Settings(data_dir=tmp_path, llm_provider="openai", openai_api_key="sk-x")
 
-        with patch("audia.agents.graph.get_settings", return_value=cfg), \
-             patch("audia.agents.graph.llm_curate", return_value="Curated text.") as mock_curate:
+        with (
+            patch("audia.agents.graph.get_settings", return_value=cfg),
+            patch("audia.agents.graph.llm_curate", return_value="Curated text.") as mock_curate,
+        ):
             out = node_curate({"preprocessed_text": "Raw text."})
 
         mock_curate.assert_called_once()
@@ -76,8 +78,10 @@ class TestNodeCurate:
 
         cfg = Settings(data_dir=tmp_path, llm_provider="openai", openai_api_key="sk-x")
 
-        with patch("audia.agents.graph.get_settings", return_value=cfg), \
-             patch("audia.agents.graph.llm_curate", side_effect=RuntimeError("API key missing")):
+        with (
+            patch("audia.agents.graph.get_settings", return_value=cfg),
+            patch("audia.agents.graph.llm_curate", side_effect=RuntimeError("API key missing")),
+        ):
             out = node_curate({"preprocessed_text": "text"})
 
         assert "error" in out
@@ -87,6 +91,7 @@ class TestNodeCurate:
 class TestNodeSynthesizeAudio:
     def test_skipped_on_error(self):
         from audia.agents.graph import node_synthesize_audio
+
         out = node_synthesize_audio({"error": "err"})
         assert out == {}
 
@@ -94,19 +99,27 @@ class TestNodeSynthesizeAudio:
         from audia.agents.graph import node_synthesize_audio
         from audia.config import Settings
 
-        cfg = Settings(data_dir=tmp_path, llm_provider="openai",
-                       tts_backend="edge-tts", tts_voice="en-US-AriaNeural")
+        cfg = Settings(
+            data_dir=tmp_path,
+            llm_provider="openai",
+            tts_backend="edge-tts",
+            tts_voice="en-US-AriaNeural",
+        )
         fake_audio = tmp_path / "out.mp3"
         fake_audio.write_bytes(b"AUDIO")
 
-        with patch("audia.agents.graph.get_settings", return_value=cfg), \
-             patch("audia.agents.graph.synthesize", return_value=fake_audio):
-            out = node_synthesize_audio({
-                "cleaned_text": "Hello world.",
-                "output_dir": str(tmp_path),
-                "run_id": "test_20260329_000000",
-                "title": "Test",
-            })
+        with (
+            patch("audia.agents.graph.get_settings", return_value=cfg),
+            patch("audia.agents.graph.synthesize", return_value=fake_audio),
+        ):
+            out = node_synthesize_audio(
+                {
+                    "cleaned_text": "Hello world.",
+                    "output_dir": str(tmp_path),
+                    "run_id": "test_20260329_000000",
+                    "title": "Test",
+                }
+            )
 
         assert out["audio_path"] == str(fake_audio)
         assert out["audio_filename"] == "out.mp3"
@@ -114,22 +127,27 @@ class TestNodeSynthesizeAudio:
 
 # ─────────────────────────────────────────────── helpers
 
+
 class TestSafeStem:
     def test_normal_title(self):
         from audia.agents.graph import _safe_stem
+
         assert _safe_stem("Attention Is All You Need") == "Attention_Is_All_You_Need"
 
     def test_strips_special_chars(self):
         from audia.agents.graph import _safe_stem
+
         assert "!" not in _safe_stem("Hello! World?")
 
     def test_truncates_long_title(self):
         from audia.agents.graph import _safe_stem
+
         long = "word " * 30
         assert len(_safe_stem(long)) <= 60
 
     def test_empty_title_fallback(self):
         from audia.agents.graph import _safe_stem
+
         assert _safe_stem("") == "audia_output"
 
 
@@ -169,6 +187,7 @@ class TestSaveDebugTexts:
 
 # ─────────────────────────────────────────────── run_pipeline integration
 
+
 class TestRunPipeline:
     def test_returns_state_with_audio(self, tmp_path):
         from audia.agents.graph import run_pipeline
@@ -180,29 +199,34 @@ class TestRunPipeline:
 
         fake_extract = MagicMock(text="body text", num_pages=2, title="My Paper")
 
-        with patch("audia.agents.graph.get_settings", return_value=cfg), \
-             patch("audia.agents.graph.extract_text", return_value=fake_extract), \
-             patch("audia.agents.graph.llm_curate", return_value="Curated."), \
-             patch("audia.agents.graph.synthesize", return_value=fake_audio):
+        with (
+            patch("audia.agents.graph.get_settings", return_value=cfg),
+            patch("audia.agents.graph.extract_text", return_value=fake_extract),
+            patch("audia.agents.graph.llm_curate", return_value="Curated."),
+            patch("audia.agents.graph.synthesize", return_value=fake_audio),
+        ):
             state = run_pipeline(tmp_path / "paper.pdf", output_dir=tmp_path)
 
         assert state.get("audio_path") == str(fake_audio)
         assert state.get("title") == "My Paper"
 
     def test_run_id_format(self, tmp_path):
+        import re
+
         from audia.agents.graph import run_pipeline
         from audia.config import Settings
-        import re
 
         cfg = Settings(data_dir=tmp_path, llm_provider="openai", openai_api_key="sk-x")
         fake_audio = tmp_path / "out.mp3"
         fake_audio.write_bytes(b"MP3")
         fake_extract = MagicMock(text="t", num_pages=1, title="T")
 
-        with patch("audia.agents.graph.get_settings", return_value=cfg), \
-             patch("audia.agents.graph.extract_text", return_value=fake_extract), \
-             patch("audia.agents.graph.llm_curate", return_value="C."), \
-             patch("audia.agents.graph.synthesize", return_value=fake_audio):
+        with (
+            patch("audia.agents.graph.get_settings", return_value=cfg),
+            patch("audia.agents.graph.extract_text", return_value=fake_extract),
+            patch("audia.agents.graph.llm_curate", return_value="C."),
+            patch("audia.agents.graph.synthesize", return_value=fake_audio),
+        ):
             state = run_pipeline(tmp_path / "my_paper.pdf", output_dir=tmp_path)
 
         run_id = state.get("run_id", "")

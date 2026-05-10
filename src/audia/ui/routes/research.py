@@ -10,17 +10,17 @@ import json
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, File, HTTPException, Query, UploadFile
+from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
 from audia.agents.graph import run_pipeline
-from audia.agents.research import ArxivSearcher
 from audia.agents.pdf_processor import extract_text
+from audia.agents.research import ArxivSearcher
 from audia.agents.text_cleaner import heuristic_clean, llm_curate
 from audia.agents.tts import synthesize
 from audia.config import DEFAULT_PROJECT, get_settings
-from audia.storage import get_session, AudioFile, Paper, ResearchSession
+from audia.storage import AudioFile, Paper, ResearchSession, get_session
 from audia.ui.jobs import JOBS
 
 router = APIRouter()
@@ -85,10 +85,14 @@ def _log(job: dict, line: str) -> None:
 
 # ─────────────────────────────────────────────────── normalize
 
-@router.post("/normalize", summary="Distil a natural-language query into a short ArXiv search string via LLM")
+
+@router.post(
+    "/normalize", summary="Distil a natural-language query into a short ArXiv search string via LLM"
+)
 async def normalize(body: NormalizeRequest) -> JSONResponse:
-    from audia.agents.text_cleaner import _build_llm
     from langchain_core.messages import HumanMessage, SystemMessage  # type: ignore
+
+    from audia.agents.text_cleaner import _build_llm
 
     cfg = get_settings()
     if body.llm_provider:
@@ -97,14 +101,17 @@ async def normalize(body: NormalizeRequest) -> JSONResponse:
         cfg.__dict__["llm_model"] = body.llm_model
 
     try:
+
         def _run() -> str:
             llm = _build_llm(cfg)
             messages = [
-                SystemMessage(content=(
-                    "You are a search query assistant. "
-                    "Extract a concise ArXiv search query (3-8 words) from the user's message. "
-                    "Return ONLY the search query, nothing else."
-                )),
+                SystemMessage(
+                    content=(
+                        "You are a search query assistant. "
+                        "Extract a concise ArXiv search query (3-8 words) from the user's message. "
+                        "Return ONLY the search query, nothing else."
+                    )
+                ),
                 HumanMessage(content=body.query),
             ]
             result = llm.invoke(messages)
@@ -118,6 +125,7 @@ async def normalize(body: NormalizeRequest) -> JSONResponse:
 
 # ─────────────────────────────────────────────────── search
 
+
 @router.post("/search", summary="Search ArXiv for papers")
 async def search(body: SearchRequest) -> JSONResponse:
     searcher = ArxivSearcher(max_results=body.max_results)
@@ -126,23 +134,26 @@ async def search(body: SearchRequest) -> JSONResponse:
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 
-    return JSONResponse({
-        "query": body.query,
-        "results": [
-            {
-                "arxiv_id": p.arxiv_id,
-                "title": p.title,
-                "authors": p.authors,
-                "abstract": p.abstract,
-                "pdf_url": p.pdf_url,
-                "published": p.published,
-            }
-            for p in papers
-        ],
-    })
+    return JSONResponse(
+        {
+            "query": body.query,
+            "results": [
+                {
+                    "arxiv_id": p.arxiv_id,
+                    "title": p.title,
+                    "authors": p.authors,
+                    "abstract": p.abstract,
+                    "pdf_url": p.pdf_url,
+                    "published": p.published,
+                }
+                for p in papers
+            ],
+        }
+    )
 
 
 # ─────────────────────────────────────────────────── convert (synchronous)
+
 
 @router.post("/convert", summary="Synchronously convert ArXiv papers to audio")
 async def convert_papers(body: ConvertResearchRequest) -> JSONResponse:
@@ -161,9 +172,7 @@ async def convert_papers(body: ConvertResearchRequest) -> JSONResponse:
 
         paper = papers[0]
         try:
-            pdf_path: Path = await asyncio.to_thread(
-                searcher.download_pdf, paper, dirs.upload_dir
-            )
+            pdf_path: Path = await asyncio.to_thread(searcher.download_pdf, paper, dirs.upload_dir)
         except Exception as exc:
             results.append({"arxiv_id": arxiv_id, "error": f"Download failed: {exc}"})
             continue
@@ -196,16 +205,19 @@ async def convert_papers(body: ConvertResearchRequest) -> JSONResponse:
             session.flush()
             audio_id = af.id
 
-        results.append({
-            "arxiv_id": arxiv_id,
-            "title": paper.title,
-            "download_url": _dl_url(audio_id, proj),
-        })
+        results.append(
+            {
+                "arxiv_id": arxiv_id,
+                "title": paper.title,
+                "download_url": _dl_url(audio_id, proj),
+            }
+        )
 
     return JSONResponse({"results": results})
 
 
 # ─────────────────────────────────────────────────── enqueue
+
 
 @router.post("/enqueue", summary="Enqueue ArXiv paper(s) for async conversion")
 async def enqueue_research(body: EnqueueRequest) -> JSONResponse:
@@ -219,15 +231,18 @@ async def enqueue_research(body: EnqueueRequest) -> JSONResponse:
         job_id = uuid.uuid4().hex
         job = _make_job(pdf_title=arxiv_id)
         JOBS[job_id] = job
-        asyncio.create_task(_run_research_job(
-            job_id, arxiv_id,
-            project=proj,
-            query=body.query,
-            llm_provider=body.llm_provider,
-            llm_model=body.llm_model,
-            tts_backend=body.tts_backend,
-            tts_voice=body.tts_voice,
-        ))
+        asyncio.create_task(
+            _run_research_job(
+                job_id,
+                arxiv_id,
+                project=proj,
+                query=body.query,
+                llm_provider=body.llm_provider,
+                llm_model=body.llm_model,
+                tts_backend=body.tts_backend,
+                tts_voice=body.tts_voice,
+            )
+        )
         jobs_out.append({"arxiv_id": arxiv_id, "job_id": job_id})
 
     return JSONResponse({"jobs": jobs_out})
@@ -255,10 +270,15 @@ async def _run_research_job(
         searcher = ArxivSearcher()
         papers = await asyncio.to_thread(searcher.search, f"id:{arxiv_id}")
         if job["cancelled"]:
-            job.update(status="cancelled", stage="cancelled", stage_label="Cancelled"); return
+            job.update(status="cancelled", stage="cancelled", stage_label="Cancelled")
+            return
         if not papers:
-            job.update(status="error", stage="error", stage_label="Failed",
-                       error=f"Paper {arxiv_id} not found on ArXiv.")
+            job.update(
+                status="error",
+                stage="error",
+                stage_label="Failed",
+                error=f"Paper {arxiv_id} not found on ArXiv.",
+            )
             _log(job, f"  \u2717 {arxiv_id} not found on ArXiv")
             return
         paper = papers[0]
@@ -268,11 +288,10 @@ async def _run_research_job(
         # Stage 2 – Download PDF
         job.update(stage="downloading", stage_label="Step 2/6 \u2500 Downloading PDF", progress=15)
         _log(job, "Step 2/6 \u2500 Downloading PDF")
-        pdf_path: Path = await asyncio.to_thread(
-            searcher.download_pdf, paper, dirs.upload_dir
-        )
+        pdf_path: Path = await asyncio.to_thread(searcher.download_pdf, paper, dirs.upload_dir)
         if job["cancelled"]:
-            job.update(status="cancelled", stage="cancelled", stage_label="Cancelled"); return
+            job.update(status="cancelled", stage="cancelled", stage_label="Cancelled")
+            return
         job["pdf_path"] = str(pdf_path)
         _log(job, f"  \u2713 Saved to {pdf_path.name}")
 
@@ -281,7 +300,8 @@ async def _run_research_job(
         _log(job, "Step 3/6 \u2500 PDF extraction")
         pdf_result = await asyncio.to_thread(extract_text, str(pdf_path))
         if job["cancelled"]:
-            job.update(status="cancelled", stage="cancelled", stage_label="Cancelled"); return
+            job.update(status="cancelled", stage="cancelled", stage_label="Cancelled")
+            return
         raw_chars = len(pdf_result.text)
         job["stats"].update(raw_chars=raw_chars, num_pages=pdf_result.num_pages)
         if pdf_result.title:
@@ -289,11 +309,14 @@ async def _run_research_job(
         _log(job, f"  \u2713 {pdf_result.num_pages} pages, {raw_chars:,} chars")
 
         # Stage 4 – Heuristic pre-pass
-        job.update(stage="preprocessing", stage_label="Step 4/6 \u2500 Heuristic pre-cleaning", progress=40)
+        job.update(
+            stage="preprocessing", stage_label="Step 4/6 \u2500 Heuristic pre-cleaning", progress=40
+        )
         _log(job, "Step 4/6 \u2500 Heuristic pre-cleaning")
         precleaned = await asyncio.to_thread(heuristic_clean, pdf_result.text)
         if job["cancelled"]:
-            job.update(status="cancelled", stage="cancelled", stage_label="Cancelled"); return
+            job.update(status="cancelled", stage="cancelled", stage_label="Cancelled")
+            return
         job["stats"]["precleaned_chars"] = len(precleaned)
         _log(job, f"  \u2713 {raw_chars:,} \u2192 {len(precleaned):,} chars after pre-pass")
 
@@ -315,7 +338,8 @@ async def _run_research_job(
 
         curated = await asyncio.to_thread(llm_curate, precleaned, cfg2, _cb_llm)
         if job["cancelled"]:
-            job.update(status="cancelled", stage="cancelled", stage_label="Cancelled"); return
+            job.update(status="cancelled", stage="cancelled", stage_label="Cancelled")
+            return
         job["stats"]["curated_chars"] = len(curated)
         _log(job, f"  \u2713 Curation complete \u2013 {len(curated):,} chars")
 
@@ -337,7 +361,8 @@ async def _run_research_job(
             progress_cb=_cb_tts,
         )
         if job["cancelled"]:
-            job.update(status="cancelled", stage="cancelled", stage_label="Cancelled"); return
+            job.update(status="cancelled", stage="cancelled", stage_label="Cancelled")
+            return
         job["stats"]["audio_filename"] = audio_path.name
         _log(job, f"  \u2713 Audio saved: {audio_path.name}")
 
@@ -367,10 +392,12 @@ async def _run_research_job(
             audio_id = af.id
             paper_id = db_paper.id
             if query:
-                session.add(ResearchSession(
-                    query=query,
-                    paper_ids=json.dumps([paper_id]),
-                ))
+                session.add(
+                    ResearchSession(
+                        query=query,
+                        paper_ids=json.dumps([paper_id]),
+                    )
+                )
 
         job["paper_id"] = paper_id
         _log(job, f"  \u2713 Saved (paper_id={paper_id}, audio_id={audio_id})")
@@ -396,10 +423,12 @@ async def _run_research_job(
 
 # ─────────────────────────────────────────────────── transcribe
 
+
 @router.post("/transcribe", summary="Transcribe uploaded audio to text")
 async def transcribe_audio(file: UploadFile = File(...)) -> JSONResponse:
     """Accept a browser audio recording and return the Whisper transcription."""
     import tempfile
+
     cfg = get_settings()
     suffix = Path(file.filename or "audio.webm").suffix or ".webm"
     with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
@@ -408,15 +437,15 @@ async def transcribe_audio(file: UploadFile = File(...)) -> JSONResponse:
         tmp_path = tmp.name
     try:
         from audia.agents.stt import transcribe_file
-        text = await asyncio.to_thread(
-            transcribe_file, tmp_path, cfg.stt_model, cfg.stt_device
-        )
+
+        text = await asyncio.to_thread(transcribe_file, tmp_path, cfg.stt_model, cfg.stt_device)
     finally:
         Path(tmp_path).unlink(missing_ok=True)
     return JSONResponse({"text": text})
 
 
 # ─────────────────────────────────────────────────── status / cancel / pdf
+
 
 @router.get("/status/{job_id}", summary="Poll research job status")
 async def get_job_status(job_id: str) -> JSONResponse:
@@ -438,7 +467,9 @@ async def cancel_job(job_id: str) -> JSONResponse:
     return JSONResponse({"status": "cancel_requested", "job_id": job_id})
 
 
-@router.get("/jobs/{job_id}/pdf", summary="Serve the PDF for an in-progress or completed research job")
+@router.get(
+    "/jobs/{job_id}/pdf", summary="Serve the PDF for an in-progress or completed research job"
+)
 async def serve_job_pdf(job_id: str) -> FileResponse:
     job = JOBS.get(job_id)
     if job is None:

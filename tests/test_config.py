@@ -2,24 +2,25 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 
 class TestSettingsDefaults:
     def test_default_llm_provider(self):
         from audia.config import Settings
+
         s = Settings(data_dir="/tmp/audia_test")
         assert s.llm_provider == "openai"
 
     def test_default_tts_backend(self):
         from audia.config import Settings
+
         s = Settings(data_dir="/tmp/audia_test")
         assert s.tts_backend == "edge-tts"
 
     def test_data_dir_field(self, tmp_path):
         from audia.config import Settings
+
         s = Settings(data_dir=tmp_path)
         assert s.data_dir == tmp_path
 
@@ -51,16 +52,19 @@ class TestSettingsProperties:
 class TestSettingsValidator:
     def test_rejects_none_provider(self):
         from audia.config import Settings
+
         with pytest.raises(Exception, match="LLM curation is required"):
             Settings(data_dir="/tmp", llm_provider="none")
 
     def test_accepts_anthropic(self):
         from audia.config import Settings
+
         s = Settings(data_dir="/tmp", llm_provider="anthropic")
         assert s.llm_provider == "anthropic"
 
     def test_normalises_case(self):
         from audia.config import Settings
+
         s = Settings(data_dir="/tmp", llm_provider="OpenAI")
         assert s.llm_provider == "openai"
 
@@ -70,10 +74,12 @@ class TestGetSettings:
         monkeypatch.setenv("AUDIA_DATA_DIR", str(tmp_path))
         monkeypatch.setenv("AUDIA_LLM_PROVIDER", "openai")
         from audia.config import get_settings
+
         s = get_settings()
         assert s.data_dir == tmp_path
 
     def test_is_cached(self, tmp_path, monkeypatch):
         monkeypatch.setenv("AUDIA_DATA_DIR", str(tmp_path))
         from audia.config import get_settings
+
         assert get_settings() is get_settings()
