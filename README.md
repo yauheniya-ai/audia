@@ -36,27 +36,27 @@ It uses an LLM to rewrite content into natural spoken language (math in plain En
 ## Tech Stack
 
 **Backend**
-- <img src="https://api.iconify.design/devicon:python.svg" width="16" height="16"> [Python](https://www.python.org) 3.10+ — package language
-- <img src="https://api.iconify.design/devicon:fastapi.svg" width="16" height="16"> [FastAPI](https://fastapi.tiangolo.com) — backend for the web UI
-- <img src="https://api.iconify.design/simple-icons:langgraph.svg" width="16" height="16"> [LangGraph](https://github.com/langchain-ai/langgraph) — agentic pipeline orchestration (PDF → preprocess → LLM curate → TTS)
-- <img src="https://api.iconify.design/simple-icons:langchain.svg" width="16" height="16"> [LangChain](https://github.com/langchain-ai/langchain) — LLM abstraction
-    - Current support for LLMs from <img src="https://api.iconify.design/logos:claude-icon.svg" width="16" height="16"> Anthropic, <img src="https://api.iconify.design/vscode-icons:file-type-gemini.svg" width="16" height="16"> Google, and <img src="https://api.iconify.design/simple-icons:openai.svg" width="16" height="16">OpenAI
-- <img src="https://api.iconify.design/logos:microsoft-icon.svg" width="16" height="16"> [edge-tts](https://github.com/rany2/edge-tts) — default TTS backend, no API key required
-- <img src="https://upload.wikimedia.org/wikipedia/commons/d/da/SYSTRAN_logo.svg" width="46" height="16"> [faster-whisper](https://github.com/SYSTRAN/faster-whisper) — STT for voice input
-- <img src="https://pymupdf.readthedocs.io/en/latest/_static/sidebar-logo-dark.svg" width="16" height="16"> [PyMuPDF](https://pymupdf.readthedocs.io/) — PDF text extraction
-- <img src="https://api.iconify.design/devicon:sqlite.svg" width="16" height="16"> [SQLite](https://sqlite.org/docs.html) — local database for papers and audio files
+- ![Python](https://api.iconify.design/devicon:python.svg?height=16) [Python](https://www.python.org) 3.10+ — package language
+- ![FastAPI](https://api.iconify.design/devicon:fastapi.svg?height=16) [FastAPI](https://fastapi.tiangolo.com) — backend for the web UI
+- ![LangGraph](https://api.iconify.design/simple-icons:langgraph.svg?height=16) [LangGraph](https://github.com/langchain-ai/langgraph) — agentic pipeline orchestration (PDF → preprocess → LLM curate → TTS)
+- ![LangChain](https://api.iconify.design/simple-icons:langchain.svg?height=16) [LangChain](https://github.com/langchain-ai/langchain) — LLM abstraction
+    - Current support for LLMs from ![Anthropic](https://api.iconify.design/logos:claude-icon.svg?height=16) Anthropic, ![Google](https://api.iconify.design/vscode-icons:file-type-gemini.svg?height=16) Google, and ![OpenAI](https://api.iconify.design/simple-icons:openai.svg?height=16) OpenAI
+- ![Microsoft](https://api.iconify.design/logos:microsoft-icon.svg?height=16) [edge-tts](https://github.com/rany2/edge-tts) — default TTS backend, no API key required
+- ![Hugging Face](https://api.iconify.design/devicon:huggingface.svg?height=16) [faster-whisper](https://github.com/SYSTRAN/faster-whisper) — STT for voice input (by SYSTRAN on Hugging Face)
+- ![PyMuPDF](https://api.iconify.design/arcticons:mupdf.svg?height=16) [PyMuPDF](https://pymupdf.readthedocs.io/) — PDF text extraction
+- ![SQLite](https://api.iconify.design/devicon:sqlite.svg?height=16) [SQLite](https://sqlite.org/docs.html) — local database for papers and audio files
 
 **Frontend**
-- <img src="https://api.iconify.design/devicon:react.svg" width="16" height="16"> [React](https://react.dev) — interactive frontend
-- <img src="https://api.iconify.design/devicon:vitejs.svg" width="16" height="16"> [Vite](https://vite.dev) — fast dev server and production bundler
-- <img src="https://api.iconify.design/devicon:tailwindcss.svg" width="16" height="16"> [Tailwind CSS](https://v2.tailwindcss.com/docs) — utility-first styling
-- <img src="https://api.iconify.design/devicon:typescript.svg" width="16" height="16"> [TypeScript](https://www.typescriptlang.org/docs/) — type-safe component and API code
+- ![React](https://api.iconify.design/devicon:react.svg?height=16) [React](https://react.dev) — interactive frontend
+- ![Vite](https://api.iconify.design/devicon:vitejs.svg?height=16) [Vite](https://vite.dev) — fast dev server and production bundler
+- ![Tailwind CSS](https://api.iconify.design/devicon:tailwindcss.svg?height=16) [Tailwind CSS](https://v2.tailwindcss.com/docs) — utility-first styling
+- ![TypeScript](https://api.iconify.design/devicon:typescript.svg?height=16) [TypeScript](https://www.typescriptlang.org/docs/) — type-safe component and API code
 
 **CLI**
-- <img src="https://api.iconify.design/devicon:typer.svg" width="16" height="16"> [Typer](https://typer.tiangolo.com/) + [Rich](https://rich.readthedocs.io/) — CLI with coloured progress output
+- ![Typer](https://api.iconify.design/devicon:typer.svg?height=16) [Typer](https://typer.tiangolo.com/) + [Rich](https://rich.readthedocs.io/) — CLI with coloured progress output
 
 **Packaging**
-- <img src="https://api.iconify.design/devicon:pypi.svg" width="16" height="16"> [PyPI](https://pypi.org/project/audia/) — distributed as an installable Python package
+- ![PyPI](https://api.iconify.design/devicon:pypi.svg?height=16) [PyPI](https://pypi.org/project/audia/) — distributed as an installable Python package
 
 ## Installation
 
